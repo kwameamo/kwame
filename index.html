@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Kwame Amo | Designer & Developer</title>
+    <title>kwame amo</title>
     <style>
         :root {
             --text-color: #1a1a1a;
@@ -45,7 +45,11 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'JetBrains Mono', monospace;
+            font-family: 'Geist Mono', monospace;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 19px;
+            font-style: normal;
         }
 
         body {
@@ -99,6 +103,8 @@
 
         h1, h2, h3 {
             font-weight: normal;
+            font-size: 13px;
+            line-height: 19px;
         }
 
         a {
@@ -117,6 +123,23 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+        }
+        
+        /* Square sections for name and about */
+        .section.square-section {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1.5rem;
+        }
+        
+        .section-title {
+            margin-bottom: 1rem;
+        }
+        
+        .section-footer {
+            margin-top: auto;
         }
 
         .section::before {
@@ -162,18 +185,17 @@
         .slogan {
             color: var(--light-gray);
             font-size: 0.9rem;
-            margin: 1rem 0 2rem;
             opacity: 0;
             animation: fadeIn 0.8s ease forwards;
             animation-delay: 0.5s;
         }
         
         .typewriter {
-            overflow: hidden;
+            overflow: visible;
             border-right: .15em solid var(--accent-color);
-            white-space: nowrap;
-            margin: 0 auto;
-            letter-spacing: .1em;
+            white-space: normal;
+            width: 100%;
+            text-align: left;
             animation: 
                 typing 3.5s steps(30, end),
                 blink-caret .75s step-end infinite;
@@ -468,8 +490,9 @@
             color: var(--light-gray);
             line-height: 1.6;
             position: relative;
-            margin-top: 1rem;
-            padding-left: 0.5rem;
+            margin: auto 0;
+            padding-left: 0;
+            text-align: left;
         }
         
         .skills-list {
@@ -477,6 +500,7 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-top: 1rem;
+            margin-bottom: 1rem;
         }
         
         .skill-tag {
@@ -574,6 +598,11 @@
             }
         }
         
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
         /* Custom cursor on desktop */
         @media (min-width: 768px) {
             body {
@@ -635,9 +664,9 @@
             <h1>main</h1>
         </div>
 
-        <div class="section nav-item">
-            <h2>david kwame amo</h2>
-            <p class="slogan">be better than perfect</p>
+        <div class="section square-section nav-item">
+            <h3 class="section-title">david kwame amo</h3>
+            <p class="slogan section-footer">be better than perfect</p>
         </div>
 
         <div class="section nav-item">
@@ -648,8 +677,8 @@
             <a href="#" class="button">view</a>
         </div>
 
-        <div class="section nav-item">
-            <h3>about me</h3>
+        <div class="section square-section nav-item">
+            <h3 class="section-title">about me</h3>
             <p class="about-text typewriter">future focused designer, specialized in product design, brand identity and workflows.</p>
             <div class="skills-list">
                 <span class="skill-tag">UI/UX</span>
@@ -659,10 +688,7 @@
                 <span class="skill-tag">HTML/CSS</span>
                 <span class="skill-tag">JavaScript</span>
             </div>
-        </div>
-
-        <div class="section nav-item">
-            <h3>ghana based</h3>
+            <p class="section-footer">ghana based</p>
         </div>
 
         <div class="section nav-item">
@@ -697,9 +723,9 @@
         <div class="section nav-item">
             <h3>contact me</h3>
             <div class="contact-grid">
-                <a href="mailto:contact@example.com" class="contact-item">email</a>
-                <a href="https://linkedin.com/in/yourusername" target="_blank" class="contact-item">linkedin</a>
-                <a href="https://instagram.com/yourusername" target="_blank" class="contact-item">inst</a>
+                <a href="mailto:kwameagain@icloud.com" class="contact-item">email</a>
+                <a href="https://linkedin.com/in/kwameamo" target="_blank" class="contact-item">linkedin</a>
+                <a href="https://instagram.com/kwamehasvision/" target="_blank" class="contact-item">inst</a>
             </div>
         </div>
 
