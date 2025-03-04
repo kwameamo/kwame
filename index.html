@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>kwame amo</title>
+    <title>Maksim Anisimov | Designer & Developer</title>
     <style>
         :root {
             --text-color: #1a1a1a;
@@ -113,7 +113,7 @@
         }
 
         .section {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             padding: 1.5rem;
             border-radius: var(--border-radius);
             background-color: var(--section-bg);
@@ -122,7 +122,7 @@
             backdrop-filter: blur(5px);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+            box-shadow: none;
         }
         
         /* Square sections for name and about */
@@ -132,6 +132,15 @@
             flex-direction: column;
             justify-content: space-between;
             padding: 1.5rem;
+        }
+        
+        .section:hover {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        .section:hover::before {
+            height: 0;
         }
         
         .section-title {
@@ -147,7 +156,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 0;
             height: 0;
             background-color: var(--accent-color);
             transition: height 0.3s ease;
@@ -499,8 +508,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-top: 1rem;
-            margin-bottom: 1rem;
+            margin-top: auto;
         }
         
         .skill-tag {
@@ -680,7 +688,7 @@
         <div class="section square-section nav-item">
             <h3 class="section-title">about me</h3>
             <p class="about-text typewriter">future focused designer, specialized in product design, brand identity and workflows.</p>
-            <div class="skills-list">
+            <div class="skills-list section-footer">
                 <span class="skill-tag">UI/UX</span>
                 <span class="skill-tag">Product Design</span>
                 <span class="skill-tag">Brand Identity</span>
@@ -688,7 +696,6 @@
                 <span class="skill-tag">HTML/CSS</span>
                 <span class="skill-tag">JavaScript</span>
             </div>
-            <p class="section-footer">ghana based</p>
         </div>
 
         <div class="section nav-item">
@@ -723,9 +730,9 @@
         <div class="section nav-item">
             <h3>contact me</h3>
             <div class="contact-grid">
-                <a href="mailto:kwameagain@icloud.com" class="contact-item">email</a>
-                <a href="https://linkedin.com/in/kwameamo" target="_blank" class="contact-item">linkedin</a>
-                <a href="https://instagram.com/kwamehasvision/" target="_blank" class="contact-item">inst</a>
+                <a href="mailto:contact@example.com" class="contact-item">email</a>
+                <a href="https://linkedin.com/in/yourusername" target="_blank" class="contact-item">linkedin</a>
+                <a href="https://instagram.com/yourusername" target="_blank" class="contact-item">inst</a>
             </div>
         </div>
 
