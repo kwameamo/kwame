@@ -183,13 +183,14 @@
             margin-top: auto;
         }
 
-        /* Gallery styling */
+      /* Gallery styling */
         .gallery-container {
-            width: 100%;
-            overflow: hidden;
-            margin: 10px 0;
+        width: 100%;
+        overflow: hidden;
+        margin: 10px 0;
+        position: relative;
         }
-        
+    
         .gallery-scroll {
             display: flex;
             gap: 8px;
@@ -198,10 +199,56 @@
             scroll-snap-type: x mandatory;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE and Edge */
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
         
         .gallery-scroll::-webkit-scrollbar {
             display: none; /* Chrome, Safari, Opera */
+        }
+        
+        /* Gallery navigation arrows */
+        .gallery-nav {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.1);
+            color: var(--text-color);
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+        
+        .gallery-container:hover .gallery-nav {
+            opacity: 1;
+        }
+        
+        .gallery-nav.prev {
+            left: 0;
+            border-top-left-radius: var(--border-radius);
+            border-bottom-left-radius: var(--border-radius);
+        }
+        
+        .gallery-nav.next {
+            right: 0;
+            border-top-right-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+        }
+        
+        /* Hide navigation when no scrolling is needed */
+        .gallery-container.no-scroll-needed .gallery-nav {
+            display: none;
+        }
+        
+        /* Make gallery container taller for better visibility */
+        .gallery-container {
+            min-height: 170px;
         }
         
         .gallery-item {
@@ -277,6 +324,14 @@
             background-repeat: no-repeat;
             transform: scale(0.9);
             transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* Adjust modal to show portrait images better */
+        @media (min-width: 768px) {
+            .modal-image-container {
+                max-width: 80vh;
+                margin: 0 auto;
+            }
         }
         
         .modal-close {
@@ -644,24 +699,28 @@
             <h3 class="section-title">david kwame amo</h3>
                 <!-- Gallery inside the square section -->
                         <div class="gallery-container">
-                            <div class="gallery-scroll">
+                        <div class="gallery-nav prev" onclick="scrollGallery(-1)">‹</div>
+                        <div class="gallery-scroll" id="gallery-scroll">
                             <div class="gallery-item" onclick="openGalleryModal(0)">
-                                <div class="gallery-image" style="background-image: url('/photos/4D98957E-4D4B-4082-BF17-00D0135B09F3.jpg'); background-size: cover; background-position: center;"></div>
+                            <div class="gallery-image" style="background-image: url('https://raw.githubusercontent.com/kwameamo/kwame/main/4D98957E-4D4B-4082-BF17-00D0135B09F3.jpg'); background-size: cover; background-position: center;"></div>
                             </div>
-                                </div>
                                 <div class="gallery-item" onclick="openGalleryModal(1)">
-                                    <div class="gallery-image" style="background: linear-gradient(45deg, var(--warning) 0%, var(--error) 100%);"></div>
+                                    <div class="gallery-image" style="background-image: url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_2166_Original.jpg'); background-size: cover; background-position: center;"></div>
                                 </div>
                                 <div class="gallery-item" onclick="openGalleryModal(2)">
-                                    <div class="gallery-image" style="background: linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%);"></div>
+                                    <div class="gallery-image" style="background-image: url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_2268_Original.jpg'); background-size: cover; background-position: center;"></div>
                                 </div>
                                 <div class="gallery-item" onclick="openGalleryModal(3)">
-                                    <div class="gallery-image" style="background: linear-gradient(45deg, var(--error) 0%, var(--accent-color) 100%);"></div>
+                                    <div class="gallery-image" style="background-image: url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_3405.JPG'); background-size: cover; background-position: center;"></div>
                                 </div>
                                 <div class="gallery-item" onclick="openGalleryModal(4)">
-                                    <div class="gallery-image" style="background: linear-gradient(45deg, var(--highlight) 0%, var(--success) 100%);"></div>
+                                    <div class="gallery-image" style="background-image: url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_5729_Original.jpg'); background-size: cover; background-position: center;"></div>
+                                </div>
+                                <div class="gallery-item" onclick="openGalleryModal(5)">
+                                    <div class="gallery-image" style="background-image: url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_7531_Original.jpg'); background-size: cover; background-position: center;"></div>
                                 </div>
                             </div>
+                        <div class="gallery-nav next" onclick="scrollGallery(1)">›</div>
                         </div>
             <p class="slogan section-footer">the future's clear</p>
         </div>
@@ -789,18 +848,18 @@
         </div>
     </div>
     <!-- 2. Add this modal overlay to the bottom of the body section but before the closing body tag -->
-        <div class="gallery-modal hidden" id="gallery-modal">
-            <div class="modal-content">
-                <div class="modal-image-container">
-                    <div class="modal-image" id="modal-image"></div>
-                </div>
-                <button class="modal-close" onclick="closeGalleryModal()">×</button>
-                <div class="modal-nav">
-                    <button class="modal-prev" onclick="changeGalleryImage(-1)">←</button>
-                    <button class="modal-next" onclick="changeGalleryImage(1)">→</button>
-                </div>
-            </div>
+    <div class="gallery-modal hidden" id="gallery-modal">
+    <div class="modal-content">
+        <div class="modal-image-container">
+            <div class="modal-image" id="modal-image"></div>
         </div>
+        <button class="modal-close" onclick="closeGalleryModal()">×</button>
+        <div class="modal-nav">
+            <button class="modal-prev" onclick="changeGalleryImage(-1)">←</button>
+            <button class="modal-next" onclick="changeGalleryImage(1)">→</button>
+        </div>
+    </div>
+    </div>
 
     <script>
         // Theme toggling function
@@ -879,121 +938,153 @@
         }
 
             <!-- 4. Add this JavaScript to the script section -->
-        // Gallery modal functionality
-        let currentGalleryIndex = 0;
-        const galleryImages = [
-            "linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%)",
-            "linear-gradient(45deg, var(--warning) 0%, var(--error) 100%)",
-            "linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%)",
-            "linear-gradient(45deg, var(--error) 0%, var(--accent-color) 100%)",
-            "linear-gradient(45deg, var(--highlight) 0%, var(--success) 100%)"
-        ];
-        
-        function openGalleryModal(index) {
-            currentGalleryIndex = index;
-            const modal = document.getElementById('gallery-modal');
-            const modalImage = document.getElementById('modal-image');
-            
-            // Set the image
-            modalImage.style.background = galleryImages[index];
-            
-            // Show the modal
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.add('active');
-                modalImage.style.transform = 'scale(1)';
-            }, 10);
-            
-            // Add keyboard event listeners
-            document.addEventListener('keydown', handleGalleryKeydown);
-            
-            // Prevent body scrolling
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeGalleryModal() {
-            const modal = document.getElementById('gallery-modal');
-            const modalImage = document.getElementById('modal-image');
-            
-            // Hide the modal with animation
-            modalImage.style.transform = 'scale(0.9)';
-            modal.classList.remove('active');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-            
-            // Remove keyboard event listeners
-            document.removeEventListener('keydown', handleGalleryKeydown);
-            
-            // Allow body scrolling again
-            document.body.style.overflow = '';
-        }
-        
-        function changeGalleryImage(direction) {
-            currentGalleryIndex = (currentGalleryIndex + direction + galleryImages.length) % galleryImages.length;
-            const modalImage = document.getElementById('modal-image');
-            
-            // Animate image change
-            modalImage.style.transform = 'scale(0.9)';
-            
-            setTimeout(() => {
-                modalImage.style.background = galleryImages[currentGalleryIndex];
-                modalImage.style.transform = 'scale(1)';
-            }, 200);
-        }
-        
-        function handleGalleryKeydown(e) {
-            if (e.key === 'Escape') {
-                closeGalleryModal();
-            } else if (e.key === 'ArrowLeft') {
-                changeGalleryImage(-1);
-            } else if (e.key === 'ArrowRight') {
-                changeGalleryImage(1);
-            }
-        }
-        
-        // Add gallery touch swipe functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const galleryScroll = document.querySelector('.gallery-scroll');
-            if (!galleryScroll) return;
-            
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-            
-            galleryScroll.addEventListener('mousedown', (e) => {
-                isDown = true;
-                startX = e.pageX - galleryScroll.offsetLeft;
-                scrollLeft = galleryScroll.scrollLeft;
-            });
-            
-            galleryScroll.addEventListener('mouseleave', () => {
-                isDown = false;
-            });
-            
-            galleryScroll.addEventListener('mouseup', () => {
-                isDown = false;
-            });
-            
-            galleryScroll.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - galleryScroll.offsetLeft;
-                const walk = (x - startX) * 2; // Scroll speed
-                galleryScroll.scrollLeft = scrollLeft - walk;
-            });
-            
-            // Modal click outside to close
-            const modal = document.getElementById('gallery-modal');
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
+            // Gallery modal functionality
+                let currentGalleryIndex = 0;
+                const galleryImages = [
+                    "url('https://raw.githubusercontent.com/kwameamo/kwame/main/4D98957E-4D4B-4082-BF17-00D0135B09F3.jpg')",
+                    "url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_2166_Original.jpg')",
+                    "url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_2268_Original.jpg')",
+                    "url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_3405.JPG')",
+                    "url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_5729_Original.jpg')",
+                    "url('https://raw.githubusercontent.com/kwameamo/kwame/main/IMG_7531_Original.jpg')"
+                ];
+                
+                function openGalleryModal(index) {
+                    currentGalleryIndex = index;
+                    const modal = document.getElementById('gallery-modal');
+                    const modalImage = document.getElementById('modal-image');
+                    
+                    // Set the image
+                    modalImage.style.background = galleryImages[index];
+                    
+                    // Show the modal
+                    modal.classList.remove('hidden');
+                    setTimeout(() => {
+                        modal.classList.add('active');
+                        modalImage.style.transform = 'scale(1)';
+                    }, 10);
+                    
+                    // Add keyboard event listeners
+                    document.addEventListener('keydown', handleGalleryKeydown);
+                    
+                    // Prevent body scrolling
+                    document.body.style.overflow = 'hidden';
+                }
+                
+                function closeGalleryModal() {
+                    const modal = document.getElementById('gallery-modal');
+                    const modalImage = document.getElementById('modal-image');
+                    
+                    // Hide the modal with animation
+                    modalImage.style.transform = 'scale(0.9)';
+                    modal.classList.remove('active');
+                    
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                    
+                    // Remove keyboard event listeners
+                    document.removeEventListener('keydown', handleGalleryKeydown);
+                    
+                    // Allow body scrolling again
+                    document.body.style.overflow = '';
+                }
+                
+                function changeGalleryImage(direction) {
+                    currentGalleryIndex = (currentGalleryIndex + direction + galleryImages.length) % galleryImages.length;
+                    const modalImage = document.getElementById('modal-image');
+                    
+                    // Animate image change
+                    modalImage.style.transform = 'scale(0.9)';
+                    
+                    setTimeout(() => {
+                        modalImage.style.background = galleryImages[currentGalleryIndex];
+                        modalImage.style.transform = 'scale(1)';
+                    }, 200);
+                }
+                
+                function handleGalleryKeydown(e) {
+                    if (e.key === 'Escape') {
                         closeGalleryModal();
+                    } else if (e.key === 'ArrowLeft') {
+                        changeGalleryImage(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        changeGalleryImage(1);
                     }
+                }
+                
+                // Improved gallery scrolling functionality
+                function scrollGallery(direction) {
+                    const galleryScroll = document.getElementById('gallery-scroll');
+                    if (!galleryScroll) return;
+                    
+                    const scrollAmount = direction * (galleryScroll.clientWidth / 2);
+                    galleryScroll.scrollBy({
+                        left: scrollAmount,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                // Handle keyboard navigation for gallery
+                function handleGalleryKeyboardNavigation(e) {
+                    if (e.key === 'ArrowLeft') {
+                        scrollGallery(-1);
+                    } else if (e.key === 'ArrowRight') {
+                        scrollGallery(1);
+                    }
+                }
+                
+                // Initialize gallery and modal functionality
+                document.addEventListener('DOMContentLoaded', function() {
+                    const galleryScroll = document.getElementById('gallery-scroll');
+                    if (!galleryScroll) return;
+                    
+                    // Add wheel event for horizontal scrolling with mouse wheel
+                    galleryScroll.addEventListener('wheel', (e) => {
+                        if (e.deltaY !== 0) {
+                            e.preventDefault();
+                            galleryScroll.scrollBy({
+                                left: e.deltaY > 0 ? 100 : -100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, { passive: false });
+                    
+                    // Use arrows for gallery navigation when focused
+                    galleryScroll.tabIndex = 0; // Make it focusable
+                    galleryScroll.addEventListener('focus', () => {
+                        document.addEventListener('keydown', handleGalleryKeyboardNavigation);
+                    });
+                    galleryScroll.addEventListener('blur', () => {
+                        document.removeEventListener('keydown', handleGalleryKeyboardNavigation);
+                    });
+                    
+                    // Modal click outside to close
+                    const modal = document.getElementById('gallery-modal');
+                    if (modal) {
+                        modal.addEventListener('click', (e) => {
+                            if (e.target === modal) {
+                                closeGalleryModal();
+                            }
+                        });
+                    }
+                    
+                    // Add automatic detection if scrollbar is needed
+                    function checkGalleryOverflow() {
+                        const container = document.querySelector('.gallery-container');
+                        const scroll = document.getElementById('gallery-scroll');
+                        
+                        if (scroll.scrollWidth <= scroll.clientWidth) {
+                            container.classList.add('no-scroll-needed');
+                        } else {
+                            container.classList.remove('no-scroll-needed');
+                        }
+                    }
+                    
+                    // Run on load and resize
+                    checkGalleryOverflow();
+                    window.addEventListener('resize', checkGalleryOverflow);
                 });
-            }
-        });
 
         // Initialize everything when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
