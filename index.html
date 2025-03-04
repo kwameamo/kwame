@@ -56,7 +56,6 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color var(--transition-speed), color var(--transition-speed);
-            will-change: background-color, color;
             padding: 2rem;
             max-width: 600px;
             margin: 0 auto;
@@ -78,8 +77,6 @@
                 radial-gradient(circle at 30% 20%, rgba(100,100,255,0.05) 0%, rgba(0,0,0,0) 50%),
                 radial-gradient(circle at 70% 80%, rgba(255,100,100,0.03) 0%, rgba(0,0,0,0) 50%);
             opacity: 0.7;
-            transition: opacity 0.3s ease, background 0.3s ease;
-            will-change: opacity;
         }
         
         body.dark-theme::before {
@@ -247,67 +244,6 @@
         .brand-item:hover .brand-name {
             color: var(--accent-color);
         }
-
-        /* Simplify gradient for mobile to improve performance */
-    @media (max-width: 768px) {
-        body::before {
-            background: 
-                radial-gradient(circle at center, rgba(100,100,255,0.03) 0%, rgba(0,0,0,0) 70%);
-        }
-        
-        body.dark-theme::before {
-            background: 
-                radial-gradient(circle at center, rgba(100,100,255,0.02) 0%, rgba(0,0,0,0) 70%);
-        }
-        
-        /* Reduce or remove backdrop-filter on mobile */
-        .section {
-            backdrop-filter: none;
-        }
-    }
-    
-    /* Improve section transitions */
-    .section {
-        transition: border 0.3s ease, background-color 0.3s ease;
-        will-change: border, background-color;
-    }
-    
-    /* Preload both themes to prevent flash */
-    .theme-preload {
-        position: absolute;
-        width: 0;
-        height: 0;
-        opacity: 0;
-        z-index: -9999;
-    }
-    
-    .theme-preload::before {
-        content: '';
-        background-color: var(--bg-color);
-    }
-    
-    .theme-preload::after {
-        content: '';
-        background-color: #121212; /* Dark theme background color */
-    }
-    
-    /* Add a simple fade overlay during transition */
-    .theme-transition-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.1);
-        opacity: 0;
-        pointer-events: none;
-        z-index: 9998;
-        transition: opacity 0.3s ease;
-    }
-    
-    .theme-transition-active .theme-transition-overlay {
-        opacity: 1;
-    }
 
       /* Gallery styling */
     .gallery-container {
@@ -826,9 +762,6 @@
     <!-- Custom cursor elements -->
     <div class="cursor"></div>
     <div class="cursor-dot"></div>
-
-    <div class="theme-transition-overlay"></div>
-    <div class="theme-preload"></div>
     
     <!-- Main container -->
     <div class="container view-container" id="main-view">
@@ -1030,34 +963,23 @@
     </div>
 
     <script>
-        // Improved theme toggling function with smoother transitions
-            function setTheme(theme) {
-                // Add transition class to briefly show overlay during transition
-                document.body.classList.add('theme-transition-active');
-                
-                // Short delay to let the browser process the overlay
-                setTimeout(() => {
-                    if (theme === 'dark') {
-                        document.body.classList.add('dark-theme');
-                        document.querySelectorAll('.theme-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        document.querySelectorAll('.theme-btn')[1].classList.add('active');
-                    } else {
-                        document.body.classList.remove('dark-theme');
-                        document.querySelectorAll('.theme-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        document.querySelectorAll('.theme-btn')[0].classList.add('active');
-                    }
-                    localStorage.setItem('theme', theme);
-                    
-                    // Remove the transition class after the theme change is complete
-                    setTimeout(() => {
-                        document.body.classList.remove('theme-transition-active');
-                    }, 300);
-                }, 50);
+        // Theme toggling function
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.theme-btn')[1].classList.add('active');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.theme-btn')[0].classList.add('active');
             }
+            localStorage.setItem('theme', theme);
+        }
         
         // View switching with fade effect
         function switchView(viewId) {
@@ -1347,35 +1269,6 @@
                 view.style.transition = 'opacity 0.3s ease';
             });
         });
-        
-        // Add this code to detect mobile and adjust transitions accordingly
-        if (window.matchMedia('(max-width: 768px)').matches) {
-            // Reduce animation duration on mobile
-            document.documentElement.style.setProperty('--transition-speed', '0.2s');
-            
-            // Simplify some animations on mobile
-            const styleSheet = document.createElement('style');
-            styleSheet.textContent = `
-                @media (max-width: 768px) {
-                    /* Disable some hover effects on mobile that might cause jank */
-                    .section:hover {
-                        outline-width: 2px;
-                    }
-                    
-                    /* Simplify transitions */
-                    .gallery-item:hover {
-                        transform: translateY(-2px);
-                    }
-                    
-                    /* Reduce or remove complex animations */
-                    body::after {
-                        opacity: 0.05;
-                    }
-                }
-            `;
-            document.head.appendChild(styleSheet);
-        }
-    });
     </script>
 </body>
 </html>
