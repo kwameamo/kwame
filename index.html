@@ -111,9 +111,43 @@
             text-decoration: none;
         }
 
+        /* Custom cursor */
+        @media (min-width: 768px) {
+            body {
+                cursor: none;
+            }
+            
+            .cursor {
+                width: 20px;
+                height: 20px;
+                border: 1px solid var(--accent-color);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 9999;
+                mix-blend-mode: difference;
+                transition: transform 0.2s ease;
+            }
+            
+            .cursor-dot {
+                width: 4px;
+                height: 4px;
+                background-color: var(--accent-color);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 9999;
+                transition: width 0.2s ease, height 0.2s ease;
+            }
+            
+            a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link {
+                cursor: none;
+            }
+        }
+
         /* Modified section styling */
         .section {
-            margin-bottom: 3px; /* Exactly 10px gap */
+            margin-bottom: 3px; /* Exactly 3px gap */
             padding: 1.5rem;
             border-radius: var(--border-radius);
             background-color: var(--section-bg);
@@ -134,9 +168,9 @@
             padding: 1.5rem;
         }
         
-        /* Add 10px stroke on hover (outside the section) */
+        /* Add 3px stroke on hover (outside the section) */
         .section:hover {
-            outline: 3px solid var(--section-border);
+            outline: 3px solid var(--accent-color);
             outline-offset: 0;
             border: 1px solid var(--section-border);
         }
@@ -167,6 +201,32 @@
             bottom: -5px;
             left: 0;
             background: linear-gradient(90deg, var(--accent-color), transparent);
+        }
+
+        /* Breadcrumb styling */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            color: var(--light-gray);
+        }
+        
+        .breadcrumb-link {
+            color: var(--light-gray);
+            transition: color 0.3s ease;
+        }
+        
+        .breadcrumb-link:hover {
+            color: var(--accent-color);
+        }
+        
+        .breadcrumb-separator {
+            color: var(--light-gray);
+        }
+        
+        .breadcrumb-current {
+            color: var(--accent-color);
         }
 
         .slogan {
@@ -332,7 +392,7 @@
 
         .contact-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.5rem;
             margin-top: 0.8rem;
         }
@@ -380,6 +440,11 @@
         /* Project card styles */
         .project-card {
             transition: border 0.3s ease, padding 0.3s ease;
+            margin-bottom: 3px;
+            border-radius: var(--border-radius);
+            background-color: var(--section-bg);
+            border: 1px solid var(--section-border);
+            padding: 1.5rem;
         }
         
         .project-header {
@@ -409,68 +474,29 @@
         }
         
         .project-card:hover {
-            outline: 10px solid var(--accent-color);
+            outline: 3px solid var(--accent-color);
             outline-offset: 0;
             border: 1px solid var(--section-border);
         }
-    </style>
-    <script>
-        // Theme toggling function
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark-theme');
-                document.querySelectorAll('.theme-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelectorAll('.theme-btn')[1].classList.add('active');
-            } else {
-                document.body.classList.remove('dark-theme');
-                document.querySelectorAll('.theme-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                document.querySelectorAll('.theme-btn')[0].classList.add('active');
-            }
-            localStorage.setItem('theme', theme);
-        }
-
-        // Check for saved theme preference
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                // Use dark theme if user's system prefers dark mode
-                setTheme('dark');
-            }
-            
-            // Portfolio button functionality
-            const portfolioBtn = document.querySelector('.button');
-            if (portfolioBtn) {
-                portfolioBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const mainContainer = document.querySelector('.container');
-                    const portfolioView = document.getElementById('portfolio-view');
-                    
-                    mainContainer.classList.add('hidden');
-                    portfolioView.classList.remove('hidden');
-                });
-            }
-        });
         
-        // View toggling function
-        function toggleView(view) {
-            const mainContainer = document.querySelector('.container');
-            const portfolioView = document.getElementById('portfolio-view');
-            
-            if (view === 'main') {
-                portfolioView.classList.add('hidden');
-                mainContainer.classList.remove('hidden');
-            }
+        /* Fade effect for views */
+        .view-container {
+            opacity: 1;
+            transition: opacity 0.3s ease;
         }
-    </script>
+        
+        .fade-out {
+            opacity: 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Custom cursor elements -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+    
+    <!-- Main container -->
+    <div class="container view-container" id="main-view">
         <div class="header">
             <h1>main</h1>
         </div>
@@ -485,7 +511,7 @@
                 <h3>portfolio</h3>
                 <span class="tag">new</span>
             </div>
-            <a href="#" class="button">view</a>
+            <a href="#" class="button" id="portfolio-btn">view</a>
         </div>
 
         <div class="section square-section">
@@ -526,14 +552,6 @@
             </div>
         </div>
 
-<!--         <div class="section">
-            <div class="label">
-                <h3>blog</h3>
-                <span class="tag">soon</span>
-            </div>
-            <a href="#" class="button">read</a>
-        </div> -->
-
         <div class="section">
             <h3>contact me</h3>
             <div class="contact-grid">
@@ -553,5 +571,168 @@
         </div>
     </div>
 
-    <!-- Portfolio Projects (Hidden initially) -->
-    <div id="portfolio-view" class="hidden">
+    <!-- Portfolio Projects View -->
+    <div id="portfolio-view" class="view-container hidden">
+        <div class="header">
+            <h1>main</h1>
+        </div>
+        
+        <div class="breadcrumb">
+            <a href="#" class="breadcrumb-link" onclick="switchView('main-view')">main</a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">portfolio</span>
+        </div>
+        
+        <div class="project-card">
+            <div class="project-header">
+                <h3>CurioGraphicsYard</h3>
+                <div class="project-tags">
+                    <span class="skill-tag">Branding</span>
+                    <span class="skill-tag">StreetWear</span>
+                </div>
+            </div>
+            <div class="project-image">
+                <div style="background: linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%); height: 180px; border-radius: var(--border-radius);"></div>
+            </div>
+            <p class="project-description">Founded streetwear brand that combines graphic design with cultural influences, creating distinctive apparel with purposeful messaging.</p>
+            <a href="#" class="button">View Project</a>
+        </div>
+        
+        <div class="project-card">
+            <div class="project-header">
+                <h3>Vision'97 Brand Identity</h3>
+                <div class="project-tags">
+                    <span class="skill-tag">Identity</span>
+                    <span class="skill-tag">Brand Design</span>
+                </div>
+            </div>
+            <div class="project-image">
+                <div style="background: linear-gradient(45deg, var(--warning) 0%, var(--error) 100%); height: 180px; border-radius: var(--border-radius);"></div>
+            </div>
+            <p class="project-description">Developed comprehensive brand identity including logo design, typography system, color palette, and brand guidelines.</p>
+            <a href="#" class="button">View Case Study</a>
+        </div>
+        
+        <div class="project-card">
+            <div class="project-header">
+                <h3>CurioLabs Digital Platform</h3>
+                <div class="project-tags">
+                    <span class="skill-tag">Web Development</span>
+                    <span class="skill-tag">UI/UX</span>
+                </div>
+            </div>
+            <div class="project-image">
+                <div style="background: linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%); height: 180px; border-radius: var(--border-radius);"></div>
+            </div>
+            <p class="project-description">Created digital platform focused on innovative web experiences and experimental digital products.</p>
+            <a href="#" class="button">View Platform</a>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggling function
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.theme-btn')[1].classList.add('active');
+            } else {
+                document.body.classList.remove('dark-theme');
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelectorAll('.theme-btn')[0].classList.add('active');
+            }
+            localStorage.setItem('theme', theme);
+        }
+        
+        // View switching with fade effect
+        function switchView(viewId) {
+            const views = document.querySelectorAll('.view-container');
+            
+            // Fade out all views
+            views.forEach(view => {
+                view.classList.add('fade-out');
+            });
+            
+            // After fade out animation, show the target view
+            setTimeout(() => {
+                views.forEach(view => {
+                    if (view.id === viewId) {
+                        view.classList.remove('hidden');
+                        // Small delay before fading in
+                        setTimeout(() => {
+                            view.classList.remove('fade-out');
+                        }, 50);
+                    } else {
+                        view.classList.add('hidden');
+                    }
+                });
+            }, 300);
+        }
+        
+        // Custom cursor functionality
+        function initCustomCursor() {
+            const cursor = document.querySelector('.cursor');
+            const cursorDot = document.querySelector('.cursor-dot');
+            
+            if (!cursor || !cursorDot || window.matchMedia('(max-width: 767px)').matches) return;
+            
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                
+                cursorDot.style.left = e.clientX + 'px';
+                cursorDot.style.top = e.clientY + 'px';
+            });
+            
+            // Scale effect for interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.style.transform = 'scale(1.5)';
+                    cursorDot.style.width = '8px';
+                    cursorDot.style.height = '8px';
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    cursor.style.transform = 'scale(1)';
+                    cursorDot.style.width = '4px';
+                    cursorDot.style.height = '4px';
+                });
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                // Use dark theme if user's system prefers dark mode
+                setTheme('dark');
+            }
+            
+            // Portfolio button functionality
+            const portfolioBtn = document.getElementById('portfolio-btn');
+            if (portfolioBtn) {
+                portfolioBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    switchView('portfolio-view');
+                });
+            }
+            
+            // Initialize custom cursor
+            initCustomCursor();
+            
+            // Set transition styles for views
+            document.querySelectorAll('.view-container').forEach(view => {
+                view.style.transition = 'opacity 0.3s ease';
+            });
+        });
+    </script>
+</body>
+</html>
