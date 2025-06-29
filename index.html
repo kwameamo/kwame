@@ -922,11 +922,6 @@
         }
         
         /* Loading state styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded]) {
-        /* Hide the entire block initially */
-            display: none; 
-        }
-
         .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
             content: 'Loading tweets...';
             display: flex;
@@ -940,10 +935,6 @@
             border: 1px dashed var(--section-border);
         }
 
-        /* Once data-elfsight-app-loaded is present, display the block */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-loaded] {
-            display: block; /* Or flex, grid, etc., depending on its natural display type */
-        }
         
         .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
             background: rgba(255, 255, 255, 0.02);
