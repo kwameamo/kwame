@@ -162,19 +162,18 @@
 
         /* Modified section styling */
         .section {
-            margin-bottom: 3px; /* Exactly 3px gap */
+            margin-bottom: 3px;
             padding: 1.5rem;
             border-radius: var(--border-radius);
             background-color: var(--section-bg);
             border: 1px solid var(--section-border);
-            transition: border 0.3s ease, padding 0.3s ease; /* Only transition border and padding */
+            transition: border 0.3s ease, padding 0.3s ease;
             backdrop-filter: blur(5px);
             position: relative;
             overflow: hidden;
             box-shadow: none;
         }
         
-        /* Square sections for name and about */
         .section.square-section {
             aspect-ratio: 1 / 1;
             display: flex;
@@ -183,7 +182,6 @@
             padding: 1.5rem;
         }
         
-        /* Add 3px stroke on hover (outside the section) */
         .section:hover {
             outline: 3px solid var(--accent-color);
             outline-offset: 0;
@@ -266,6 +264,7 @@
             overflow: hidden;
             margin: 10px 0;
             position: relative;
+            min-height: 170px;
         }
         
         .gallery-scroll {
@@ -274,17 +273,16 @@
             overflow-x: auto;
             padding-bottom: 8px;
             scroll-snap-type: x mandatory;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
         
         .gallery-scroll::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            display: none;
         }
         
-        /* Gallery navigation arrows */
         .gallery-nav {
             position: absolute;
             top: 0;
@@ -318,14 +316,8 @@
             border-bottom-right-radius: var(--border-radius);
         }
         
-        /* Hide navigation when no scrolling is needed */
         .gallery-container.no-scroll-needed .gallery-nav {
             display: none;
-        }
-        
-        /* Make gallery container taller for better visibility */
-        .gallery-container {
-            min-height: 170px;
         }
         
         .gallery-item {
@@ -392,9 +384,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
         }
         
-        /* Adjust modal image display */
         .modal-image {
             width: auto;
             height: auto;
@@ -404,7 +396,6 @@
             transition: opacity 0.3s ease;
         }
         
-        /* Add loading effect */
         @keyframes pulse {
             0% { opacity: 0.6; }
             50% { opacity: 0.8; }
@@ -415,7 +406,6 @@
             animation: pulse 1.5s infinite;
         }
         
-        /* Adjust modal to show portrait images better */
         @media (min-width: 768px) {
             .modal-image-container {
                 max-width: 80vh;
@@ -471,7 +461,6 @@
             position: relative;
         }
         
-        /* New header tab styling */
         .header-tab {
             display: flex;
             align-items: center;
@@ -517,12 +506,10 @@
             transition: all 0.3s ease;
         }
         
-        /* Light theme indicator */
         .header-theme-toggle::before {
             background: radial-gradient(circle, #ffdd00 30%, transparent 70%);
         }
         
-        /* Dark theme indicator */
         .dark-theme .header-theme-toggle::before {
             background: radial-gradient(circle, #aaa 30%, transparent 70%);
         }
@@ -541,7 +528,6 @@
             color: var(--light-gray);
         }
 
-        /* Breadcrumb styling */
         .breadcrumb {
             display: flex;
             align-items: center;
@@ -706,7 +692,6 @@
             display: none;
         }
         
-        /* Project card styles */
         .project-card {
             transition: border 0.3s ease, padding 0.3s ease;
             margin-bottom: 3px;
@@ -748,7 +733,6 @@
             border: 1px solid var(--section-border);
         }
         
-        /* Fade effect for views */
         .view-container {
             opacity: 1;
             transition: opacity 0.3s ease;
@@ -758,7 +742,6 @@
             opacity: 0;
         }
         
-        /* Marquee section styling */
         .marquee-section {
             margin-bottom: 3px;
             padding: 1.5rem;
@@ -822,13 +805,11 @@
             width: 100% !important;
         }
         
-        /* Override Twitter widget styling */
         .twitter-timeline iframe {
             border-radius: var(--border-radius) !important;
             background: var(--section-bg) !important;
         }
         
-        /* Custom styling for when the widget loads */
         .tw-widget {
             border-radius: var(--border-radius) !important;
             background-color: var(--section-bg) !important;
@@ -836,7 +817,6 @@
             box-shadow: none !important;
         }
         
-        /* Additional Twitter widget overrides */
         .twitter-timeline[data-chrome*="transparent"] {
             background: rgba(0, 0, 0, 0.02) !important;
         }
@@ -845,7 +825,6 @@
             background: rgba(255, 255, 255, 0.02) !important;
         }
         
-        /* Fallback styling when Twitter doesn't load */
         .twitter-timeline:not(.twitter-timeline-rendered) {
             background-color: rgba(0, 0, 0, 0.02);
             border-radius: var(--border-radius);
@@ -863,6 +842,7 @@
         .dark-theme .twitter-timeline:not(.twitter-timeline-rendered) {
             background-color: rgba(255, 255, 255, 0.02);
         }
+        
         .portfolio-gallery-container {
             width: 100%;
             overflow: hidden;
@@ -959,11 +939,9 @@
     </style>
 </head>
 <body>
-    <!-- Custom cursor elements -->
     <div class="cursor"></div>
     <div class="cursor-dot"></div>
     
-    <!-- Main container -->
     <div class="container view-container" id="main-view">
         <div class="header">
             <div class="header-tab">
@@ -978,9 +956,7 @@
 
         <div class="section square-section">
             <h3 class="section-title">david kwame amo</h3>
-            <!-- Twitter/X Feed inside the square section -->
             <div class="twitter-feed-container">
-                <!-- Real Twitter embed (will work on actual website) -->
                 <a class="twitter-timeline" 
                    data-width="100%"
                    data-height="250" 
@@ -991,26 +967,12 @@
                    Tweets by @KwameHasVision
                 </a>
                 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-                
-                <!-- Fallback placeholder for preview -->
-                <div class="twitter-placeholder">
-                    <div class="placeholder-header">@KwameHasVision</div>
-                    <div class="placeholder-tweet">
-                        <p>Real Twitter feed will display here when hosted on your website</p>
-                        <span class="placeholder-time">Live tweets</span>
-                    </div>
-                    <div class="placeholder-note">
-                        ✓ Twitter embed code is ready<br>
-                        ✓ Will show live tweets when deployed
-                    </div>
-                </div>
             </div>
             <p class="slogan section-footer">the future's clear</p>
         </div>
 
         <div class="section square-section">
             <h3 class="section-title">portfolio</h3>
-            <!-- Portfolio Gallery inside the square section -->
             <div class="gallery-container">
                 <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
                 <div class="gallery-scroll" id="portfolio-gallery-scroll">
@@ -1131,7 +1093,6 @@
         </div>
     </div>
 
-    <!-- Portfolio Projects View -->
     <div id="portfolio-view" class="view-container hidden">
         <div class="header">
             <div class="header-tab">
@@ -1150,7 +1111,6 @@
             <span class="breadcrumb-current">portfolio</span>
         </div>
         
-        <!-- Portfolio Gallery -->
         <div class="section">
             <div class="label">
                 <h3>recent work</h3>
@@ -1158,7 +1118,7 @@
             </div>
             <div class="portfolio-gallery-container">
                 <div class="portfolio-gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
-                <div class="portfolio-gallery-scroll" id="portfolio-gallery-scroll">
+                <div class="portfolio-gallery-scroll" id="portfolio-gallery-scroll-extended">
                     <div class="portfolio-gallery-item">
                         <div class="portfolio-gallery-image">
                             <div style="background: linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%);"></div>
@@ -1240,26 +1200,62 @@
         </div>
     </div>
     
-    <!-- Gallery Modal -->
     <div class="gallery-modal hidden" id="gallery-modal">
         <div class="modal-content">
             <div class="modal-image-container">
                 <img class="modal-image" id="modal-image" src="" alt="Gallery image">
             </div>
-            <button class="modal-close" onclick="">×</button>
+            <button class="modal-close">×</button>
             <div class="modal-nav">
-                <button class="modal-prev" onclick="">←</button>
-                <button class="modal-next" onclick="">→</button>
+                <button class="modal-prev">←</button>
+                <button class="modal-next">→</button>
             </div>
         </div>
     </div>
 
     <script>
+        // State variables
+        let currentGalleryIndex = 0;
+        let currentPortfolioIndex = 0;
+        let isPortfolioModal = false;
+
+        // Portfolio data
+        const portfolioImages = [
+            "./portfolio/kejetia-1.jpg",
+            "./portfolio/kejetia-2.jpg",
+            "./portfolio/kejetia-3.jpg",
+            "./portfolio/kejetia-4.jpg",
+            "./portfolio/kejetia-5.jpg",
+            "./portfolio/no-love-4.jpg",
+            "./portfolio/no-love-0.jpg",
+            "./portfolio/no-love-2.jpg",
+            "./portfolio/no-love-5.jpg"
+        ];
+        
+        const portfolioCaptions = [
+            "Kejetia Series - Market Life",
+            "Kejetia Series - Daily Commerce", 
+            "Kejetia Series - Street Culture",
+            "Kejetia Series - Urban Energy",
+            "Kejetia Series - Community Spirit",
+            "No Love Series - Portrait Study",
+            "No Love Series - Emotional Expression",
+            "No Love Series - Human Connection",
+            "No Love Series - Visual Storytelling"
+        ];
+
+        // Personal gallery data
+        const galleryImagesFull = [
+            "./photos/1.jpg",
+            "./photos/2.jpg",
+            "./photos/3.jpg",
+            "./photos/4.jpg",
+            "./photos/5.jpeg"
+        ];
+
         // Update time and date function
         function updateDateTime() {
             const now = new Date();
-            
-            // Format time in GMT
             const timeOptions = {
                 timeZone: 'GMT',
                 hour12: false,
@@ -1268,8 +1264,6 @@
                 second: '2-digit'
             };
             const timeString = now.toLocaleTimeString('en-US', timeOptions) + ' GMT';
-            
-            // Format date
             const dateOptions = {
                 month: 'short',
                 day: 'numeric',
@@ -1277,15 +1271,11 @@
             };
             const dateString = now.toLocaleDateString('en-US', dateOptions);
             
-            // Update both views
-            const timeElements = document.querySelectorAll('[id^="current-time"]');
-            const dateElements = document.querySelectorAll('[id^="current-date"]');
-            
-            timeElements.forEach(el => el.textContent = timeString);
-            dateElements.forEach(el => el.textContent = dateString);
+            document.querySelectorAll('[id^="current-time"]').forEach(el => el.textContent = timeString);
+            document.querySelectorAll('[id^="current-date"]').forEach(el => el.textContent = dateString);
         }
 
-        // Theme toggling function
+        // Theme functions
         function setTheme(theme) {
             if (theme === 'dark') {
                 document.body.classList.add('dark-theme');
@@ -1295,30 +1285,21 @@
             localStorage.setItem('theme', theme);
         }
         
-        // Toggle theme function for header button
         function toggleTheme() {
             const isDark = document.body.classList.contains('dark-theme');
             setTheme(isDark ? 'light' : 'dark');
         }
         
-        // View switching with fade effect
+        // View switching
         function switchView(viewId) {
             const views = document.querySelectorAll('.view-container');
+            views.forEach(view => view.classList.add('fade-out'));
             
-            // Fade out all views
-            views.forEach(view => {
-                view.classList.add('fade-out');
-            });
-            
-            // After fade out animation, show the target view
             setTimeout(() => {
                 views.forEach(view => {
                     if (view.id === viewId) {
                         view.classList.remove('hidden');
-                        // Small delay before fading in
-                        setTimeout(() => {
-                            view.classList.remove('fade-out');
-                        }, 50);
+                        setTimeout(() => view.classList.remove('fade-out'), 50);
                     } else {
                         view.classList.add('hidden');
                     }
@@ -1326,30 +1307,25 @@
             }, 300);
         }
         
-        // Custom cursor functionality
+        // Custom cursor
         function initCustomCursor() {
             const cursor = document.querySelector('.cursor');
             const cursorDot = document.querySelector('.cursor-dot');
             
-            if (!cursor || !cursorDot) return;
-            
-            // Only hide on mobile devices
-            if (window.matchMedia('(max-width: 767px)').matches) {
-                cursor.style.display = 'none';
-                cursorDot.style.display = 'none';
+            if (!cursor || !cursorDot || window.matchMedia('(max-width: 767px)').matches) {
+                if (cursor) cursor.style.display = 'none';
+                if (cursorDot) cursorDot.style.display = 'none';
                 return;
             }
             
             document.addEventListener('mousemove', (e) => {
                 cursor.style.left = e.clientX + 'px';
                 cursor.style.top = e.clientY + 'px';
-                
                 cursorDot.style.left = e.clientX + 'px';
                 cursorDot.style.top = e.clientY + 'px';
             });
             
-            // Scale effect for interactive elements
-            const interactiveElements = document.querySelectorAll('a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link');
+            const interactiveElements = document.querySelectorAll('a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link, .gallery-item');
             interactiveElements.forEach(el => {
                 el.addEventListener('mouseenter', () => {
                     cursor.style.transform = 'scale(1.5)';
@@ -1365,150 +1341,7 @@
             });
         }
 
-        // Gallery image arrays using local paths
-        let currentGalleryIndex = 0;
-        const galleryImageThumbs = [
-            "./photos/1.jpg",
-            "./photos/2.jpg",
-            "./photos/3.jpg",
-            "./photos/4.jpg",
-            "./photos/5.jpeg"
-        ];
-        
-        const galleryImagesFull = [
-            "./photos/1.jpg",
-            "./photos/2.jpg",
-            "./photos/3.jpg",
-            "./photos/4.jpg",
-            "./photos/5.jpeg"
-        ];
-
-        // Preload images for smoother experience
-        function preloadImages() {
-            galleryImagesFull.forEach((src) => {
-                const img = new Image();
-                img.src = src;
-            });
-        }
-        
-        function openGalleryModal(index) {
-            currentGalleryIndex = index;
-            isPortfolioModal = false;
-            
-            const modal = document.getElementById('gallery-modal');
-            const modalImage = document.getElementById('modal-image');
-            
-            // Set loading state
-            modalImage.style.opacity = '0.5';
-            
-            // Set the image
-            modalImage.src = galleryImagesFull[index];
-            modalImage.onload = function() {
-                modalImage.style.opacity = '1';
-            };
-            
-            // Show the modal
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-            
-            // Prevent body scrolling
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeGalleryModal() {
-            isPortfolioModal = false;
-            
-            const modal = document.getElementById('gallery-modal');
-            
-            // Hide the modal with animation
-            modal.classList.remove('active');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-            
-            // Allow body scrolling again
-            document.body.style.overflow = '';
-        }
-        
-        function changeGalleryImage(direction) {
-            currentGalleryIndex = (currentGalleryIndex + direction + galleryImagesFull.length) % galleryImagesFull.length;
-            const modalImage = document.getElementById('modal-image');
-            
-            // Set loading state
-            modalImage.style.opacity = '0.5';
-            
-            // Change image with fade effect
-            modalImage.src = galleryImagesFull[currentGalleryIndex];
-            modalImage.onload = function() {
-                modalImage.style.opacity = '1';
-            };
-        }
-        
-        function handleGalleryKeydown(e) {
-            if (e.key === 'Escape') {
-                closeGalleryModal();
-            } else if (e.key === 'ArrowLeft') {
-                changeGalleryImage(-1);
-            } else if (e.key === 'ArrowRight') {
-                changeGalleryImage(1);
-            }
-        }
-        
-        // Improved gallery scrolling functionality
-        function scrollGallery(direction) {
-            const galleryScroll = document.getElementById('gallery-scroll');
-            if (!galleryScroll) return;
-            
-            const scrollAmount = direction * (galleryScroll.clientWidth / 2);
-            galleryScroll.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-        
-        // Portfolio gallery scrolling
-        function scrollPortfolioGallery(direction) {
-            const galleryScroll = document.getElementById('portfolio-gallery-scroll');
-            if (!galleryScroll) return;
-            
-            const scrollAmount = direction * (galleryScroll.clientWidth / 2);
-            galleryScroll.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-        
         // Portfolio modal functions
-        let currentPortfolioIndex = 0;
-        let isPortfolioModal = false;
-        
-        const portfolioImages = [
-            "./portfolio/kejetia-1.jpg",
-            "./portfolio/kejetia-2.jpg",
-            "./portfolio/kejetia-3.jpg",
-            "./portfolio/kejetia-4.jpg",
-            "./portfolio/kejetia-5.jpg",
-            "./portfolio/no-love-4.jpg",
-            "./portfolio/no-love-0.jpg",
-            "./portfolio/no-love-2.jpg",
-            "./portfolio/no-love-5.jpg"
-        ];
-        
-        const portfolioCaptions = [
-            "Kejetia Boyz Jersey — Jul. 2024",
-            "Kejetia Boyz Jersey — Jul. 2024"
-            "Kejetia Boyz Jersey — Jul. 2024"
-            "Kejetia Boyz Jersey — Jul. 2024"
-            "Kejetia Boyz Jersey — Jul. 2024"
-            "No Love In The City Familiar Hearts Tee — Feb. 2025",
-            "No Love In The City Familiar Hearts Tee — Feb. 2025",
-            "No Love In The City Militia Tee — Feb. 2025",
-            "No Love In The City Militia Tee — Feb. 2025"
-        ];
-        
         function openPortfolioModal(index) {
             currentPortfolioIndex = index;
             isPortfolioModal = true;
@@ -1517,79 +1350,71 @@
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
             
-            // Clear any existing portfolio content
-            const existingPortfolioImg = document.getElementById('portfolio-modal-image');
+            // Clear existing portfolio content
+            const existingImg = document.getElementById('portfolio-modal-image');
             const existingCaption = modal.querySelector('.portfolio-modal-caption');
-            if (existingPortfolioImg) existingPortfolioImg.remove();
+            if (existingImg) existingImg.remove();
             if (existingCaption) existingCaption.remove();
             
-            // Create image element for portfolio items
-            const portfolioImg = document.createElement('img');
-            portfolioImg.src = portfolioImages[index];
-            portfolioImg.style.width = 'auto';
-            portfolioImg.style.height = 'auto';
-            portfolioImg.style.maxWidth = '80vh';
-            portfolioImg.style.maxHeight = '60vh';
-            portfolioImg.style.objectFit = 'contain';
-            portfolioImg.style.borderRadius = 'var(--border-radius)';
-            portfolioImg.style.marginBottom = '1rem';
-            portfolioImg.style.transition = 'opacity 0.3s ease';
-            portfolioImg.id = 'portfolio-modal-image';
-            
-            // Create caption element
-            const captionDiv = document.createElement('div');
-            captionDiv.style.color = 'white';
-            captionDiv.style.fontSize = '16px';
-            captionDiv.style.textAlign = 'center';
-            captionDiv.style.fontWeight = '400';
-            captionDiv.textContent = portfolioCaptions[index];
-            captionDiv.className = 'portfolio-modal-caption';
-            
-            // Hide the regular modal image and show portfolio image with caption
+            // Hide default modal image
             modalImage.style.display = 'none';
+            
+            // Create portfolio image
+            const portfolioImg = document.createElement('img');
+            portfolioImg.id = 'portfolio-modal-image';
+            portfolioImg.src = portfolioImages[index];
+            portfolioImg.style.cssText = `
+                width: auto;
+                height: auto;
+                max-width: 80vh;
+                max-height: 60vh;
+                object-fit: contain;
+                border-radius: var(--border-radius);
+                margin-bottom: 1rem;
+                transition: opacity 0.3s ease;
+            `;
+            
+            // Create caption
+            const captionDiv = document.createElement('div');
+            captionDiv.className = 'portfolio-modal-caption';
+            captionDiv.textContent = portfolioCaptions[index];
+            captionDiv.style.cssText = `
+                color: white;
+                font-size: 16px;
+                text-align: center;
+                font-weight: 400;
+            `;
+            
             modalContainer.style.flexDirection = 'column';
             modalContainer.style.justifyContent = 'center';
             modalContainer.appendChild(portfolioImg);
             modalContainer.appendChild(captionDiv);
             
-            // Show the modal
+            // Show modal
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.add('active');
-            }, 10);
-            
-            // Prevent body scrolling
+            setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
         }
         
         function closePortfolioModal() {
             isPortfolioModal = false;
-            
             const modal = document.getElementById('gallery-modal');
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
             
-            // Remove portfolio image and caption, show regular modal image again
+            // Remove portfolio content
             const portfolioImg = document.getElementById('portfolio-modal-image');
             const captionDiv = modal.querySelector('.portfolio-modal-caption');
-            if (portfolioImg) {
-                portfolioImg.remove();
-            }
-            if (captionDiv) {
-                captionDiv.remove();
-            }
+            if (portfolioImg) portfolioImg.remove();
+            if (captionDiv) captionDiv.remove();
+            
+            // Reset modal
             modalImage.style.display = 'block';
             modalContainer.style.flexDirection = 'column';
             modalContainer.style.justifyContent = 'center';
             
-            // Hide the modal with animation
             modal.classList.remove('active');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-            
-            // Allow body scrolling again
+            setTimeout(() => modal.classList.add('hidden'), 300);
             document.body.style.overflow = '';
         }
         
@@ -1599,19 +1424,51 @@
             const captionDiv = document.querySelector('.portfolio-modal-caption');
             
             if (portfolioImg) {
-                // Add loading effect
                 portfolioImg.style.opacity = '0.5';
                 portfolioImg.src = portfolioImages[currentPortfolioIndex];
-                portfolioImg.onload = function() {
-                    portfolioImg.style.opacity = '1';
-                };
+                portfolioImg.onload = () => portfolioImg.style.opacity = '1';
             }
             if (captionDiv) {
                 captionDiv.textContent = portfolioCaptions[currentPortfolioIndex];
             }
         }
+
+        // Personal gallery modal functions
+        function openGalleryModal(index) {
+            currentGalleryIndex = index;
+            isPortfolioModal = false;
+            
+            const modal = document.getElementById('gallery-modal');
+            const modalImage = document.getElementById('modal-image');
+            
+            modalImage.style.opacity = '0.5';
+            modalImage.src = galleryImagesFull[index];
+            modalImage.onload = () => modalImage.style.opacity = '1';
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
         
-        // Universal modal navigation functions
+        function closeGalleryModal() {
+            isPortfolioModal = false;
+            const modal = document.getElementById('gallery-modal');
+            
+            modal.classList.remove('active');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+            document.body.style.overflow = '';
+        }
+        
+        function changeGalleryImage(direction) {
+            currentGalleryIndex = (currentGalleryIndex + direction + galleryImagesFull.length) % galleryImagesFull.length;
+            const modalImage = document.getElementById('modal-image');
+            
+            modalImage.style.opacity = '0.5';
+            modalImage.src = galleryImagesFull[currentGalleryIndex];
+            modalImage.onload = () => modalImage.style.opacity = '1';
+        }
+
+        // Universal modal functions
         function closeModal() {
             if (isPortfolioModal) {
                 closePortfolioModal();
@@ -1627,157 +1484,64 @@
                 changeGalleryImage(direction);
             }
         }
-        
-        // Universal keyboard handler
-        function handleUniversalKeydown(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            } else if (e.key === 'ArrowLeft') {
-                navigateModal(-1);
-            } else if (e.key === 'ArrowRight') {
-                navigateModal(1);
-            }
-        }
-        
-        // Handle keyboard navigation for gallery
-        function handleGalleryKeyboardNavigation(e) {
-            if (e.key === 'ArrowLeft') {
-                scrollGallery(-1);
-            } else if (e.key === 'ArrowRight') {
-                scrollGallery(1);
-            }
-        }
-        
-        // Initialize gallery and modal functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const galleryScroll = document.getElementById('gallery-scroll');
+
+        // Gallery scrolling
+        function scrollPortfolioGallery(direction) {
+            const galleryScroll = document.getElementById('portfolio-gallery-scroll');
             if (!galleryScroll) return;
             
-            // Preload images for smoother viewing
-            preloadImages();
-            
-            // Add wheel event for horizontal scrolling with mouse wheel
-            galleryScroll.addEventListener('wheel', (e) => {
-                if (e.deltaY !== 0) {
-                    e.preventDefault();
-                    galleryScroll.scrollBy({
-                        left: e.deltaY > 0 ? 100 : -100,
-                        behavior: 'smooth'
-                    });
-                }
-            }, { passive: false });
-            
-            // Use arrows for gallery navigation when focused
-            galleryScroll.tabIndex = 0; // Make it focusable
-            galleryScroll.addEventListener('focus', () => {
-                document.addEventListener('keydown', handleGalleryKeyboardNavigation);
+            const scrollAmount = direction * (galleryScroll.clientWidth / 2);
+            galleryScroll.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
             });
-            galleryScroll.addEventListener('blur', () => {
-                document.removeEventListener('keydown', handleGalleryKeyboardNavigation);
-            });
-            
-            // Modal click outside to close
-            const modal = document.getElementById('gallery-modal');
-            if (modal) {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        closeModal();
-                    }
-                });
-                
-                // Set up modal button handlers
-                const modalClose = modal.querySelector('.modal-close');
-                const modalPrev = modal.querySelector('.modal-prev');
-                const modalNext = modal.querySelector('.modal-next');
-                
-                if (modalClose) {
-                    modalClose.onclick = function() {
-                        closeModal();
-                    };
-                }
-                
-                if (modalPrev) {
-                    modalPrev.onclick = function() {
-                        navigateModal(-1);
-                    };
-                }
-                
-                if (modalNext) {
-                    modalNext.onclick = function() {
-                        navigateModal(1);
-                    };
-                }
-                
-                // Universal keyboard handler
-                document.addEventListener('keydown', handleUniversalKeydown);
-            }
-            
-            // Add automatic detection if scrollbar is needed
-            function checkGalleryOverflow() {
-                const container = document.querySelector('.gallery-container');
-                const scroll = document.getElementById('gallery-scroll');
-                
-                if (scroll.scrollWidth <= scroll.clientWidth) {
-                    container.classList.add('no-scroll-needed');
-                } else {
-                    container.classList.remove('no-scroll-needed');
-                }
-            }
-            
-            // Lazy load optimization for thumbnails
-            function lazyLoadThumbnails() {
-                const thumbnails = document.querySelectorAll('.gallery-image');
-                
-                // Simple intersection observer for lazy loading
-                if ('IntersectionObserver' in window) {
-                    const observer = new IntersectionObserver((entries) => {
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting) {
-                                const div = entry.target;
-                                // The background image should already be set through style
-                                // Mark as loaded
-                                div.classList.add('loaded');
-                                // Unobserve after loading
-                                observer.unobserve(div);
-                            }
-                        });
-                    }, {
-                        root: null,
-                        rootMargin: '0px',
-                        threshold: 0.1
-                    });
-                    
-                    thumbnails.forEach(img => {
-                        observer.observe(img);
-                    });
-                }
-            }
-            
-            // Run functions
-            checkGalleryOverflow();
-            lazyLoadThumbnails();
-            window.addEventListener('resize', checkGalleryOverflow);
-        });
+        }
 
-        // Initialize everything when DOM is loaded
+        // Initialize everything
         document.addEventListener('DOMContentLoaded', function() {
-            // Update time and date immediately and then every second
+            // Time updates
             updateDateTime();
             setInterval(updateDateTime, 1000);
             
-            // Check for saved theme preference
+            // Theme
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme) {
                 setTheme(savedTheme);
             } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                // Use dark theme if user's system prefers dark mode
                 setTheme('dark');
             }
             
-            // Initialize custom cursor
+            // Custom cursor
             initCustomCursor();
             
-            // Set transition styles for views
+            // Modal setup
+            const modal = document.getElementById('gallery-modal');
+            if (modal) {
+                // Click outside to close
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+                
+                // Button handlers
+                const modalClose = modal.querySelector('.modal-close');
+                const modalPrev = modal.querySelector('.modal-prev');
+                const modalNext = modal.querySelector('.modal-next');
+                
+                if (modalClose) modalClose.onclick = closeModal;
+                if (modalPrev) modalPrev.onclick = () => navigateModal(-1);
+                if (modalNext) modalNext.onclick = () => navigateModal(1);
+                
+                // Keyboard handlers
+                document.addEventListener('keydown', (e) => {
+                    if (modal.classList.contains('active')) {
+                        if (e.key === 'Escape') closeModal();
+                        else if (e.key === 'ArrowLeft') navigateModal(-1);
+                        else if (e.key === 'ArrowRight') navigateModal(1);
+                    }
+                });
+            }
+            
+            // View transitions
             document.querySelectorAll('.view-container').forEach(view => {
                 view.style.transition = 'opacity 0.3s ease';
             });
