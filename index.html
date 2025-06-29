@@ -944,33 +944,33 @@
             <p class="slogan section-footer">the future's clear</p>
         </div>
 
-        <div class="section">
-            <div class="label">
-                <h3>portfolio</h3>
-                 <!-- Gallery inside the square section -->
-                    <div class="gallery-container">
-                    <div class="gallery-nav prev" onclick="scrollGallery(-1)">‹</div>
-                    <div class="gallery-scroll" id="gallery-scroll">
-                        <div class="gallery-item" onclick="openGalleryModal(0)">
-                            <div class="gallery-image" style="background-image: url('./photos/1.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(1)">
-                            <div class="gallery-image" style="background-image: url('./photos/2.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(2)">
-                            <div class="gallery-image" style="background-image: url('./photos/3.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(3)">
-                            <div class="gallery-image" style="background-image: url('./photos/4.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(4)">
-                            <div class="gallery-image" style="background-image: url('./photos/5.jpeg'); background-size: cover; background-position: center;"></div>
-                        </div>
+        <div class="section square-section">
+            <h3 class="section-title">portfolio</h3>
+            <!-- Portfolio Gallery inside the square section -->
+            <div class="gallery-container">
+                <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
+                <div class="gallery-scroll" id="portfolio-gallery-scroll">
+                    <div class="gallery-item" onclick="openPortfolioModal(0)">
+                        <div class="gallery-image" style="background: linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%); background-size: cover; background-position: center;"></div>
                     </div>
-                    <div class="gallery-nav next" onclick="scrollGallery(1)">›</div>
-                <span class="tag">new</span>
+                    <div class="gallery-item" onclick="openPortfolioModal(1)">
+                        <div class="gallery-image" style="background: linear-gradient(135deg, var(--warning) 0%, var(--error) 100%); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(2)">
+                        <div class="gallery-image" style="background: linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(3)">
+                        <div class="gallery-image" style="background: linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(4)">
+                        <div class="gallery-image" style="background: linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%); background-size: cover; background-position: center;"></div>
+                    </div>
+                </div>
+                <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
             </div>
-            <a href="https://www.behance.net/kwameamo" target="_blank" class="button" id="portfolio-btn">view</a>
+            <div class="section-footer">
+                <a href="https://www.behance.net/kwameamo" target="_blank" class="button" id="portfolio-btn">view extended portfolio</a>
+            </div>
         </div>
 
         <div class="section square-section">
@@ -1407,6 +1407,121 @@
             });
         }
         
+        // Portfolio modal functions
+        let currentPortfolioIndex = 0;
+        const portfolioImages = [
+            "linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%)",
+            "linear-gradient(135deg, var(--warning) 0%, var(--error) 100%)",
+            "linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%)",
+            "linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%)",
+            "linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%)"
+        ];
+        
+        const portfolioCaptions = [
+            "Brand Identity Design",
+            "Streetwear Collection",
+            "Web Development Project", 
+            "Logo Design Package",
+            "Digital Art Series"
+        ];
+        
+        function openPortfolioModal(index) {
+            currentPortfolioIndex = index;
+            const modal = document.getElementById('gallery-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalContainer = modal.querySelector('.modal-image-container');
+            
+            // Create a temporary div with gradient background for portfolio items
+            const tempDiv = document.createElement('div');
+            tempDiv.style.background = portfolioImages[index];
+            tempDiv.style.width = '400px';
+            tempDiv.style.height = '400px';
+            tempDiv.style.borderRadius = 'var(--border-radius)';
+            tempDiv.style.marginBottom = '1rem';
+            
+            // Create caption element
+            const captionDiv = document.createElement('div');
+            captionDiv.style.color = 'white';
+            captionDiv.style.fontSize = '16px';
+            captionDiv.style.textAlign = 'center';
+            captionDiv.style.fontWeight = '400';
+            captionDiv.textContent = portfolioCaptions[index];
+            captionDiv.className = 'portfolio-modal-caption';
+            
+            // Hide the img and show the div with caption
+            modalImage.style.display = 'none';
+            modalContainer.style.flexDirection = 'column';
+            modalContainer.appendChild(tempDiv);
+            modalContainer.appendChild(captionDiv);
+            
+            // Show the modal
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('active');
+            }, 10);
+            
+            // Add keyboard event listeners
+            document.addEventListener('keydown', handlePortfolioKeydown);
+            
+            // Prevent body scrolling
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePortfolioModal() {
+            const modal = document.getElementById('gallery-modal');
+            const modalImage = document.getElementById('modal-image');
+            const modalContainer = modal.querySelector('.modal-image-container');
+            
+            // Remove any temporary divs and captions, show img again
+            const tempDiv = modal.querySelector('.modal-image-container > div:not(.modal-image)');
+            const captionDiv = modal.querySelector('.portfolio-modal-caption');
+            if (tempDiv) {
+                tempDiv.remove();
+            }
+            if (captionDiv) {
+                captionDiv.remove();
+            }
+            modalImage.style.display = 'block';
+            modalContainer.style.flexDirection = 'row';
+            
+            // Hide the modal with animation
+            modal.classList.remove('active');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+            
+            // Remove keyboard event listeners
+            document.removeEventListener('keydown', handlePortfolioKeydown);
+            
+            // Allow body scrolling again
+            document.body.style.overflow = '';
+        }
+        
+        function changePortfolioImage(direction) {
+            currentPortfolioIndex = (currentPortfolioIndex + direction + portfolioImages.length) % portfolioImages.length;
+            const modal = document.getElementById('gallery-modal');
+            const tempDiv = modal.querySelector('.modal-image-container > div:not(.modal-image)');
+            const captionDiv = modal.querySelector('.portfolio-modal-caption');
+            
+            if (tempDiv) {
+                tempDiv.style.background = portfolioImages[currentPortfolioIndex];
+            }
+            if (captionDiv) {
+                captionDiv.textContent = portfolioCaptions[currentPortfolioIndex];
+            }
+        }
+        
+        function handlePortfolioKeydown(e) {
+            if (e.key === 'Escape') {
+                closePortfolioModal();
+            } else if (e.key === 'ArrowLeft') {
+                changePortfolioImage(-1);
+            } else if (e.key === 'ArrowRight') {
+                changePortfolioImage(1);
+            }
+        }
+        
         // Handle keyboard navigation for gallery
         function handleGalleryKeyboardNavigation(e) {
             if (e.key === 'ArrowLeft') {
@@ -1449,7 +1564,13 @@
             if (modal) {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
-                        closeGalleryModal();
+                        // Check if we're viewing portfolio or regular gallery
+                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
+                        if (captionDiv) {
+                            closePortfolioModal();
+                        } else {
+                            closeGalleryModal();
+                        }
                     }
                 });
             }
