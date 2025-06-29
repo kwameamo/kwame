@@ -951,19 +951,32 @@
                 <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
                 <div class="gallery-scroll" id="portfolio-gallery-scroll">
                     <div class="gallery-item" onclick="openPortfolioModal(0)">
-                        <div class="gallery-image" style="background: linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background: url('./porfolio/kejetia-1.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
+                    
                     <div class="gallery-item" onclick="openPortfolioModal(1)">
-                        <div class="gallery-image" style="background: linear-gradient(135deg, var(--warning) 0%, var(--error) 100%); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background: url('./porfolio/kejetia-2.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(2)">
-                        <div class="gallery-image" style="background: linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background: url('./porfolio/kejetia-3.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background: linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background: url('./porfolio/kejetia-4.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(4)">
-                        <div class="gallery-image" style="background: linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background: url('./porfolio/kejetia-5.jpg'); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(5)">
+                        <div class="gallery-image" style="background: url('./porfolio/no-love-0.jpg'); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(6)">
+                        <div class="gallery-image" style="background: url('./porfolio/no-love-2.jpg'); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(7)">
+                        <div class="gallery-image" style="background: url('./porfolio/no-love-4.jpg'); background-size: cover; background-position: center;"></div>
+                    </div>
+                    <div class="gallery-item" onclick="openPortfolioModal(8)">
+                        <div class="gallery-image" style="background: url('./porfolio/no-love-5.jpg.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                 </div>
                 <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
@@ -1408,21 +1421,38 @@
         }
         
         // Portfolio modal functions
+        // let currentPortfolioIndex = 0;
+        // const portfolioImages = [
+        //     "linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%)",
+        //     "linear-gradient(135deg, var(--warning) 0%, var(--error) 100%)",
+        //     "linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%)",
+        //     "linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%)",
+        //     "linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%)"
+        // ];
+
         let currentPortfolioIndex = 0;
         const portfolioImages = [
-            "linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%)",
-            "linear-gradient(135deg, var(--warning) 0%, var(--error) 100%)",
-            "linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%)",
-            "linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%)",
-            "linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%)"
+            "./portfolio/kejetia-1.jpg",
+            "./portfolio/kejetia-2.jpg",
+            "./portfolio/kejetia-3.jpg",
+            "./portfolio/kejetia-4.jpg",
+            "./portfolio/kejetia-5.jpg",
+            "./portfolio/no-love-4.jpg",
+            "./portfolio/no-love-0.jpg",
+            "./portfolio/no-love-2.jpg",
+            "./portfolio/no-love-5.jpg"
         ];
         
         const portfolioCaptions = [
-            "Brand Identity Design",
-            "Streetwear Collection",
-            "Web Development Project", 
-            "Logo Design Package",
-            "Digital Art Series"
+            "Kejetia Boys Jersey - Jul. 2024",
+            "Kejetia Boys Jersey - Jul. 2024",
+            "Kejetia Boys Jersey - Jul. 2024",
+            "Kejetia Boys Jersey - Jul. 2024",
+            "Kejetia Boys Jersey - Jul. 2024",
+            "No Love In The City - Feb. 2025",
+            "No Love In The City - Feb. 2025",
+            "No Love In The City - Feb. 2025",
+            "No Love In The City - Feb. 2025"
         ];
         
         function openPortfolioModal(index) {
@@ -1431,13 +1461,13 @@
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
             
-            // Create a temporary div with gradient background for portfolio items
-            const tempDiv = document.createElement('div');
-            tempDiv.style.background = portfolioImages[index];
-            tempDiv.style.width = '400px';
-            tempDiv.style.height = '400px';
-            tempDiv.style.borderRadius = 'var(--border-radius)';
-            tempDiv.style.marginBottom = '1rem';
+            // // Create a temporary div with gradient background for portfolio items
+            // const tempDiv = document.createElement('div');
+            // tempDiv.style.background = portfolioImages[index];
+            // tempDiv.style.width = '400px';
+            // tempDiv.style.height = '400px';
+            // tempDiv.style.borderRadius = 'var(--border-radius)';
+            // tempDiv.style.marginBottom = '1rem';
             
             // Create caption element
             const captionDiv = document.createElement('div');
