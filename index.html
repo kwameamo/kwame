@@ -951,32 +951,31 @@
                 <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
                 <div class="gallery-scroll" id="portfolio-gallery-scroll">
                     <div class="gallery-item" onclick="openPortfolioModal(0)">
-                        <div class="gallery-image" style="background: url('./porfolio/kejetia-1.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/kejetia-1.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
-                    
                     <div class="gallery-item" onclick="openPortfolioModal(1)">
-                        <div class="gallery-image" style="background: url('./porfolio/kejetia-2.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/kejetia-2.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(2)">
-                        <div class="gallery-image" style="background: url('./porfolio/kejetia-3.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/kejetia-3.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background: url('./porfolio/kejetia-4.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/kejetia-4.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(4)">
-                        <div class="gallery-image" style="background: url('./porfolio/kejetia-5.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/kejetia-5.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(5)">
-                        <div class="gallery-image" style="background: url('./porfolio/no-love-0.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/no-love-4.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(6)">
-                        <div class="gallery-image" style="background: url('./porfolio/no-love-2.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/no-love-0.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(7)">
-                        <div class="gallery-image" style="background: url('./porfolio/no-love-4.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/no-love-2.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                     <div class="gallery-item" onclick="openPortfolioModal(8)">
-                        <div class="gallery-image" style="background: url('./porfolio/no-love-5.jpg.jpg'); background-size: cover; background-position: center;"></div>
+                        <div class="gallery-image" style="background-image: url('./portfolio/no-love-5.jpg'); background-size: cover; background-position: center;"></div>
                     </div>
                 </div>
                 <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
@@ -1421,15 +1420,6 @@
         }
         
         // Portfolio modal functions
-        // let currentPortfolioIndex = 0;
-        // const portfolioImages = [
-        //     "linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%)",
-        //     "linear-gradient(135deg, var(--warning) 0%, var(--error) 100%)",
-        //     "linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%)",
-        //     "linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%)",
-        //     "linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%)"
-        // ];
-
         let currentPortfolioIndex = 0;
         const portfolioImages = [
             "./portfolio/kejetia-1.jpg",
@@ -1444,15 +1434,15 @@
         ];
         
         const portfolioCaptions = [
-            "Kejetia Boys Jersey - Jul. 2024",
-            "Kejetia Boys Jersey - Jul. 2024",
-            "Kejetia Boys Jersey - Jul. 2024",
-            "Kejetia Boys Jersey - Jul. 2024",
-            "Kejetia Boys Jersey - Jul. 2024",
-            "No Love In The City - Feb. 2025",
-            "No Love In The City - Feb. 2025",
-            "No Love In The City - Feb. 2025",
-            "No Love In The City - Feb. 2025"
+            "Kejetia Boyz Jersey - Jul. 2024",
+            "Kejetia Boyz Jersey - Jul. 2024", 
+            "Kejetia Boyz Jersey - Jul. 2024",
+            "Kejetia Boyz Jersey - Jul. 2024",
+            "Kejetia Boyz Jersey - Jul. 2024t",
+            "No Love In The City Familiar Hearts Tee - Feb. 2025",
+            "No Love In The City Familiar Hearts Tee - Feb. 2025",
+            "No Love In The City Militia Tee - Feb. 2025",
+            "No Love In The City Militia Tee - Feb. 2025"
         ];
         
         function openPortfolioModal(index) {
@@ -1461,13 +1451,16 @@
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
             
-            // // Create a temporary div with gradient background for portfolio items
-            // const tempDiv = document.createElement('div');
-            // tempDiv.style.background = portfolioImages[index];
-            // tempDiv.style.width = '400px';
-            // tempDiv.style.height = '400px';
-            // tempDiv.style.borderRadius = 'var(--border-radius)';
-            // tempDiv.style.marginBottom = '1rem';
+            // Create image element for portfolio items
+            const portfolioImg = document.createElement('img');
+            portfolioImg.src = portfolioImages[index];
+            portfolioImg.style.width = 'auto';
+            portfolioImg.style.height = 'auto';
+            portfolioImg.style.maxWidth = '80vh';
+            portfolioImg.style.maxHeight = '60vh';
+            portfolioImg.style.objectFit = 'contain';
+            portfolioImg.style.borderRadius = 'var(--border-radius)';
+            portfolioImg.style.marginBottom = '1rem';
             
             // Create caption element
             const captionDiv = document.createElement('div');
@@ -1478,10 +1471,10 @@
             captionDiv.textContent = portfolioCaptions[index];
             captionDiv.className = 'portfolio-modal-caption';
             
-            // Hide the img and show the div with caption
+            // Hide the regular modal image and show portfolio image with caption
             modalImage.style.display = 'none';
             modalContainer.style.flexDirection = 'column';
-            modalContainer.appendChild(tempDiv);
+            modalContainer.appendChild(portfolioImg);
             modalContainer.appendChild(captionDiv);
             
             // Show the modal
@@ -1502,11 +1495,11 @@
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
             
-            // Remove any temporary divs and captions, show img again
-            const tempDiv = modal.querySelector('.modal-image-container > div:not(img)');
+            // Remove portfolio image and caption, show regular modal image again
+            const portfolioImg = modal.querySelector('.modal-image-container > img:not(#modal-image)');
             const captionDiv = modal.querySelector('.portfolio-modal-caption');
-            if (tempDiv) {
-                tempDiv.remove();
+            if (portfolioImg) {
+                portfolioImg.remove();
             }
             if (captionDiv) {
                 captionDiv.remove();
@@ -1532,11 +1525,11 @@
         function changePortfolioImage(direction) {
             currentPortfolioIndex = (currentPortfolioIndex + direction + portfolioImages.length) % portfolioImages.length;
             const modal = document.getElementById('gallery-modal');
-            const tempDiv = modal.querySelector('.modal-image-container > div:not(img)');
+            const portfolioImg = modal.querySelector('.modal-image-container > img:not(#modal-image)');
             const captionDiv = modal.querySelector('.portfolio-modal-caption');
             
-            if (tempDiv) {
-                tempDiv.style.background = portfolioImages[currentPortfolioIndex];
+            if (portfolioImg) {
+                portfolioImg.src = portfolioImages[currentPortfolioIndex];
             }
             if (captionDiv) {
                 captionDiv.textContent = portfolioCaptions[currentPortfolioIndex];
