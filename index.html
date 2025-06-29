@@ -112,36 +112,51 @@
         }
 
         /* Custom cursor */
-        @media (min-width: 768px) {
+        body {
+            cursor: none;
+        }
+        
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--accent-color);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.2s ease;
+            opacity: 1;
+        }
+        
+        .cursor-dot {
+            width: 4px;
+            height: 4px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: width 0.2s ease, height 0.2s ease;
+            opacity: 1;
+        }
+        
+        a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link {
+            cursor: none;
+        }
+        
+        /* Show default cursor on mobile */
+        @media (max-width: 767px) {
             body {
-                cursor: none;
+                cursor: auto;
             }
             
-            .cursor {
-                width: 20px;
-                height: 20px;
-                border: 1px solid var(--accent-color);
-                border-radius: 50%;
-                position: fixed;
-                pointer-events: none;
-                z-index: 9999;
-                mix-blend-mode: difference;
-                transition: transform 0.2s ease;
-            }
-            
-            .cursor-dot {
-                width: 4px;
-                height: 4px;
-                background-color: var(--accent-color);
-                border-radius: 50%;
-                position: fixed;
-                pointer-events: none;
-                z-index: 9999;
-                transition: width 0.2s ease, height 0.2s ease;
+            .cursor, .cursor-dot {
+                display: none;
             }
             
             a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link {
-                cursor: none;
+                cursor: pointer;
             }
         }
 
@@ -886,8 +901,8 @@
 </head>
 <body>
     <!-- Custom cursor elements -->
-<!--     <div class="cursor"></div>
-    <div class="cursor-dot"></div> -->
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
     
     <!-- Main container -->
     <div class="container view-container" id="main-view">
@@ -1219,7 +1234,14 @@
             const cursor = document.querySelector('.cursor');
             const cursorDot = document.querySelector('.cursor-dot');
             
-            if (!cursor || !cursorDot || window.matchMedia('(max-width: 767px)').matches) return;
+            if (!cursor || !cursorDot) return;
+            
+            // Only hide on mobile devices
+            if (window.matchMedia('(max-width: 767px)').matches) {
+                cursor.style.display = 'none';
+                cursorDot.style.display = 'none';
+                return;
+            }
             
             document.addEventListener('mousemove', (e) => {
                 cursor.style.left = e.clientX + 'px';
