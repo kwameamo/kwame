@@ -801,7 +801,7 @@
         .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 {
             height: 100% !important;
             min-height: 200px !important;
-            max-height: 280px !important;
+            max-height: 2450px !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
             border-radius: var(--border-radius) !important;
@@ -922,6 +922,11 @@
         }
         
         /* Loading state styling */
+        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded]) {
+        /* Hide the entire block initially */
+            display: none; 
+        }
+
         .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
             content: 'Loading tweets...';
             display: flex;
@@ -933,6 +938,11 @@
             background: rgba(0, 0, 0, 0.02);
             border-radius: var(--border-radius);
             border: 1px dashed var(--section-border);
+        }
+
+        /* Once data-elfsight-app-loaded is present, display the block */
+        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-loaded] {
+            display: block; /* Or flex, grid, etc., depending on its natural display type */
         }
         
         .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
