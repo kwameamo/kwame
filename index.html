@@ -810,66 +810,58 @@
             height: 100%;
             margin: auto 0;
             overflow: hidden;
+            border-radius: var(--border-radius);
         }
         
         .twitter-timeline {
-            flex: 1;
+            flex: 1 !important;
             border-radius: var(--border-radius) !important;
             border: none !important;
+            background: transparent !important;
+            min-height: 200px !important;
+            width: 100% !important;
         }
         
-        /* Placeholder styling for preview */
-        .twitter-placeholder {
-            flex: 1;
-            padding: 1rem;
+        /* Override Twitter widget styling */
+        .twitter-timeline iframe {
+            border-radius: var(--border-radius) !important;
+            background: var(--section-bg) !important;
+        }
+        
+        /* Custom styling for when the widget loads */
+        .tw-widget {
+            border-radius: var(--border-radius) !important;
+            background-color: var(--section-bg) !important;
+            border: 1px solid var(--section-border) !important;
+            box-shadow: none !important;
+        }
+        
+        /* Additional Twitter widget overrides */
+        .twitter-timeline[data-chrome*="transparent"] {
+            background: rgba(0, 0, 0, 0.02) !important;
+        }
+        
+        .dark-theme .twitter-timeline[data-chrome*="transparent"] {
+            background: rgba(255, 255, 255, 0.02) !important;
+        }
+        
+        /* Fallback styling when Twitter doesn't load */
+        .twitter-timeline:not(.twitter-timeline-rendered) {
             background-color: rgba(0, 0, 0, 0.02);
             border-radius: var(--border-radius);
             border: 1px dashed var(--section-border);
             display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-        
-        .dark-theme .twitter-placeholder {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-        
-        .placeholder-header {
-            font-weight: 500;
-            color: var(--accent-color);
+            align-items: center;
+            justify-content: center;
+            color: var(--light-gray);
             font-size: 12px;
-        }
-        
-        .placeholder-tweet {
-            background-color: rgba(0, 0, 0, 0.03);
-            padding: 0.8rem;
-            border-radius: var(--border-radius);
-            border-left: 3px solid var(--accent-color);
-        }
-        
-        .dark-theme .placeholder-tweet {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-        
-        .placeholder-tweet p {
-            color: var(--light-gray);
-            font-size: 11px;
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
-        }
-        
-        .placeholder-time {
-            color: var(--accent-color);
-            font-size: 9px;
-            opacity: 0.7;
-        }
-        
-        .placeholder-note {
-            font-size: 9px;
-            color: var(--light-gray);
             text-align: center;
-            margin-top: auto;
-            opacity: 0.8;
+            padding: 2rem;
+            min-height: 200px;
+        }
+        
+        .dark-theme .twitter-timeline:not(.twitter-timeline-rendered) {
+            background-color: rgba(255, 255, 255, 0.02);
         }
         .portfolio-gallery-container {
             width: 100%;
@@ -1003,14 +995,6 @@
                 <!-- Fallback placeholder for preview -->
                 <div class="twitter-placeholder">
                     <div class="placeholder-header">@KwameHasVision</div>
-                    <div class="placeholder-tweet">
-                        <p>Real Twitter feed will display here when hosted on your website</p>
-                        <span class="placeholder-time">Live tweets</span>
-                    </div>
-                    <div class="placeholder-note">
-                        ✓ Twitter embed code is ready<br>
-                        ✓ Will show live tweets when deployed
-                    </div>
                 </div>
             </div>
             <p class="slogan section-footer">the future's clear</p>
@@ -1401,6 +1385,8 @@
         
         function openGalleryModal(index) {
             currentGalleryIndex = index;
+            isPortfolioModal = false;
+            
             const modal = document.getElementById('gallery-modal');
             const modalImage = document.getElementById('modal-image');
             
@@ -1419,14 +1405,13 @@
                 modal.classList.add('active');
             }, 10);
             
-            // Add keyboard event listeners
-            document.addEventListener('keydown', handleGalleryKeydown);
-            
             // Prevent body scrolling
             document.body.style.overflow = 'hidden';
         }
         
         function closeGalleryModal() {
+            isPortfolioModal = false;
+            
             const modal = document.getElementById('gallery-modal');
             
             // Hide the modal with animation
@@ -1435,9 +1420,6 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
-            
-            // Remove keyboard event listeners
-            document.removeEventListener('keydown', handleGalleryKeydown);
             
             // Allow body scrolling again
             document.body.style.overflow = '';
@@ -1493,6 +1475,8 @@
         
         // Portfolio modal functions
         let currentPortfolioIndex = 0;
+        let isPortfolioModal = false;
+        
         const portfolioImages = [
             "./portfolio/kejetia-1.jpg",
             "./portfolio/kejetia-2.jpg",
@@ -1519,9 +1503,17 @@
         
         function openPortfolioModal(index) {
             currentPortfolioIndex = index;
+            isPortfolioModal = true;
+            
             const modal = document.getElementById('gallery-modal');
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
+            
+            // Clear any existing portfolio content
+            const existingPortfolioImg = document.getElementById('portfolio-modal-image');
+            const existingCaption = modal.querySelector('.portfolio-modal-caption');
+            if (existingPortfolioImg) existingPortfolioImg.remove();
+            if (existingCaption) existingCaption.remove();
             
             // Create image element for portfolio items
             const portfolioImg = document.createElement('img');
@@ -1533,6 +1525,7 @@
             portfolioImg.style.objectFit = 'contain';
             portfolioImg.style.borderRadius = 'var(--border-radius)';
             portfolioImg.style.marginBottom = '1rem';
+            portfolioImg.style.transition = 'opacity 0.3s ease';
             portfolioImg.id = 'portfolio-modal-image';
             
             // Create caption element
@@ -1547,6 +1540,7 @@
             // Hide the regular modal image and show portfolio image with caption
             modalImage.style.display = 'none';
             modalContainer.style.flexDirection = 'column';
+            modalContainer.style.justifyContent = 'center';
             modalContainer.appendChild(portfolioImg);
             modalContainer.appendChild(captionDiv);
             
@@ -1556,14 +1550,13 @@
                 modal.classList.add('active');
             }, 10);
             
-            // Add keyboard event listeners
-            document.addEventListener('keydown', handlePortfolioKeydown);
-            
             // Prevent body scrolling
             document.body.style.overflow = 'hidden';
         }
         
         function closePortfolioModal() {
+            isPortfolioModal = false;
+            
             const modal = document.getElementById('gallery-modal');
             const modalImage = document.getElementById('modal-image');
             const modalContainer = modal.querySelector('.modal-image-container');
@@ -1588,9 +1581,6 @@
                 modal.classList.add('hidden');
             }, 300);
             
-            // Remove keyboard event listeners
-            document.removeEventListener('keydown', handlePortfolioKeydown);
-            
             // Allow body scrolling again
             document.body.style.overflow = '';
         }
@@ -1613,13 +1603,31 @@
             }
         }
         
-        function handlePortfolioKeydown(e) {
-            if (e.key === 'Escape') {
+        // Universal modal navigation functions
+        function closeModal() {
+            if (isPortfolioModal) {
                 closePortfolioModal();
+            } else {
+                closeGalleryModal();
+            }
+        }
+        
+        function navigateModal(direction) {
+            if (isPortfolioModal) {
+                changePortfolioImage(direction);
+            } else {
+                changeGalleryImage(direction);
+            }
+        }
+        
+        // Universal keyboard handler
+        function handleUniversalKeydown(e) {
+            if (e.key === 'Escape') {
+                closeModal();
             } else if (e.key === 'ArrowLeft') {
-                changePortfolioImage(-1);
+                navigateModal(-1);
             } else if (e.key === 'ArrowRight') {
-                changePortfolioImage(1);
+                navigateModal(1);
             }
         }
         
@@ -1665,54 +1673,35 @@
             if (modal) {
                 modal.addEventListener('click', (e) => {
                     if (e.target === modal) {
-                        // Check if we're viewing portfolio or regular gallery
-                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
-                        if (captionDiv) {
-                            closePortfolioModal();
-                        } else {
-                            closeGalleryModal();
-                        }
+                        closeModal();
                     }
                 });
                 
-                // Add click handlers for modal navigation buttons
+                // Set up modal button handlers
+                const modalClose = modal.querySelector('.modal-close');
                 const modalPrev = modal.querySelector('.modal-prev');
                 const modalNext = modal.querySelector('.modal-next');
                 
+                if (modalClose) {
+                    modalClose.onclick = function() {
+                        closeModal();
+                    };
+                }
+                
                 if (modalPrev) {
                     modalPrev.onclick = function() {
-                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
-                        if (captionDiv) {
-                            changePortfolioImage(-1);
-                        } else {
-                            changeGalleryImage(-1);
-                        }
+                        navigateModal(-1);
                     };
                 }
                 
                 if (modalNext) {
                     modalNext.onclick = function() {
-                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
-                        if (captionDiv) {
-                            changePortfolioImage(1);
-                        } else {
-                            changeGalleryImage(1);
-                        }
+                        navigateModal(1);
                     };
                 }
                 
-                // Also add close button handler
-                const modalClose = modal.querySelector('.modal-close');
-                if (modalClose) {
-                    modalClose.onclick = function() {
-                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
-                        if (captionDiv) {
-                            closePortfolioModal();
-                        } else {
-                            closeGalleryModal();
-                        }
-                    };
-                }
+                // Universal keyboard handler
+                document.addEventListener('keydown', handleUniversalKeydown);
             }
             
             // Add automatic detection if scrollbar is needed
