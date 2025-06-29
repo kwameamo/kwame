@@ -1473,7 +1473,7 @@
             const modalContainer = modal.querySelector('.modal-image-container');
             
             // Remove any temporary divs and captions, show img again
-            const tempDiv = modal.querySelector('.modal-image-container > div:not(.modal-image)');
+            const tempDiv = modal.querySelector('.modal-image-container > div:not(img)');
             const captionDiv = modal.querySelector('.portfolio-modal-caption');
             if (tempDiv) {
                 tempDiv.remove();
@@ -1482,7 +1482,8 @@
                 captionDiv.remove();
             }
             modalImage.style.display = 'block';
-            modalContainer.style.flexDirection = 'row';
+            modalContainer.style.flexDirection = 'column';
+            modalContainer.style.justifyContent = 'center';
             
             // Hide the modal with animation
             modal.classList.remove('active');
@@ -1501,7 +1502,7 @@
         function changePortfolioImage(direction) {
             currentPortfolioIndex = (currentPortfolioIndex + direction + portfolioImages.length) % portfolioImages.length;
             const modal = document.getElementById('gallery-modal');
-            const tempDiv = modal.querySelector('.modal-image-container > div:not(.modal-image)');
+            const tempDiv = modal.querySelector('.modal-image-container > div:not(img)');
             const captionDiv = modal.querySelector('.portfolio-modal-caption');
             
             if (tempDiv) {
@@ -1573,6 +1574,32 @@
                         }
                     }
                 });
+                
+                // Update modal navigation for portfolio
+                const modalPrev = modal.querySelector('.modal-prev');
+                const modalNext = modal.querySelector('.modal-next');
+                
+                if (modalPrev) {
+                    modalPrev.addEventListener('click', () => {
+                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
+                        if (captionDiv) {
+                            changePortfolioImage(-1);
+                        } else {
+                            changeGalleryImage(-1);
+                        }
+                    });
+                }
+                
+                if (modalNext) {
+                    modalNext.addEventListener('click', () => {
+                        const captionDiv = modal.querySelector('.portfolio-modal-caption');
+                        if (captionDiv) {
+                            changePortfolioImage(1);
+                        } else {
+                            changeGalleryImage(1);
+                        }
+                    });
+                }
             }
             
             // Add automatic detection if scrollbar is needed
