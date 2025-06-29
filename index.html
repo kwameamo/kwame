@@ -803,7 +803,20 @@
             animation-play-state: paused;
         }
         
-        /* Portfolio gallery styling */
+        /* Twitter feed styling */
+        .twitter-feed-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            margin: auto 0;
+            overflow: hidden;
+        }
+        
+        .twitter-timeline {
+            flex: 1;
+            border-radius: var(--border-radius) !important;
+            border: none !important;
+        }
         .portfolio-gallery-container {
             width: 100%;
             overflow: hidden;
@@ -919,27 +932,16 @@
 
         <div class="section square-section">
             <h3 class="section-title">david kwame amo</h3>
-                <!-- Gallery inside the square section -->
-                    <div class="gallery-container">
-                    <div class="gallery-nav prev" onclick="scrollGallery(-1)">‹</div>
-                    <div class="gallery-scroll" id="gallery-scroll">
-                        <div class="gallery-item" onclick="openGalleryModal(0)">
-                            <div class="gallery-image" style="background-image: url('./photos/1.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(1)">
-                            <div class="gallery-image" style="background-image: url('./photos/2.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(2)">
-                            <div class="gallery-image" style="background-image: url('./photos/3.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(3)">
-                            <div class="gallery-image" style="background-image: url('./photos/4.jpg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openGalleryModal(4)">
-                            <div class="gallery-image" style="background-image: url('./photos/5.jpeg'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-                    <div class="gallery-nav next" onclick="scrollGallery(1)">›</div>
+            <!-- Twitter/X Feed inside the square section -->
+            <div class="twitter-feed-container">
+                <a class="twitter-timeline" 
+                   data-height="250" 
+                   data-theme="light" 
+                   data-chrome="noheader nofooter noborders transparent noscrollbar"
+                   href="https://twitter.com/KwameHasVision?ref_src=twsrc%5Etfw">
+                   Tweets by KwameHasVision
+                </a>
+                <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
             </div>
             <p class="slogan section-footer">the future's clear</p>
         </div>
@@ -1434,15 +1436,15 @@
         ];
         
         const portfolioCaptions = [
-            "Kejetia Boyz Jersey - Jul. 2024",
-            "Kejetia Boyz Jersey - Jul. 2024", 
-            "Kejetia Boyz Jersey - Jul. 2024",
-            "Kejetia Boyz Jersey - Jul. 2024",
-            "Kejetia Boyz Jersey - Jul. 2024t",
-            "No Love In The City Familiar Hearts Tee - Feb. 2025",
-            "No Love In The City Familiar Hearts Tee - Feb. 2025",
-            "No Love In The City Militia Tee - Feb. 2025",
-            "No Love In The City Militia Tee - Feb. 2025"
+            "Kejetia Series - Market Life",
+            "Kejetia Series - Daily Commerce", 
+            "Kejetia Series - Street Culture",
+            "Kejetia Series - Urban Energy",
+            "Kejetia Series - Community Spirit",
+            "No Love Series - Portrait Study",
+            "No Love Series - Emotional Expression",
+            "No Love Series - Human Connection",
+            "No Love Series - Visual Storytelling"
         ];
         
         function openPortfolioModal(index) {
