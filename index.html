@@ -924,15 +924,12 @@
         /* Loading state styling */
         .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
             content: 'Loading tweets...';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 200px;
-            color: var(--light-gray);
-            font-size: 11px;
-            background: rgba(0, 0, 0, 0.02);
-            border-radius: var(--border-radius);
-            border: 1px dashed var(--section-border);
+            /* ... styling ... */
+        }
+        
+        /* Hide loading state when widget is loaded */
+        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-loaded]::before {
+            display: none !important;
         }
 
         
