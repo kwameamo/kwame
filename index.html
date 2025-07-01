@@ -111,38 +111,95 @@
             text-decoration: none;
         }
 
-        /* Custom cursor */
+        /* Retro custom cursor */
         body {
             cursor: none;
         }
         
         .cursor {
-            width: 20px;
-            height: 20px;
-            border: 1px solid var(--accent-color);
-            border-radius: 50%;
+            width: 24px;
+            height: 24px;
             position: fixed;
             pointer-events: none;
             z-index: 9999;
-            mix-blend-mode: difference;
-            transition: transform 0.2s ease;
+            transition: transform 0.1s ease;
             opacity: 1;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        .cursor::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background: 
+                /* Classic arrow cursor shape using CSS */
+                linear-gradient(45deg, transparent 30%, var(--accent-color) 30%, var(--accent-color) 35%, transparent 35%),
+                linear-gradient(-45deg, transparent 65%, var(--accent-color) 65%, var(--accent-color) 70%, transparent 70%),
+                linear-gradient(90deg, transparent 40%, var(--accent-color) 40%, var(--accent-color) 45%, transparent 45%),
+                linear-gradient(0deg, transparent 60%, var(--accent-color) 60%, var(--accent-color) 65%, transparent 65%);
+            background-size: 100% 100%;
+            filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.8)) drop-shadow(-1px -1px 0px rgba(255,255,255,0.3));
+        }
+        
+        /* Alternative retro cursor using pixel art approach */
+        .cursor::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-image: 
+                /* Creating a pixelated arrow cursor */
+                conic-gradient(from 0deg at 12px 12px, 
+                    var(--accent-color) 0deg 45deg, 
+                    transparent 45deg 90deg,
+                    var(--accent-color) 90deg 135deg,
+                    transparent 135deg 180deg,
+                    var(--accent-color) 180deg 225deg,
+                    transparent 225deg 270deg,
+                    var(--accent-color) 270deg 315deg,
+                    transparent 315deg 360deg);
+            clip-path: polygon(0% 0%, 30% 30%, 15% 30%, 15% 70%, 0% 70%);
+            filter: contrast(2) brightness(1.2);
+            image-rendering: pixelated;
+        }
+        
+        /* Simplified retro cursor design */
+        .cursor {
+            background: var(--accent-color);
+            clip-path: polygon(0% 0%, 0% 70%, 15% 55%, 30% 100%, 45% 85%, 30% 40%, 100% 40%, 0% 0%);
+            box-shadow: 
+                2px 2px 0px rgba(0,0,0,0.6),
+                1px 1px 0px rgba(255,255,255,0.4) inset,
+                -1px -1px 0px rgba(0,0,0,0.4) inset;
+            border: 1px solid rgba(0,0,0,0.8);
+            image-rendering: pixelated;
         }
         
         .cursor-dot {
-            width: 4px;
-            height: 4px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            transition: width 0.2s ease, height 0.2s ease;
-            opacity: 1;
+            display: none; /* Hide the dot for retro style */
         }
         
+        /* Hover states for retro cursor */
         a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link {
             cursor: none;
+        }
+        
+        .cursor.hover {
+            transform: scale(1.3);
+            filter: brightness(1.3) saturate(1.5);
+            box-shadow: 
+                3px 3px 0px rgba(0,0,0,0.8),
+                2px 2px 0px rgba(255,255,255,0.6) inset,
+                -2px -2px 0px rgba(0,0,0,0.6) inset,
+                0 0 10px var(--accent-color);
+        }
+        
+        .cursor.click {
+            transform: scale(0.9);
+            filter: brightness(0.8);
         }
         
         /* Show default cursor on mobile */
@@ -1473,36 +1530,38 @@
             }, 300);
         }
         
-        // Custom cursor
+        // Retro custom cursor
         function initCustomCursor() {
             const cursor = document.querySelector('.cursor');
             const cursorDot = document.querySelector('.cursor-dot');
             
-            if (!cursor || !cursorDot || window.matchMedia('(max-width: 767px)').matches) {
+            if (!cursor || window.matchMedia('(max-width: 767px)').matches) {
                 if (cursor) cursor.style.display = 'none';
                 if (cursorDot) cursorDot.style.display = 'none';
                 return;
             }
             
             document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-                cursorDot.style.left = e.clientX + 'px';
-                cursorDot.style.top = e.clientY + 'px';
+                cursor.style.left = (e.clientX - 12) + 'px';
+                cursor.style.top = (e.clientY - 12) + 'px';
             });
             
             const interactiveElements = document.querySelectorAll('a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link, .gallery-item');
             interactiveElements.forEach(el => {
                 el.addEventListener('mouseenter', () => {
-                    cursor.style.transform = 'scale(1.5)';
-                    cursorDot.style.width = '8px';
-                    cursorDot.style.height = '8px';
+                    cursor.classList.add('hover');
                 });
                 
                 el.addEventListener('mouseleave', () => {
-                    cursor.style.transform = 'scale(1)';
-                    cursorDot.style.width = '4px';
-                    cursorDot.style.height = '4px';
+                    cursor.classList.remove('hover');
+                });
+                
+                el.addEventListener('mousedown', () => {
+                    cursor.classList.add('click');
+                });
+                
+                el.addEventListener('mouseup', () => {
+                    cursor.classList.remove('click');
                 });
             });
         }
