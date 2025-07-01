@@ -598,51 +598,70 @@
             background-color: var(--accent-color-hover);
         }
 
-        .experience-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-
-        .experience-item {
-            text-align: center;
-            padding: 0.8rem 0.5rem;
-            background-color: rgba(0, 0, 0, 0.03);
-            border-radius: var(--border-radius);
-            transition: border-color 0.3s ease;
-            border: 1px solid transparent;
+        /* Timeline styling */
+        .timeline {
             position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .dark-theme .experience-item {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        .experience-item:hover {
-            border-color: var(--accent-color);
+            margin-top: 1rem;
         }
         
-        .experience-logo {
-            width: 40px;
-            height: 40px;
-            background-color: var(--accent-color);
-            color: var(--button-text);
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent-color);
+            opacity: 0.3;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
+            background: var(--accent-color);
+            border: 3px solid var(--bg-color);
+            z-index: 1;
         }
         
-        .experience-name {
+        .timeline-year {
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-company {
             font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-role {
+            font-size: 0.8rem;
+            color: var(--light-gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-description {
+            font-size: 0.8rem;
+            color: var(--light-gray);
+            line-height: 1.4;
         }
 
         .contact-grid {
@@ -686,6 +705,23 @@
             background-color: var(--accent-color);
             color: var(--button-text);
             display: inline-block;
+        }
+
+        /* Spotify embed styling */
+        .spotify-container {
+            margin-top: 1rem;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            background: var(--section-bg);
+            border: 1px solid var(--section-border);
+        }
+        
+        .spotify-container iframe {
+            border-radius: var(--border-radius);
+            border: none;
+            width: 100%;
+            height: 152px;
+            background: transparent;
         }
 
         .hidden {
@@ -1070,6 +1106,23 @@
         </div>
 
         <div class="section square-section">
+            <h3 class="section-title">about me</h3>
+            <p class="about-text">designer & entrepreneur specializing in graphic design, branding, and web development. founder of CurioGraphicsYard, CurioLabs and Vision'97. passionate about crafting visuals and building digital experiences.</p>
+            <div class="skills-list section-footer">
+                <span class="skill-tag">StreetwearDevelopment</span>
+                <span class="skill-tag">GraphicDesign</span>
+                <span class="skill-tag">Branding</span>
+                <span class="skill-tag">WebDesign</span>
+                <span class="skill-tag">AdobeCreativeSuite</span>
+                <span class="skill-tag">Figma</span>
+                <span class="skill-tag">Webflow</span>
+                <span class="skill-tag">SaaS</span>
+                <span class="skill-tag">ProductDevelopment</span>
+                <span class="skill-tag">BrandStrategy</span>
+            </div>
+        </div>
+
+        <div class="section square-section">
             <h3 class="section-title">portfolio</h3>
             <div class="gallery-container">
                 <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
@@ -1108,41 +1161,46 @@
                 <a href="https://www.behance.net/kwameamo" target="_blank" class="button" id="portfolio-btn">view extended portfolio</a>
             </div>
         </div>
-
-        <div class="section square-section">
-            <h3 class="section-title">about me</h3>
-            <p class="about-text">designer & entrepreneur specializing in graphic design, branding, and web development. founder of CurioGraphicsYard, CurioLabs and Vision'97. passionate about crafting visuals and building digital experiences.</p>
-            <div class="skills-list section-footer">
-                <span class="skill-tag">StreetwearDevelopment</span>
-                <span class="skill-tag">GraphicDesign</span>
-                <span class="skill-tag">Branding</span>
-                <span class="skill-tag">WebDesign</span>
-                <span class="skill-tag">AdobeCreativeSuite</span>
-                <span class="skill-tag">Figma</span>
-                <span class="skill-tag">Webflow</span>
-                <span class="skill-tag">SaaS</span>
-                <span class="skill-tag">ProductDevelopment</span>
-                <span class="skill-tag">BrandStrategy</span>
+        
+        <div class="section">
+            <div class="label">
+                <h3>music designed artworks by me</h3>
+                <span class="tag">album covers</span>
+            </div>
+            <div class="spotify-container">
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4i7GYtfHft5UlQ79s6ujE9?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
         </div>
 
         <div class="section">
             <div class="label">
                 <h3>experience</h3>
-                <span class="tag">10+ years</span>
+                <span class="tag">timeline</span>
             </div>
-            <div class="experience-grid">
-                <div class="experience-item">
-                    <div class="experience-logo">C</div>
-                    <div class="experience-name">CurioGfxYard</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2024 - Present</div>
+                    <div class="timeline-company">Vision'97</div>
+                    <div class="timeline-role">Founder & Creative Director</div>
+                    <div class="timeline-description">Leading streetwear brand development with focus on cultural storytelling and premium design.</div>
                 </div>
-                <div class="experience-item">
-                    <div class="experience-logo">F</div>
-                    <div class="experience-name">freelance</div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2020 - Present</div>
+                    <div class="timeline-company">CurioLabs</div>
+                    <div class="timeline-role">Founder & Technical Lead</div>
+                    <div class="timeline-description">Developing innovative digital products and SaaS solutions for creative industries.</div>
                 </div>
-                <div class="experience-item">
-                    <div class="experience-logo">V</div>
-                    <div class="experience-name">Vision'97</div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2018 - Present</div>
+                    <div class="timeline-company">CurioGraphicsYard</div>
+                    <div class="timeline-role">Founder & Designer</div>
+                    <div class="timeline-description">Creative studio specializing in brand identity, graphic design, and digital experiences.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2014 - 2020</div>
+                    <div class="timeline-company">Freelance</div>
+                    <div class="timeline-role">Graphic Designer & Developer</div>
+                    <div class="timeline-description">Collaborated with various clients on branding, web design, and creative direction projects.</div>
                 </div>
             </div>
         </div>
@@ -1249,6 +1307,16 @@
                     </div>
                 </div>
                 <div class="portfolio-gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="label">
+                <h3>music designed artworks by me</h3>
+                <span class="tag">album covers</span>
+            </div>
+            <div class="spotify-container">
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4i7GYtfHft5UlQ79s6ujE9?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
         </div>
         
