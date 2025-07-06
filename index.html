@@ -311,7 +311,39 @@
         .gallery-item:hover .gallery-image {
             transform: scale(1.05);
         }
-        
+
+        /* Portfolio gallery specific styles */
+        .portfolio-galleries-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) transparent;
+        }
+
+        .portfolio-galleries-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .portfolio-galleries-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .portfolio-galleries-wrapper::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
+            opacity: 0.7;
+        }
+
+        .portfolio-galleries-wrapper::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color-hover);
+            opacity: 1;
+        }
+
         /* Modal styling */
         .gallery-modal {
             position: fixed;
@@ -1088,80 +1120,82 @@
 
         <div class="section square-section">
             <h3 class="section-title">selected work</h3>
-            <div class="gallery-container">
-                <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
-                <div class="gallery-scroll" id="portfolio-gallery-scroll">
-                    <div class="gallery-item" onclick="openPortfolioModal(0)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/1.webp'); background-size: cover; background-position: center;"></div>
+            <div class="portfolio-galleries-wrapper">
+                <div class="gallery-container" id="gallery-container-1">
+                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-1', -1)">‹</div>
+                    <div class="gallery-scroll" id="portfolio-gallery-scroll-1">
+                        <div class="gallery-item" onclick="openPortfolioModal(0)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/1.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(1)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/2.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(2)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/3.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(3)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/4.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
                     </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(1)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/2.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(2)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/3.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/4.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
+                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-1', 1)">›</div>
                 </div>
-                <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
-            </div>
-            <div class="gallery-container">
-                <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
-                <div class="gallery-scroll" id="portfolio-gallery-scroll">
-                    <div class="gallery-item" onclick="openPortfolioModal(0)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/5.webp'); background-size: cover; background-position: center;"></div>
+                <div class="gallery-container" id="gallery-container-2">
+                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-2', -1)">‹</div>
+                    <div class="gallery-scroll" id="portfolio-gallery-scroll-2">
+                        <div class="gallery-item" onclick="openPortfolioModal(4)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/5.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(5)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/6.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(6)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/7.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(7)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/8.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
                     </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(1)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/6.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(2)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/7.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/8.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
+                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-2', 1)">›</div>
                 </div>
-                <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
-            </div>
-            <div class="gallery-container">
-                <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
-                <div class="gallery-scroll" id="portfolio-gallery-scroll">
-                    <div class="gallery-item" onclick="openPortfolioModal(0)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/9.webp'); background-size: cover; background-position: center;"></div>
+                <div class="gallery-container" id="gallery-container-3">
+                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-3', -1)">‹</div>
+                    <div class="gallery-scroll" id="portfolio-gallery-scroll-3">
+                        <div class="gallery-item" onclick="openPortfolioModal(8)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/9.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(9)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/10.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(10)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/11.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(11)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/12.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(12)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/13.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
                     </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(1)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/10.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(2)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/11.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/12.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/13.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
+                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-3', 1)">›</div>
                 </div>
-                <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
-            </div>
-             <div class="gallery-container">
-                <div class="gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
-                <div class="gallery-scroll" id="portfolio-gallery-scroll">
-                    <div class="gallery-item" onclick="openPortfolioModal(0)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/14.webp'); background-size: cover; background-position: center;"></div>
+                <div class="gallery-container" id="gallery-container-4">
+                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-4', -1)">‹</div>
+                    <div class="gallery-scroll" id="portfolio-gallery-scroll-4">
+                        <div class="gallery-item" onclick="openPortfolioModal(13)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/14.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(14)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/15.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(15)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/16.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
+                        <div class="gallery-item" onclick="openPortfolioModal(16)">
+                            <div class="gallery-image" style="background-image: url('./portfolio/17.webp'); background-size: cover; background-position: center;"></div>
+                        </div>
                     </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(1)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/15.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(2)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/16.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
-                    <div class="gallery-item" onclick="openPortfolioModal(3)">
-                        <div class="gallery-image" style="background-image: url('./portfolio/17.webp'); background-size: cover; background-position: center;"></div>
-                    </div>
+                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-4', 1)">›</div>
                 </div>
-                <div class="gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
             </div>
             <div class="section-footer">
                 <a href="https://www.behance.net/kwameamo" target="_blank" class="button" id="portfolio-btn">view extended portfolio</a>
@@ -1370,7 +1404,10 @@
             }, 300);
         }
         
-    
+        // Custom cursor initialization
+        function initCustomCursor() {
+            // Add custom cursor implementation if needed
+        }
 
         // Portfolio modal functions
         function openPortfolioModal(index) {
@@ -1517,14 +1554,31 @@
         }
 
         // Gallery scrolling
-        function scrollPortfolioGallery(direction) {
-            const galleryScroll = document.getElementById('portfolio-gallery-scroll');
+        function scrollPortfolioGallery(containerId, direction) {
+            const container = document.getElementById(containerId);
+            const galleryScroll = container.querySelector('.gallery-scroll');
             if (!galleryScroll) return;
             
             const scrollAmount = direction * (galleryScroll.clientWidth / 2);
             galleryScroll.scrollBy({
                 left: scrollAmount,
                 behavior: 'smooth'
+            });
+        }
+
+        // Check if galleries need scroll navigation
+        function checkGalleryScrollNeeded() {
+            const galleries = document.querySelectorAll('.gallery-container');
+            galleries.forEach(gallery => {
+                const scrollContainer = gallery.querySelector('.gallery-scroll');
+                if (scrollContainer) {
+                    const needsScroll = scrollContainer.scrollWidth > scrollContainer.clientWidth;
+                    if (!needsScroll) {
+                        gallery.classList.add('no-scroll-needed');
+                    } else {
+                        gallery.classList.remove('no-scroll-needed');
+                    }
+                }
             });
         }
 
@@ -1544,6 +1598,10 @@
             
             // Custom cursor
             initCustomCursor();
+            
+            // Check gallery scroll on load and resize
+            checkGalleryScrollNeeded();
+            window.addEventListener('resize', checkGalleryScrollNeeded);
             
             // Modal setup
             const modal = document.getElementById('gallery-modal');
