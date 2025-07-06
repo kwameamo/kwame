@@ -112,7 +112,7 @@
         }
 
         /* Retro custom cursor */
-        body {
+/*         body {
             cursor: none;
         }
         
@@ -127,32 +127,32 @@
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
-        }
+        } */
         
-        .cursor::before {
+/*         .cursor::before {
             content: '';
             position: absolute;
             width: 24px;
             height: 24px;
-            background: 
+            background:  */
                 /* Classic arrow cursor shape using CSS */
-                linear-gradient(45deg, transparent 30%, var(--accent-color) 30%, var(--accent-color) 35%, transparent 35%),
+/*                 linear-gradient(45deg, transparent 30%, var(--accent-color) 30%, var(--accent-color) 35%, transparent 35%),
                 linear-gradient(-45deg, transparent 65%, var(--accent-color) 65%, var(--accent-color) 70%, transparent 70%),
                 linear-gradient(90deg, transparent 40%, var(--accent-color) 40%, var(--accent-color) 45%, transparent 45%),
                 linear-gradient(0deg, transparent 60%, var(--accent-color) 60%, var(--accent-color) 65%, transparent 65%);
             background-size: 100% 100%;
             filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.8)) drop-shadow(-1px -1px 0px rgba(255,255,255,0.3));
-        }
+        } */
         
         /* Alternative retro cursor using pixel art approach */
-        .cursor::after {
+/*         .cursor::after {
             content: '';
             position: absolute;
             width: 24px;
             height: 24px;
             background-image: 
                 /* Creating a pixelated arrow cursor */
-                conic-gradient(from 0deg at 12px 12px, 
+/*                 conic-gradient(from 0deg at 12px 12px, 
                     var(--accent-color) 0deg 45deg, 
                     transparent 45deg 90deg,
                     var(--accent-color) 90deg 135deg,
@@ -163,11 +163,11 @@
                     transparent 315deg 360deg);
             clip-path: polygon(0% 0%, 30% 30%, 15% 30%, 15% 70%, 0% 70%);
             filter: contrast(2) brightness(1.2);
-            image-rendering: pixelated;
+            image-rendering: pixelated; */
         }
-        
+         */
         /* Simplified retro cursor design */
-        .cursor {
+/*         .cursor {
             background: var(--accent-color);
             clip-path: polygon(0% 0%, 0% 70%, 15% 55%, 30% 100%, 45% 85%, 30% 40%, 100% 40%, 0% 0%);
             box-shadow: 
@@ -180,14 +180,14 @@
         
         .cursor-dot {
             display: none; /* Hide the dot for retro style */
-        }
+        } */
         
         /* Hover states for retro cursor */
         a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link {
             cursor: none;
         }
         
-        .cursor.hover {
+/*         .cursor.hover {
             transform: scale(1.3);
             filter: brightness(1.3) saturate(1.5);
             box-shadow: 
@@ -195,12 +195,12 @@
                 2px 2px 0px rgba(255,255,255,0.6) inset,
                 -2px -2px 0px rgba(0,0,0,0.6) inset,
                 0 0 10px var(--accent-color);
-        }
+        } */
         
-        .cursor.click {
+/*         .cursor.click {
             transform: scale(0.9);
             filter: brightness(0.8);
-        }
+        } */
         
         /* Show default cursor on mobile */
         @media (max-width: 767px) {
@@ -1132,8 +1132,8 @@
     </style>
 </head>
 <body>
-    <div class="cursor"></div>
-    <div class="cursor-dot"></div>
+<!--     <div class="cursor"></div>
+    <div class="cursor-dot"></div> -->
     
     <div class="container view-container" id="main-view">
         <div class="header">
@@ -1265,7 +1265,7 @@
         <div class="section">
             <div class="label">
                 <h3>brands</h3>
-                <span class="tag">brands i run</span>
+                <span class="tag">buiding...</span>
             </div>
             <div class="brands-grid">
                 <a href="https://curiogfxyard.work" target="_blank" class="brand-item">
@@ -1305,71 +1305,10 @@
             </div>
         </div>
     </div>
-
-    <div id="portfolio-view" class="view-container hidden">
-        <div class="header">
-            <div class="header-tab">
-                <div class="header-left">
-                    <span class="header-emoji">👁️‍🗨️</span>
-                    <div class="header-theme-toggle" onclick="toggleTheme()"></div>
-                </div>
-                <span class="header-time" id="current-time-portfolio">--:--:-- GMT</span>
-                <span class="header-date" id="current-date-portfolio">--- --, ----</span>
-            </div>
-        </div>
-        
-        <div class="breadcrumb">
-            <a href="#" class="breadcrumb-link" onclick="switchView('main-view')">main</a>
-            <span class="breadcrumb-separator">/</span>
-            <span class="breadcrumb-current">portfolio</span>
-        </div>
         
         <div class="section">
             <div class="label">
-                <h3>recent work</h3>
-                <span class="tag">gallery</span>
-            </div>
-            <div class="portfolio-gallery-container">
-                <div class="portfolio-gallery-nav prev" onclick="scrollPortfolioGallery(-1)">‹</div>
-                <div class="portfolio-gallery-scroll" id="portfolio-gallery-scroll-extended">
-                    <div class="portfolio-gallery-item">
-                        <div class="portfolio-gallery-image">
-                            <div style="background: linear-gradient(45deg, var(--accent-color) 0%, var(--highlight) 100%);"></div>
-                        </div>
-                        <div class="portfolio-gallery-caption">Brand Identity<br>Design</div>
-                    </div>
-                    <div class="portfolio-gallery-item">
-                        <div class="portfolio-gallery-image">
-                            <div style="background: linear-gradient(135deg, var(--warning) 0%, var(--error) 100%);"></div>
-                        </div>
-                        <div class="portfolio-gallery-caption">Streetwear<br>Collection</div>
-                    </div>
-                    <div class="portfolio-gallery-item">
-                        <div class="portfolio-gallery-image">
-                            <div style="background: linear-gradient(45deg, var(--success) 0%, var(--highlight) 100%);"></div>
-                        </div>
-                        <div class="portfolio-gallery-caption">Web Development<br>Project</div>
-                    </div>
-                    <div class="portfolio-gallery-item">
-                        <div class="portfolio-gallery-image">
-                            <div style="background: linear-gradient(225deg, var(--accent-color) 0%, var(--warning) 100%);"></div>
-                        </div>
-                        <div class="portfolio-gallery-caption">Logo Design<br>Package</div>
-                    </div>
-                    <div class="portfolio-gallery-item">
-                        <div class="portfolio-gallery-image">
-                            <div style="background: linear-gradient(315deg, var(--error) 0%, var(--highlight) 100%);"></div>
-                        </div>
-                        <div class="portfolio-gallery-caption">Digital Art<br>Series</div>
-                    </div>
-                </div>
-                <div class="portfolio-gallery-nav next" onclick="scrollPortfolioGallery(1)">›</div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="label">
-                <h3>music designed artworks by me</h3>
+                <h3>music artworks designed by me</h3>
                 <span class="tag">album covers</span>
             </div>
             <div class="spotify-container">
