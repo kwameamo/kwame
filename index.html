@@ -3,1626 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>david kwame amo</title>
+    <title>David Kwame Amo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --text-color: #1a1a1a;
-            --bg-color: #f8f9fa;
-            --accent-color: #4361ee;
-            --accent-color-hover: #3a56d4;
-            --light-gray: #666;
-            --section-bg: rgba(255, 255, 255, 0.7);
-            --section-border: rgba(0, 0, 0, 0.05);
-            --section-shadow: rgba(0, 0, 0, 0.05);
-            --button-text: #ffffff;
-            --highlight: #4cc9f0;
-            --error: #ef476f;
-            --success: #06d6a0;
-            --warning: #ffd166;
-            --transition-speed: 0.3s;
-            --border-radius: 8px;
-        }
-
-        body.dark-theme {
-            --text-color: #e9ecef;
-            --bg-color: #121212;
-            --accent-color: #4cc9f0;
-            --accent-color-hover: #7ad5f5;
-            --light-gray: #adb5bd;
-            --section-bg: rgba(255, 255, 255, 0.03);
-            --section-border: rgba(255, 255, 255, 0.1);
-            --section-shadow: rgba(0, 0, 0, 0.2);
-            --button-text: #000000;
-            --highlight: #4361ee;
-            --error: #ef476f;
-            --success: #06d6a0;
-            --warning: #ffd166;
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Geist Mono', monospace;
-            font-size: 13px;
-            font-weight: 400;
-            line-height: 19px;
-            font-style: normal;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-            padding: 2rem;
-            max-width: 600px;
-            margin: 0 auto;
+            font-family: 'Syne Mono', 'Courier New', monospace;
+            background: #ffffff;
+            color: #1a1a1a;
             line-height: 1.6;
-            position: relative;
-            overflow-x: hidden;
-            font-weight: 300;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(circle at 30% 20%, rgba(100,100,255,0.05) 0%, rgba(0,0,0,0) 50%),
-                radial-gradient(circle at 70% 80%, rgba(255,100,100,0.03) 0%, rgba(0,0,0,0) 50%);
-            opacity: 0.7;
-        }
-        
-        body.dark-theme::before {
-            background: 
-                radial-gradient(circle at 30% 20%, rgba(100,100,255,0.03) 0%, rgba(0,0,0,0) 50%),
-                radial-gradient(circle at 70% 80%, rgba(255,100,100,0.02) 0%, rgba(0,0,0,0) 50%);
-        }
-        
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background-image: 
-                linear-gradient(var(--section-border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--section-border) 1px, transparent 1px);
-            background-size: 50px 50px;
-            opacity: 0.1;
-        }
-
-        h1, h2, h3 {
-            font-weight: normal;
-            font-size: 13px;
-            line-height: 19px;
-        }
-
-        a {
-            color: var(--text-color);
-            text-decoration: none;
-        }
-        
-        /* Show default cursor on mobile */
-        @media (max-width: 767px) {
-            body {
-                cursor: auto;
-            }
-            
-            .cursor, .cursor-dot {
-                display: none;
-            }
-            
-            a, button, .theme-btn, .experience-item, .contact-item, .breadcrumb-link {
-                cursor: pointer;
-            }
-        }
-
-        /* Modified section styling */
-        .section {
-            margin-bottom: 3px;
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            background-color: var(--section-bg);
-            border: 1px solid var(--section-border);
-            transition: border 0.3s ease, padding 0.3s ease;
-            backdrop-filter: blur(5px);
-            position: relative;
-            overflow: hidden;
-            box-shadow: none;
-        }
-        
-        .section.square-section {
-            aspect-ratio: 1 / 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 1.5rem;
-        }
-        
-        .section:hover {
-            outline: 3px solid var(--accent-color);
-            outline-offset: 0;
-            border: 1px solid var(--section-border);
-        }
-        
-        .section-title {
-            margin-bottom: 1rem;
-        }
-        
-        .section-footer {
-            margin-top: auto;
-        }
-
-        .brands-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-        
-        .brand-item {
-            text-align: center;
-            padding: 0.8rem 0.5rem;
-            background-color: rgba(0, 0, 0, 0.03);
-            border-radius: var(--border-radius);
-            transition: border-color 0.3s ease, transform 0.3s ease;
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
-            color: var(--text-color);
-            text-decoration: none;
-        }
-        
-        .dark-theme .brand-item {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-        
-        .brand-item:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-3px);
-        }
-        
-        .brand-logo {
-            width: 80px;
-            height: 80px;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .brand-item:hover .brand-logo {
-            transform: scale(1.1);
-        }
-        
-        .brand-svg {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        .brand-name {
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-        
-        .brand-item:hover .brand-name {
-            color: var(--accent-color);
+            padding: 2rem 0.5rem;
         }
 
-        /* Gallery styling */
-        .gallery-container {
-            width: 100%;
-            overflow: hidden;
-            margin: 10px 0;
-            position: relative;
-            min-height: 170px;
+        .hero-image {
+            width: 240px;
+            height: 300px;
+            margin-bottom: 2rem;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
-        
-        .gallery-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .gallery-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .gallery-nav {
-            position: absolute;
-            top: 0;
-            height: 100%;
-            width: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.1);
-            color: var(--text-color);
-            font-size: 16px;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 2;
-        }
-        
-        .gallery-container:hover .gallery-nav {
-            opacity: 1;
-        }
-        
-        .gallery-nav.prev {
-            left: 0;
-            border-top-left-radius: var(--border-radius);
-            border-bottom-left-radius: var(--border-radius);
-        }
-        
-        .gallery-nav.next {
-            right: 0;
-            border-top-right-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-        }
-        
-        .gallery-container.no-scroll-needed .gallery-nav {
-            display: none;
-        }
-        
-        .gallery-item {
-            flex: 0 0 auto;
-            width: 120px;
-            height: 160px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            scroll-snap-align: start;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        
-        .gallery-item:hover {
-            transform: translateY(-3px);
-        }
-        
-        .gallery-image {
+
+        .hero-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .gallery-item:hover .gallery-image {
-            transform: scale(1.05);
-        }
-
-        /* Portfolio gallery specific styles */
-        .portfolio-galleries-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 5px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-color) transparent;
-        }
-
-        .portfolio-galleries-wrapper::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .portfolio-galleries-wrapper::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .portfolio-galleries-wrapper::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 3px;
-            opacity: 0.7;
-        }
-
-        .portfolio-galleries-wrapper::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color-hover);
-            opacity: 1;
-        }
-
-        /* Modal styling */
-        .gallery-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            -webkit-user-drag: none;
+            user-select: none;
         }
-        
-        .gallery-modal.active {
-            opacity: 1;
-            pointer-events: auto;
+
+        .bio {
+            max-width: 650px;
+            text-align: center;
+            margin-bottom: 2rem;
         }
-        
-        .modal-content {
-            position: relative;
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
+
+        .bio p {
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .brands {
             display: flex;
-            align-items: center;
+            gap: 3rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
             justify-content: center;
         }
-        
-        .modal-image-container {
+
+        .brand-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #1a1a1a;
+            transition: opacity 0.3s ease;
+        }
+
+        .brand-link:hover {
+            opacity: 0.6;
+        }
+
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-logo img {
             width: 100%;
             height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        
-        .modal-image {
-            width: auto;
-            height: auto;
-            max-width: 100%;
-            max-height: 100%;
             object-fit: contain;
-            transition: opacity 0.3s ease;
         }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.6; }
-        }
-        
-        .modal-image.loading {
-            animation: pulse 1.5s infinite;
-        }
-        
-        @media (min-width: 768px) {
-            .modal-image-container {
-                max-width: 80vh;
-                margin: 0 auto;
-            }
-        }
-        
-        .modal-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+
+        .social-icons {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1001;
-        }
-        
-        .modal-nav {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-        }
-        
-        .modal-prev, .modal-next {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .header {
-            margin-bottom: 3rem;
-            position: relative;
-        }
-        
-        .header-tab {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 1.5rem;
-            border-radius: var(--border-radius);
-            background-color: var(--section-bg);
-            border: 1px solid var(--section-border);
-            backdrop-filter: blur(5px);
-            font-size: 13px;
-            font-weight: 300;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        
-        .header-emoji {
-            font-size: 16px;
-        }
-        
-        .header-theme-toggle {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            border: 1px solid var(--section-border);
-        }
-        
-        .header-theme-toggle::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 10px;
-            height: 10px;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-        
-        .header-theme-toggle::before {
-            background: radial-gradient(circle, #ffdd00 30%, transparent 70%);
-        }
-        
-        .dark-theme .header-theme-toggle::before {
-            background: radial-gradient(circle, #aaa 30%, transparent 70%);
-        }
-        
-        .header-theme-toggle:hover {
-            border-color: var(--accent-color);
-            transform: scale(1.1);
-        }
-        
-        .header-time {
-            color: var(--text-color);
-            font-weight: 400;
-        }
-        
-        .header-date {
-            color: var(--light-gray);
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            color: var(--light-gray);
-        }
-        
-        .breadcrumb-link {
-            color: var(--light-gray);
-            transition: color 0.3s ease;
-        }
-        
-        .breadcrumb-link:hover {
-            color: var(--accent-color);
-        }
-        
-        .breadcrumb-separator {
-            color: var(--light-gray);
-        }
-        
-        .breadcrumb-current {
-            color: var(--accent-color);
-        }
-
-        .slogan {
-            color: var(--light-gray);
-            font-size: 0.9rem;
-        }
-        
-        .about-text {
-            color: var(--light-gray);
-            line-height: 1.6;
-            position: relative;
-            margin: auto 0;
-            padding-left: 0;
-            text-align: left;
-        }
-
-        .label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .tag {
-            display: inline-block;
-            font-size: 0.8rem;
-            color: var(--light-gray);
-        }
-
-        .button {
-            display: block;
-            width: 100%;
-            padding: 0.8rem;
-            background-color: var(--accent-color);
-            color: var(--button-text);
-            border: none;
-            border-radius: var(--border-radius);
-            text-align: center;
-            cursor: pointer;
-            font-weight: 500;
-            letter-spacing: 0.05em;
-            transition: background-color var(--transition-speed);
-        }
-
-        .button:hover {
-            background-color: var(--accent-color-hover);
-        }
-
-        /* Timeline styling */
-        .timeline {
-            position: relative;
-            margin-top: 1rem;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--accent-color);
-            opacity: 0.3;
-        }
-        
-        .timeline-item {
-            position: relative;
-            padding-left: 50px;
-            margin-bottom: 2rem;
-            transition: transform 0.2s ease;
-        }
-        
-        .timeline-item:hover {
-            transform: translateX(5px);
-        }
-        
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            border: 3px solid var(--bg-color);
-            z-index: 1;
-        }
-        
-        .timeline-year {
-            font-size: 0.75rem;
-            color: var(--accent-color);
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-        
-        .timeline-company {
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-        
-        .timeline-role {
-            font-size: 0.8rem;
-            color: var(--light-gray);
-            margin-bottom: 0.5rem;
-        }
-        
-        .timeline-description {
-            font-size: 0.8rem;
-            color: var(--light-gray);
-            line-height: 1.4;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.8rem;
-        }
-
-        .contact-item {
-            text-align: center;
-            padding: 0.75rem 0.5rem;
-            background-color: rgba(0, 0, 0, 0.03);
-            border-radius: var(--border-radius);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-
-        .dark-theme .contact-item {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        .contact-item:hover {
-            background-color: var(--accent-color);
-            color: var(--button-text);
-        }
-        
-        .skills-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 1.5rem;
             margin-top: auto;
         }
-        
-        .skill-tag {
-            font-size: 0.7rem;
-            padding: 0.3rem 0.6rem;
-            border-radius: 50px;
-            background-color: var(--accent-color);
-            color: var(--button-text);
-            display: inline-block;
-        }
 
-        /* Spotify embed styling */
-        .spotify-container {
-            margin-top: 1rem;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            background: var(--section-bg);
-            border: 1px solid var(--section-border);
-        }
-        
-        .spotify-container iframe {
-            border-radius: var(--border-radius);
-            border: none;
-            width: 100%;
-            height: 352px;
-            background: transparent;
-        }
-
-        .hidden {
-            display: none;
-        }
-        
-        .project-card {
-            transition: border 0.3s ease, padding 0.3s ease;
-            margin-bottom: 3px;
-            border-radius: var(--border-radius);
-            background-color: var(--section-bg);
-            border: 1px solid var(--section-border);
-            padding: 1.5rem;
-        }
-        
-        .project-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-        
-        .project-tags {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 0.5rem;
-        }
-        
-        .project-image {
-            margin-bottom: 1rem;
-            overflow: hidden;
-            border-radius: var(--border-radius);
-        }
-        
-        .project-description {
-            margin-bottom: 1.5rem;
-            color: var(--light-gray);
-        }
-        
-        .project-card:hover {
-            outline: 3px solid var(--accent-color);
-            outline-offset: 0;
-            border: 1px solid var(--section-border);
-        }
-        
-        .view-container {
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-        
-        .fade-out {
-            opacity: 0;
-        }
-        
-        .marquee-section {
-            margin-bottom: 3px;
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            background-color: var(--section-bg);
-            border: 1px solid var(--section-border);
-            backdrop-filter: blur(5px);
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .marquee-section:hover {
-            outline: 3px solid var(--accent-color);
-            outline-offset: 0;
-            border: 1px solid var(--section-border);
-        }
-        
-        .marquee-container {
-            width: 100%;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        
-        .marquee-text {
-            display: inline-block;
-            animation: marqueeLeft 15s linear infinite;
-            color: var(--light-gray);
-            font-style: bold;
-            font-size: 14px;
-        }
-        
-        @keyframes marqueeLeft {
-            0% {
-                transform: translateX(100%);
-            }
-            100% {
-                transform: translateX(-100%);
-            }
-        }
-        
-        .marquee-container:hover .marquee-text {
-            animation-play-state: paused;
-        }
-        
-        /* Twitter/Elfsight feed styling */
-        .twitter-feed-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            margin: auto 0;
-            overflow: hidden;
-            border-radius: var(--border-radius);
-            position: relative;
-        }
-        
-        /* Elfsight Twitter widget overrides */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 {
-            height: 100% !important;
-            min-height: 200px !important;
-            max-height: 2450px !important;
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            border-radius: var(--border-radius) !important;
-            background: transparent !important;
-            scrollbar-width: thin !important;
-            scrollbar-color: var(--accent-color) transparent !important;
-        }
-        
-        /* Custom scrollbar for webkit browsers */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8::-webkit-scrollbar {
-            width: 6px !important;
-        }
-        
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8::-webkit-scrollbar-track {
-            background: transparent !important;
-        }
-        
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8::-webkit-scrollbar-thumb {
-            background: var(--accent-color) !important;
-            border-radius: 3px !important;
-            opacity: 0.7 !important;
-        }
-        
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-color-hover) !important;
-            opacity: 1 !important;
-        }
-        
-        /* Theme-aware styling for Elfsight widget */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 * {
-            font-size: 11px !important;
-            line-height: 1.3 !important;
-        }
-        
-        /* Light theme styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 {
-            background-color: rgba(0, 0, 0, 0.02) !important;
-            border: 1px solid var(--section-border) !important;
-        }
-        
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 [data-elfsight-widget-theme] {
-            background-color: var(--section-bg) !important;
-            color: var(--text-color) !important;
-        }
-        
-        /* Dark theme styling */
-        .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 {
-            background-color: rgba(255, 255, 255, 0.02) !important;
-            border: 1px solid var(--section-border) !important;
-        }
-        
-        .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 [data-elfsight-widget-theme] {
-            background-color: var(--section-bg) !important;
-            color: var(--text-color) !important;
-        }
-        
-        /* Widget content styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-widget-content,
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-twitter-feed-content {
-            background: transparent !important;
-            padding: 0.5rem !important;
-            font-size: 10px !important;
-        }
-        
-        /* Tweet cards styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-twitter-feed-item,
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .tweet {
-            background: rgba(0, 0, 0, 0.03) !important;
-            border: 1px solid var(--section-border) !important;
-            border-radius: var(--border-radius) !important;
-            margin-bottom: 0.5rem !important;
-            padding: 0.75rem !important;
-            font-size: 10px !important;
-            line-height: 1.3 !important;
-        }
-        
-        .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-twitter-feed-item,
-        .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .tweet {
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid var(--section-border) !important;
-        }
-        
-        /* Tweet text styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-twitter-feed-text,
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .tweet-text {
-            color: var(--light-gray) !important;
-            font-size: 10px !important;
-            line-height: 1.3 !important;
-            margin-bottom: 0.3rem !important;
-        }
-        
-        /* User info styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-twitter-feed-user,
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .tweet-user {
-            color: var(--accent-color) !important;
-            font-size: 9px !important;
-            font-weight: 500 !important;
-        }
-        
-        /* Date/time styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-twitter-feed-date,
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .tweet-date {
-            color: var(--light-gray) !important;
-            font-size: 8px !important;
-            opacity: 0.8 !important;
-        }
-        
-        /* Mobile scrolling optimizations */
-        @media (max-width: 767px) {
-            .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 {
-                -webkit-overflow-scrolling: touch !important;
-                overscroll-behavior: contain !important;
-            }
-            
-            .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8::-webkit-scrollbar {
-                width: 4px !important;
-            }
-        }
-        
-        /* Loading state styling */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
-/*             content: '@KwameHasVision';
-            /* ... styling ... */ */
-        }
-        
-        /* Hide loading state when widget is loaded */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-loaded]::before {
-            display: none !important;
-        }
-
-        
-        .dark-theme .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8[data-elfsight-app-lazy]:not([data-elfsight-app-loaded])::before {
-            background: rgba(255, 255, 255, 0.02);
-        }
-        
-        /* Hide Elfsight branding if present */
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .eapps-link,
-        .elfsight-app-1a9bb44e-9330-46de-93b4-269ad102bfa8 .elfsight-badge {
-            display: none !important;
-        }
-        
-        .portfolio-gallery-container {
-            width: 100%;
-            overflow: hidden;
-            margin: 1.5rem 0;
-            position: relative;
-        }
-        
-        .portfolio-gallery-scroll {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .portfolio-gallery-scroll::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .portfolio-gallery-nav {
-            position: absolute;
-            top: 0;
-            height: calc(100% - 40px);
-            width: 25px;
+        .social-icon {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(0, 0, 0, 0.1);
-            color: var(--text-color);
-            font-size: 16px;
-            cursor: pointer;
-            opacity: 0;
+            text-decoration: none;
+            color: #1a1a1a;
             transition: opacity 0.3s ease;
-            z-index: 2;
         }
-        
-        .portfolio-gallery-container:hover .portfolio-gallery-nav {
-            opacity: 1;
+
+        .social-icon:hover {
+            opacity: 0.6;
         }
-        
-        .portfolio-gallery-nav.prev {
-            left: 0;
-            border-top-left-radius: var(--border-radius);
-            border-bottom-left-radius: var(--border-radius);
+
+        .social-icon svg {
+            width: 28px;
+            height: 28px;
         }
-        
-        .portfolio-gallery-nav.next {
-            right: 0;
-            border-top-right-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-        }
-        
-        .portfolio-gallery-item {
-            flex: 0 0 auto;
-            width: 140px;
-            border-radius: var(--border-radius);
-            scroll-snap-align: start;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        
-        .portfolio-gallery-item:hover {
-            transform: translateY(-3px);
-        }
-        
-        .portfolio-gallery-image {
-            width: 100%;
-            height: 180px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-        
-        .portfolio-gallery-image div {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.5s ease;
-        }
-        
-        .portfolio-gallery-item:hover .portfolio-gallery-image div {
-            transform: scale(1.05);
-        }
-        
-        .portfolio-gallery-caption {
-            text-align: center;
-            font-size: 11px;
-            color: var(--light-gray);
-            line-height: 1.3;
+
+        @media (max-width: 768px) {
+            .hero-image {
+                width: 200px;
+                height: 250px;
+            }
+
+            .bio p {
+                font-size: 13px;
+            }
+
+            .brands {
+                gap: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    
-    <div class="container view-container" id="main-view">
-        <div class="header">
-            <div class="header-tab">
-                <div class="header-left">
-                    <span class="header-emoji">👁️‍🗨️</span>
-                    <div class="header-theme-toggle" onclick="toggleTheme()"></div>
-                </div>
-                <span class="header-time" id="current-time">--:--:-- GMT</span>
-                <span class="header-date" id="current-date">--- --, ----</span>
-            </div>
-        </div>
-
-        <div class="section square-section">
-            <h3 class="section-title">david kwame amo</h3>
-            <p class="about-text">designer & entrepreneur specializing in graphic design, branding, and web development. founder of CurioGraphicsYard, CurioLabs and Vision'97. passionate about crafting visuals and building digital experiences.</p>
-            <div class="skills-list section-footer">
-                <span class="skill-tag">StreetwearDevelopment</span>
-                <span class="skill-tag">GraphicDesign</span>
-                <span class="skill-tag">Branding</span>
-                <span class="skill-tag">WebDesign</span>
-                <span class="skill-tag">WebDevelopment</span>
-                <span class="skill-tag">AdobeCreativeSuite</span>
-                <span class="skill-tag">Figma</span>
-                <span class="skill-tag">Webflow</span>
-                <span class="skill-tag">SaaS</span>
-                <span class="skill-tag">ProductDevelopment</span>
-                <span class="skill-tag">BrandStrategy</span>
-            </div>
-        </div>
-
-        <div class="section square-section">
-            <h3 class="section-title">selected work</h3>
-            <div class="portfolio-galleries-wrapper">
-                <div class="gallery-container" id="gallery-container-1">
-                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-1', -1)">‹</div>
-                    <div class="gallery-scroll" id="portfolio-gallery-scroll-1">
-                        <div class="gallery-item" onclick="openPortfolioModal(0)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/1.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(1)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/2.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(2)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/3.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(3)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/4.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-1', 1)">›</div>
-                </div>
-                <div class="gallery-container" id="gallery-container-2">
-                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-2', -1)">‹</div>
-                    <div class="gallery-scroll" id="portfolio-gallery-scroll-2">
-                        <div class="gallery-item" onclick="openPortfolioModal(4)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/5.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(5)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/6.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(6)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/7.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(7)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/8.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-2', 1)">›</div>
-                </div>
-                <div class="gallery-container" id="gallery-container-3">
-                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-3', -1)">‹</div>
-                    <div class="gallery-scroll" id="portfolio-gallery-scroll-3">
-                        <div class="gallery-item" onclick="openPortfolioModal(8)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/9.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(9)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/10.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(10)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/11.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(11)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/12.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(12)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/13.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-3', 1)">›</div>
-                </div>
-                <div class="gallery-container" id="gallery-container-4">
-                    <div class="gallery-nav prev" onclick="scrollPortfolioGallery('gallery-container-4', -1)">‹</div>
-                    <div class="gallery-scroll" id="portfolio-gallery-scroll-4">
-                        <div class="gallery-item" onclick="openPortfolioModal(13)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/14.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(14)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/15.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(15)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/16.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                        <div class="gallery-item" onclick="openPortfolioModal(16)">
-                            <div class="gallery-image" style="background-image: url('./portfolio/17.webp'); background-size: cover; background-position: center;"></div>
-                        </div>
-                    </div>
-                    <div class="gallery-nav next" onclick="scrollPortfolioGallery('gallery-container-4', 1)">›</div>
-                </div>
-            </div>
-            <div class="section-footer">
-                <a href="https://www.behance.net/kwameamo" target="_blank" class="button" id="portfolio-btn">view extended portfolio</a>
-            </div>
-        </div>
-
-         <div class="section">
-            <div class="label">
-                <h3>music artworks by me</h3>
-                <span class="tag">album covers</span>
-            </div>
-            <div class="spotify-container">
-                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/4i7GYtfHft5UlQ79s6ujE9?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="label">
-                <h3>experience</h3>
-                <span class="tag">timeline</span>
-            </div>
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-year">2024 - Present</div>
-                    <div class="timeline-company">Vision'97</div>
-                    <div class="timeline-role">Founder & Creative Director</div>
-                    <div class="timeline-description">Leading streetwear brand development with focus on cultural storytelling and premium design.</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-year">2020 - Present</div>
-                    <div class="timeline-company">CurioLabs</div>
-                    <div class="timeline-role">Founder & Technical Lead</div>
-                    <div class="timeline-description">Developing innovative digital products and SaaS solutions for creative industries.</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-year">2018 - Present</div>
-                    <div class="timeline-company">CurioGraphicsYard</div>
-                    <div class="timeline-role">Founder & Designer</div>
-                    <div class="timeline-description">Creative studio specializing in brand identity, graphic design, and digital experiences.</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-year">2014 - 2020</div>
-                    <div class="timeline-company">Freelance</div>
-                    <div class="timeline-role">Graphic Designer & Developer</div>
-                    <div class="timeline-description">Collaborated with various clients on branding, web design, and creative direction projects.</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="label">
-                <h3>brands</h3>
-                <span class="tag">building...</span>
-            </div>
-            <div class="brands-grid">
-                <a href="https://curiogfxyard.work" target="_blank" class="brand-item">
-                    <div class="brand-logo">
-                        <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard Logo" class="brand-svg">
-                    </div>
-                    <div class="brand-name">CurioGfxYard</div>
-                </a>
-                <a href="https://curiolabs.dev" target="_blank" class="brand-item">
-                    <div class="brand-logo">
-                        <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs Logo" class="brand-svg">
-                    </div>
-                    <div class="brand-name">CurioLabs</div>
-                </a>
-                <a href="https://vision97.vision" target="_blank" class="brand-item">
-                    <div class="brand-logo">
-                        <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97 Logo" class="brand-svg">
-                    </div>
-                    <div class="brand-name">Vision'97</div>
-                </a>
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>contact me</h3>
-            <div class="contact-grid">
-                <a href="mailto:kwameagain@icloud.com" class="contact-item">email</a>
-                <a href="https://linkedin.com/in/kwameamo" target="_blank" class="contact-item">linkedin</a>
-                <a href="https://instagram.com/KwameHasVision" target="_blank" class="contact-item">insta</a>
-                <a href="https://twitter.com/KwameHasVision" target="_blank" class="contact-item">twitter</a>
-            </div>
-        </div>
-
-        <div class="marquee-section">
-            <div class="marquee-container">
-                <div class="marquee-text">your story is not where you start—it's where you choose to go.</div>
-            </div>
-        </div>
-    </div>
-   
-    
-    <div class="gallery-modal hidden" id="gallery-modal">
-        <div class="modal-content">
-            <div class="modal-image-container">
-                <img class="modal-image" id="modal-image" src="" alt="Gallery image">
-            </div>
-            <button class="modal-close">×</button>
-            <div class="modal-nav">
-                <button class="modal-prev">←</button>
-                <button class="modal-next">→</button>
-            </div>
-        </div>
+    <div class="hero-image" oncontextmenu="return false;">
+        <img src="/photos/me.jpg" alt="David Kwame Amo" oncontextmenu="return false;" ondragstart="return false;">
     </div>
 
-    <script>
-        // State variables
-        let currentGalleryIndex = 0;
-        let currentPortfolioIndex = 0;
-        let isPortfolioModal = false;
-
-        // Portfolio data
-        const portfolioImages = [
-            "./portfolio/1.webp",
-            "./portfolio/2.webp",
-            "./portfolio/3.webp",
-            "./portfolio/4.webp",
-            "./portfolio/5.webp",
-            "./portfolio/6.webp",
-            "./portfolio/7.webp",
-            "./portfolio/8.webp",
-            "./portfolio/9.webp",
-            "./portfolio/10.webp",
-            "./portfolio/11.webp",
-            "./portfolio/12.webp",
-            "./portfolio/13.webp",
-            "./portfolio/14.webp",
-            "./portfolio/15.webp",
-            "./portfolio/16.webp",
-            "./portfolio/17.webp"
-        ];
+    <div class="bio">
+        <p>Designer and builder working across brands, digital products, and streetwear through CurioGraphicsYard, CurioLabs, and Vision'97.</p>
         
-        const portfolioCaptions = [
-            "Ghetto Life, Jun. 2025",
-            "Ghetto Life, Jun. 2025",
-            "Ghetto Life, Jun. 2025",
-            "Ghetto Life, Jun. 2025",
-            "No Love In The City, Feb. 2025",
-            "No Love In The City, Feb. 2025",
-            "No Love In The City, Feb. 2025",
-            "No Love In The City, Feb. 2025",
-            "Topperclaz, Jan. 2025",
-            "Topperclaz, Jan. 2025",
-            "Topperclaz, Jan. 2025",
-            "Kejetia Boyz, Jul. 2024", 
-            "Kejetia Boyz, Jul. 2024",
-            "Ghetto Life, May. 2025",
-            "Ghetto Life, May. 2025",
-            "Ghetto Life, May. 2025",
-            "Ghetto Life, May. 2025"
-        ];
-
-        // Update time and date function
-        function updateDateTime() {
-            const now = new Date();
-            const timeOptions = {
-                timeZone: 'GMT',
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            const timeString = now.toLocaleTimeString('en-US', timeOptions) + ' GMT';
-            const dateOptions = {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            };
-            const dateString = now.toLocaleDateString('en-US', dateOptions);
-            
-            document.querySelectorAll('[id^="current-time"]').forEach(el => el.textContent = timeString);
-            document.querySelectorAll('[id^="current-date"]').forEach(el => el.textContent = dateString);
-        }
-
-        // Theme functions
-        function setTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark-theme');
-            } else {
-                document.body.classList.remove('dark-theme');
-            }
-            localStorage.setItem('theme', theme);
-        }
+        <p>Founder of Vision'97 streetwear. Lead designer at CurioGraphicsYard, a design and garment printing studio. Building digital products at CurioLabs.</p>
         
-        function toggleTheme() {
-            const isDark = document.body.classList.contains('dark-theme');
-            setTheme(isDark ? 'light' : 'dark');
-        }
-        
-        // View switching
-        function switchView(viewId) {
-            const views = document.querySelectorAll('.view-container');
-            views.forEach(view => view.classList.add('fade-out'));
-            
-            setTimeout(() => {
-                views.forEach(view => {
-                    if (view.id === viewId) {
-                        view.classList.remove('hidden');
-                        setTimeout(() => view.classList.remove('fade-out'), 50);
-                    } else {
-                        view.classList.add('hidden');
-                    }
-                });
-            }, 300);
-        }
-        
-        // Custom cursor initialization
-        function initCustomCursor() {
-            // Add custom cursor implementation if needed
-        }
+        <p>Worked with No Love In The City, Tujours Sur L'argent, and Kejetia Boyz on merchandise and graphics. Full creative direction for Gye Owuo Corp.</p>
+    </div>
 
-        // Portfolio modal functions
-        function openPortfolioModal(index) {
-            currentPortfolioIndex = index;
-            isPortfolioModal = true;
-            
-            const modal = document.getElementById('gallery-modal');
-            const modalImage = document.getElementById('modal-image');
-            const modalContainer = modal.querySelector('.modal-image-container');
-            
-            // Clear existing portfolio content
-            const existingImg = document.getElementById('portfolio-modal-image');
-            const existingCaption = modal.querySelector('.portfolio-modal-caption');
-            if (existingImg) existingImg.remove();
-            if (existingCaption) existingCaption.remove();
-            
-            // Hide default modal image
-            modalImage.style.display = 'none';
-            
-            // Create portfolio image
-            const portfolioImg = document.createElement('img');
-            portfolioImg.id = 'portfolio-modal-image';
-            portfolioImg.src = portfolioImages[index];
-            portfolioImg.style.cssText = `
-                width: auto;
-                height: auto;
-                max-width: 80vh;
-                max-height: 60vh;
-                object-fit: contain;
-                border-radius: var(--border-radius);
-                margin-bottom: 1rem;
-                transition: opacity 0.3s ease;
-            `;
-            
-            // Create caption
-            const captionDiv = document.createElement('div');
-            captionDiv.className = 'portfolio-modal-caption';
-            captionDiv.textContent = portfolioCaptions[index];
-            captionDiv.style.cssText = `
-                color: white;
-                font-size: 16px;
-                text-align: center;
-                font-weight: 400;
-            `;
-            
-            modalContainer.style.flexDirection = 'column';
-            modalContainer.style.justifyContent = 'center';
-            modalContainer.appendChild(portfolioImg);
-            modalContainer.appendChild(captionDiv);
-            
-            // Show modal
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('active'), 10);
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closePortfolioModal() {
-            isPortfolioModal = false;
-            const modal = document.getElementById('gallery-modal');
-            const modalImage = document.getElementById('modal-image');
-            const modalContainer = modal.querySelector('.modal-image-container');
-            
-            // Remove portfolio content
-            const portfolioImg = document.getElementById('portfolio-modal-image');
-            const captionDiv = modal.querySelector('.portfolio-modal-caption');
-            if (portfolioImg) portfolioImg.remove();
-            if (captionDiv) captionDiv.remove();
-            
-            // Reset modal
-            modalImage.style.display = 'block';
-            modalContainer.style.flexDirection = 'column';
-            modalContainer.style.justifyContent = 'center';
-            
-            modal.classList.remove('active');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-            document.body.style.overflow = '';
-        }
-        
-        function changePortfolioImage(direction) {
-            currentPortfolioIndex = (currentPortfolioIndex + direction + portfolioImages.length) % portfolioImages.length;
-            const portfolioImg = document.getElementById('portfolio-modal-image');
-            const captionDiv = document.querySelector('.portfolio-modal-caption');
-            
-            if (portfolioImg) {
-                portfolioImg.style.opacity = '0.5';
-                portfolioImg.src = portfolioImages[currentPortfolioIndex];
-                portfolioImg.onload = () => portfolioImg.style.opacity = '1';
-            }
-            if (captionDiv) {
-                captionDiv.textContent = portfolioCaptions[currentPortfolioIndex];
-            }
-        }
+    <div class="brands">
+        <a href="https://curiogfxyard.work" target="_blank" class="brand-link">
+            <div class="brand-logo">
+                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard">
+            </div>
+        </a>
+        <a href="https://curiolabs.dev" target="_blank" class="brand-link">
+            <div class="brand-logo">
+                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs">
+            </div>
+        </a>
+        <a href="https://vision97.vision" target="_blank" class="brand-link">
+            <div class="brand-logo">
+                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97">
+            </div>
+        </a>
+    </div>
 
-        // Personal gallery modal functions
-        function openGalleryModal(index) {
-            currentGalleryIndex = index;
-            isPortfolioModal = false;
-            
-            const modal = document.getElementById('gallery-modal');
-            const modalImage = document.getElementById('modal-image');
-            
-            modalImage.style.opacity = '0.5';
-            modalImage.src = galleryImagesFull[index];
-            modalImage.onload = () => modalImage.style.opacity = '1';
-            
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('active'), 10);
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeGalleryModal() {
-            isPortfolioModal = false;
-            const modal = document.getElementById('gallery-modal');
-            
-            modal.classList.remove('active');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-            document.body.style.overflow = '';
-        }
-        
-        function changeGalleryImage(direction) {
-            currentGalleryIndex = (currentGalleryIndex + direction + galleryImagesFull.length) % galleryImagesFull.length;
-            const modalImage = document.getElementById('modal-image');
-            
-            modalImage.style.opacity = '0.5';
-            modalImage.src = galleryImagesFull[currentGalleryIndex];
-            modalImage.onload = () => modalImage.style.opacity = '1';
-        }
-
-        // Universal modal functions
-        function closeModal() {
-            if (isPortfolioModal) {
-                closePortfolioModal();
-            } else {
-                closeGalleryModal();
-            }
-        }
-        
-        function navigateModal(direction) {
-            if (isPortfolioModal) {
-                changePortfolioImage(direction);
-            } else {
-                changeGalleryImage(direction);
-            }
-        }
-
-        // Gallery scrolling
-        function scrollPortfolioGallery(containerId, direction) {
-            const container = document.getElementById(containerId);
-            const galleryScroll = container.querySelector('.gallery-scroll');
-            if (!galleryScroll) return;
-            
-            const scrollAmount = direction * (galleryScroll.clientWidth / 2);
-            galleryScroll.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-
-        // Check if galleries need scroll navigation
-        function checkGalleryScrollNeeded() {
-            const galleries = document.querySelectorAll('.gallery-container');
-            galleries.forEach(gallery => {
-                const scrollContainer = gallery.querySelector('.gallery-scroll');
-                if (scrollContainer) {
-                    const needsScroll = scrollContainer.scrollWidth > scrollContainer.clientWidth;
-                    if (!needsScroll) {
-                        gallery.classList.add('no-scroll-needed');
-                    } else {
-                        gallery.classList.remove('no-scroll-needed');
-                    }
-                }
-            });
-        }
-
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', function() {
-            // Time updates
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            
-            // Theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                setTheme(savedTheme);
-            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                setTheme('dark');
-            }
-            
-            // Custom cursor
-            initCustomCursor();
-            
-            // Check gallery scroll on load and resize
-            checkGalleryScrollNeeded();
-            window.addEventListener('resize', checkGalleryScrollNeeded);
-            
-            // Modal setup
-            const modal = document.getElementById('gallery-modal');
-            if (modal) {
-                // Click outside to close
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) closeModal();
-                });
-                
-                // Button handlers
-                const modalClose = modal.querySelector('.modal-close');
-                const modalPrev = modal.querySelector('.modal-prev');
-                const modalNext = modal.querySelector('.modal-next');
-                
-                if (modalClose) modalClose.onclick = closeModal;
-                if (modalPrev) modalPrev.onclick = () => navigateModal(-1);
-                if (modalNext) modalNext.onclick = () => navigateModal(1);
-                
-                // Keyboard handlers
-                document.addEventListener('keydown', (e) => {
-                    if (modal.classList.contains('active')) {
-                        if (e.key === 'Escape') closeModal();
-                        else if (e.key === 'ArrowLeft') navigateModal(-1);
-                        else if (e.key === 'ArrowRight') navigateModal(1);
-                    }
-                });
-            }
-            
-            // View transitions
-            document.querySelectorAll('.view-container').forEach(view => {
-                view.style.transition = 'opacity 0.3s ease';
-            });
-        });
-    </script>
-    <script src="https://static.elfsight.com/platform/platform.js" async></script>
-
+    <div class="social-icons">
+        <a href="https://instagram.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+        </a>
+        <a href="https://twitter.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+        </a>
+        <a href="https://www.behance.net/kwameamo" target="_blank" class="social-icon" aria-label="Behance">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/>
+            </svg>
+        </a>
+        <a href="https://linkedin.com/in/kwameamo" target="_blank" class="social-icon" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+        </a>
+        <a href="mailto:kwameagain@icloud.com" class="social-icon" aria-label="Email">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/>
+            </svg>
+        </a>
+    </div>
 </body>
 </html>
