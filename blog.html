@@ -247,15 +247,12 @@
                 const response = await fetch('blog-posts.json');
                 const data = await response.json();
                 
-                // Sort by ID descending (newest first)
-                posts = data.sort((a, b) => b.id - a.id);
+                // Sort by date descending (newest first)
+                posts = data.sort((a, b) => new Date(b.date) - new Date(a.date));
                 
-                // Auto-generate dates based on order
-                const today = new Date();
-                posts.forEach((post, index) => {
-                    const postDate = new Date(today);
-                    postDate.setDate(today.getDate() - (index * 2)); // Each post is 2 days older
-                    post.date = formatDate(postDate);
+                // Format dates for display
+                posts.forEach(post => {
+                    post.displayDate = formatDate(new Date(post.date));
                 });
                 
                 renderBlogCards();
@@ -264,7 +261,7 @@
                 // Fallback to sample post if JSON fails to load
                 posts = [{
                     id: 1,
-                    date: formatDate(new Date()),
+                    displayDate: formatDate(new Date()),
                     title: "Welcome to the Blog",
                     excerpt: "Blog posts will appear here once blog-posts.json is configured.",
                     content: "<p>Add your blog posts to blog-posts.json to see them here.</p>"
@@ -284,7 +281,7 @@
             const grid = document.getElementById('blog-grid');
             grid.innerHTML = posts.map((post, index) => `
                 <div class="blog-card" onclick="openPost(${index})">
-                    <div class="blog-date">${post.date}</div>
+                    <div class="blog-date">${post.displayDate}</div>
                     <h3 class="blog-card-title">${post.title}</h3>
                     <p class="blog-excerpt">${post.excerpt}</p>
                 </div>
@@ -297,7 +294,7 @@
             const post = posts[index];
             
             document.getElementById('modal-title').textContent = post.title;
-            document.getElementById('modal-date').textContent = post.date;
+            document.getElementById('modal-date').textContent = post.displayDate;
             document.getElementById('modal-body').innerHTML = post.content;
             document.getElementById('blog-modal').classList.add('active');
             document.body.style.overflow = 'hidden';

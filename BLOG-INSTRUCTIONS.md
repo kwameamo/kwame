@@ -2,25 +2,35 @@
 
 ## Quick Guide
 
-Edit the `blog-posts.json` file to add or edit blog posts. The dates are automatically generated based on the order of posts.
+Edit the `blog-posts.json` file to add or edit blog posts. You specify the exact date for each post.
 
 ## Adding a New Post
 
 1. Open `blog-posts.json`
-2. Add a new entry at the top of the array (it will appear as the newest post)
+2. Add a new entry
 3. Give it a unique `id` (use the next number in sequence)
-4. Add your `title`, `excerpt`, and `content`
+4. Add the **exact date** you're posting (format: YYYY-MM-DD)
+5. Add your `title`, `excerpt`, and `content`
 
 ## Example Post Structure
 
 ```json
 {
   "id": 5,
+  "date": "2026-02-14",
   "title": "Your Post Title Here",
   "excerpt": "A short description of what this post is about (1-2 sentences).",
   "content": "<p>Your full blog post content goes here.</p><p>Use HTML tags for formatting.</p><h2>Subheadings</h2><p>More content...</p>"
 }
 ```
+
+## Date Format
+
+Use `YYYY-MM-DD` format (e.g., `2026-02-14` for February 14, 2026)
+
+The blog will automatically:
+- Sort posts by date (newest first)
+- Display the date as "Feb 14, 2026"
 
 ## Content Formatting
 
@@ -30,34 +40,24 @@ Use these HTML tags in your content:
 - `<strong>...</strong>` for bold text
 - `<em>...</em>` for italic text
 
-## How Dating Works
-
-Posts are automatically dated based on their position:
-- The first post (highest ID) = Today's date
-- Second post = 2 days ago
-- Third post = 4 days ago
-- And so on...
-
-This means newer posts should have higher IDs and be placed at the top of the JSON array.
-
-## Example: Adding a New Post
-
-If your current highest ID is 4, add this at the top of the array in `blog-posts.json`:
+## Example: Adding a New Post Today
 
 ```json
 [
   {
     "id": 5,
+    "date": "2026-02-14",
     "title": "My New Post",
     "excerpt": "This is my newest blog post.",
     "content": "<p>The full content of my post goes here.</p>"
   },
   {
     "id": 4,
+    "date": "2026-02-05",
     "title": "Previous Post",
     ...
   }
 ]
 ```
 
-That's it! The blog will automatically show your new post with today's date.
+That's it! Just add the date when you create the post and it will display correctly.
