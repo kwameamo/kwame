@@ -28,8 +28,8 @@
         }
 
         .hero-image {
-            width: 240px;
-            height: 300px;
+            /* width: 240px; */
+            height: 200px;
             margin-bottom: 2rem;
             user-select: none;
             -webkit-user-select: none;
@@ -79,6 +79,10 @@
             opacity: 0.6;
         }
 
+        .hero-image-link:hover {
+            cursor: crosshair;
+        }
+
         .brand-logo {
             width: 60px;
             height: 60px;
@@ -119,8 +123,8 @@
 
         @media (max-width: 768px) {
             .hero-image {
-                width: 200px;
-                height: 250px;
+                width: 250px;
+                /* height: 170px; */
             }
 
             .bio p {
@@ -134,10 +138,11 @@
     </style>
 </head>
 <body>
+    <a href="https://instagram.com/KwameHasVision" target="_blank" class="hero-image-link">
     <div class="hero-image" oncontextmenu="return false;">
-        <img src="/photos/me.jpg" alt="David Kwame Amo" oncontextmenu="return false;" ondragstart="return false;">
+        <img src="/photos/me.png" alt="David Kwame Amo" oncontextmenu="return false;" ondragstart="return false;">
     </div>
-
+    </a>
     <div class="bio">
         <p>Designer and builder working across brands, digital products, and streetwear through CurioGraphicsYard, CurioLabs, FoldsVTG and Vision'97.</p>
         
