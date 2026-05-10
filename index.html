@@ -6,64 +6,266 @@
     <title>David Kwame Amo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #0f0f0f;
+            --paper: #f8f7f4;
+            --mid: #9e9e9e;
+            --line: #e2e0db;
+            --accent: #1a1a1a;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Syne Mono', 'Courier New', monospace;
-            background: #ffffff;
-            color: #1a1a1a;
+            font-family: 'Syne Mono', monospace;
+            background: var(--paper);
+            color: var(--ink);
             line-height: 1.6;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem 0.5rem;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow: hidden;
         }
 
+        /* Grain overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.6;
+        }
+
+        /* ── Page fade-in ── */
+        .page-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(12px);
+            animation: fadeUp 0.7s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Hero ── */
         .hero-image {
-            /* width: 240px; */
-            height: 200px;
-            margin-bottom: 2rem;
+            height: 90px;
+            margin-top: 4rem;
+            margin-bottom: 0.75rem;
             user-select: none;
             -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
 
         .hero-image img {
-            width: 100%;
             height: 100%;
-            object-fit: cover;
+            width: auto;
+            object-fit: contain;
             pointer-events: none;
             -webkit-user-drag: none;
-            user-select: none;
+            clip-path: inset(0 100% 0 0);
+            animation: writeIn 1.4s cubic-bezier(0.25, 0.1, 0.2, 1) 0.2s forwards;
         }
 
+        @keyframes writeIn {
+            0%   { clip-path: inset(0 100% 0 0); }
+            60%  { clip-path: inset(0 8%   0 0); }
+            80%  { clip-path: inset(0 2%   0 0); }
+            100% { clip-path: inset(0 0%   0 0); }
+        }
+
+        /* ── Now Playing Widget ── */
+        .player-wrap {
+            margin: 1rem 0 1.75rem;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            color: var(--mid);
+            transition: opacity 0.4s ease;
+        }
+
+        .player.playing {
+            color: var(--ink);
+        }
+
+        /* Equalizer bars */
+        .eq-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .player.playing .eq-bars {
+            opacity: 1;
+        }
+
+        .eq-bars span {
+            display: block;
+            width: 2.5px;
+            background: var(--ink);
+            border-radius: 1px;
+            animation: none;
+            height: 3px;
+        }
+
+        .player.playing .eq-bars span:nth-child(1) { animation: bar 0.9s ease-in-out infinite; }
+        .player.playing .eq-bars span:nth-child(2) { animation: bar 0.7s ease-in-out 0.15s infinite; }
+        .player.playing .eq-bars span:nth-child(3) { animation: bar 1.1s ease-in-out 0.05s infinite; }
+        .player.playing .eq-bars span:nth-child(4) { animation: bar 0.8s ease-in-out 0.3s infinite; }
+
+        @keyframes bar {
+            0%, 100% { height: 3px; }
+            50% { height: 13px; }
+        }
+
+        .player-text-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            max-width: 280px;
+            overflow: hidden;
+        }
+
+        .player-track {
+            font-size: 12px;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 220px;
+            display: block;
+        }
+
+        .player-track a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .player-track a:hover {
+            border-bottom-color: var(--ink);
+        }
+
+        .player-artist {
+            font-size: 10px;
+            color: var(--mid);
+            letter-spacing: 0.06em;
+            text-transform: lowercase;
+        }
+
+        .player-idle {
+            font-size: 11px;
+            color: var(--mid);
+            letter-spacing: 0.06em;
+        }
+
+        /* Pill tag when playing */
+        .now-tag {
+            font-size: 9px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: 1px solid var(--line);
+            padding: 2px 6px;
+            color: var(--mid);
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .player.playing .now-tag {
+            border-color: var(--ink);
+            color: var(--ink);
+        }
+
+        /* ── Bio ── */
         .bio {
-            max-width: 650px;
+            max-width: 580px;
             text-align: center;
-            /* margin-bottom: 2rem; */
+            margin-bottom: 1rem;
+            animation: fadeUp 0.7s ease 0.1s both;
         }
 
         .bio p {
-            font-size: 13px;
-            line-height: 1.6;
-            margin-bottom: 1rem;
+            font-size: 12.5px;
+            line-height: 1.75;
+            margin-bottom: 0.85rem;
+            color: #3a3a3a;
         }
 
+        .bio p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bio a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px dotted currentColor;
+        }
+
+        /* ── Blog link ── */
+        .blog-cta {
+            margin-bottom: 1rem;
+            animation: fadeUp 0.7s ease 0.15s both;
+        }
+
+        .blog-cta a {
+            text-decoration: none;
+            color: var(--ink);
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            border: 1px solid var(--line);
+            padding: 0.55rem 1.2rem;
+            display: inline-block;
+            transition: all 0.25s ease;
+            position: relative;
+            background: transparent;
+        }
+
+        .blog-cta a:hover {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        /* ── Brands ── */
         .brands {
             display: flex;
-            gap: 3rem;
-            margin-bottom: 1rem;
+            gap: 2.5rem;
+            margin-bottom: 0.5rem;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
+            animation: fadeUp 0.7s ease 0.2s both;
         }
 
         .brand-link {
@@ -71,22 +273,18 @@
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            color: #1a1a1a;
-            transition: opacity 0.3s ease;
+            color: var(--ink);
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
         .brand-link:hover {
-            opacity: 0.6;
-        }
-
-        .hero-image-link:hover {
-            cursor: crosshair;
+            opacity: 0.45;
+            transform: translateY(-2px);
         }
 
         .brand-logo {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 0.5rem;
+            width: 76px;
+            height: 76px;
         }
 
         .brand-logo img {
@@ -95,115 +293,272 @@
             object-fit: contain;
         }
 
+        /* ── Divider ── */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--line);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── Social ── */
         .social-icons {
             display: flex;
-            gap: 1.5rem;
-            margin-top: auto;
+            gap: 1rem;
+            animation: fadeUp 0.7s ease 0.25s both;
         }
 
         .social-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            color: #1a1a1a;
-            transition: opacity 0.3s ease;
+            color: var(--mid);
+            transition: color 0.2s ease, transform 0.2s ease;
+            border: 1px solid transparent;
         }
 
         .social-icon:hover {
-            opacity: 0.6;
+            color: var(--ink);
+            transform: translateY(-2px);
         }
 
         .social-icon svg {
-            width: 28px;
-            height: 28px;
+            width: 18px;
+            height: 18px;
         }
 
+        /* ── Footer stamp ── */
+        .stamp {
+            margin-top: 3rem;
+            font-size: 10px;
+            color: var(--line);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* ══════════════════════════════
+           MOBILE ONLY — ≤768px
+        ══════════════════════════════ */
         @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
             .hero-image {
-                width: 250px;
-                /* height: 170px; */
+                height: 60px;
+                margin-top: 1.5rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .player-wrap {
+                margin: 0.5rem 0 0.75rem;
+                min-height: 28px;
+            }
+
+            .bio {
+                padding: 0 0.75rem;
+                margin-bottom: 1rem;
             }
 
             .bio p {
-                font-size: 13px;
+                font-size: 11px;
+                line-height: 1.6;
+                margin-bottom: 0.6rem;
+            }
+
+            .blog-cta {
+                margin-bottom: 1.25rem;
+            }
+
+            .blog-cta a {
+                font-size: 11px;
+                padding: 0.4rem 1rem;
             }
 
             .brands {
-                gap: 2rem;
+                gap: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .brand-logo {
+                width: 62px;
+                height: 62px;
+            }
+
+            .divider {
+                margin-bottom: 0.75rem;
+            }
+
+            .social-icons {
+                gap: 0.5rem;
+            }
+
+            .social-icon {
+                width: 30px;
+                height: 30px;
+            }
+
+            .social-icon svg {
+                width: 15px;
+                height: 15px;
+            }
+        }
+
+        /* ── Very small screens — ≤380px ── */
+        @media (max-width: 380px) {
+            .bio p {
+                font-size: 10.5px;
+            }
+
+            .brand-logo {
+                width: 52px;
+                height: 52px;
+            }
+
+            .brands {
+                gap: 1.25rem;
+            }
+
+            .social-icons {
+                gap: 0.35rem;
             }
         }
     </style>
 </head>
 <body>
-    <a href="https://instagram.com/KwameHasVision" target="_blank" class="hero-image-link">
-    <div class="hero-image" oncontextmenu="return false;">
-        <img src="/photos/me.png" alt="David Kwame Amo" oncontextmenu="return false;" ondragstart="return false;">
-    </div>
-    </a>
-    <div class="bio">
-        <p>Designer and builder working across brands, digital products, and streetwear through CurioGraphicsYard, CurioLabs, FoldsVTG and Vision'97.</p>
-        
-        <p>Founder of Vision'97. Lead designer at CurioGraphicsYard, a design and garment printing studio. Building digital products at CurioLabs. Experimenting with FoldsVTG.</p>
-        
-        <p>Worked with No Love In The City, Toujours Sur L'argent, Cherié by A, and Kejetia Boyz on merchandise and graphics. Full creative direction for Gye Owuo Corp and Cherié by A.</p>
+    <div class="page-wrap">
+        <div class="hero-image" oncontextmenu="return false;">
+            <img src="photos/kwame-scrib.png" alt="David Kwame Amo" oncontextmenu="return false;" ondragstart="return false;">
+        </div>
+
+        <!-- Now Playing -->
+        <div class="player-wrap">
+            <div class="player" id="player">
+                <div class="eq-bars">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div class="player-text-wrap" id="player-text">
+                    <span class="player-idle">not playing</span>
+                </div>
+                <div class="now-tag" id="now-tag">idle</div>
+            </div>
+        </div>
+
+        <!-- Bio -->
+        <div class="bio">
+            <p>designer and builder operating at the intersection of culture, code, and commerce through <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a>, <a href="https://instagram.com/foldsvtg/" target="_blank" rel="noopener">FoldsVTG</a>, and <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>.</p>
+            <p>founder of <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>, a brand rooted in clarity of purpose. lead designer at <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, creating designs and garments, and building practical digital tools at <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a> to solve real operational problems. <a href="https://instagram.com/foldsvtg/" target="_blank" rel="noopener">FoldsVTG</a> is a space for experimentation in vintage and storytelling through clothing.</p>
+            <p>collaborated with <a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a>, <a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a>, <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, and <a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a> to name a few on merchandise and visual identity. provides full creative direction and design for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, shaping brand language and product execution.</p>
+        </div>
+
+        <!-- Blog CTA -->
+        <div class="blog-cta">
+            <a href="blog.html">read blog →</a>
+        </div>
+
+        <!-- Brands -->
+        <div class="brands">
+            <a href="https://cgy.design" target="_blank" class="brand-link" title="CurioGraphicsYard">
+                <div class="brand-logo">
+                    <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard">
+                </div>
+            </a>
+            <a href="https://vision97.vision" target="_blank" class="brand-link" title="Vision'97">
+                <div class="brand-logo">
+                    <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97">
+                </div>
+            </a>
+            <a href="https://curiolabs.dev" target="_blank" class="brand-link" title="CurioLabs">
+                <div class="brand-logo">
+                    <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs">
+                </div>
+            </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Social -->
+        <div class="social-icons">
+            <a href="https://instagram.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a href="https://twitter.com/KwameHasVision" target="_blank" class="social-icon" aria-label="X / Twitter">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://www.behance.net/kwameamo" target="_blank" class="social-icon" aria-label="Behance">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/></svg>
+            </a>
+            <a href="https://linkedin.com/in/kwameamo" target="_blank" class="social-icon" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <a href="https://pinterest.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Pinterest">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="/cdn-cgi/l/email-protection#4d263a2c20282c2a2c24230d242e21223829632e2220" class="social-icon" aria-label="Email">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg>
+            </a>
+        </div>
+
+
     </div>
 
-    <div style="margin-bottom: 2rem;">
-        <a href="blog.html" style="text-decoration: none; color: #1a1a1a; font-size: 13px; border: 1px solid #e0e0e0; padding: 0.5rem 1rem; display: inline-block; transition: all 0.3s ease;" onmouseover="this.style.borderColor='#1a1a1a'; this.style.background='#1a1a1a'; this.style.color='#ffffff'" onmouseout="this.style.borderColor='#e0e0e0'; this.style.background='transparent'; this.style.color='#1a1a1a'">read blog →</a>
-    </div>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        const playerEl  = document.getElementById('player');
+        const textWrap  = document.getElementById('player-text');
+        const nowTag    = document.getElementById('now-tag');
+        let currentId   = null;
 
-    <div class="brands">
-        <a href="https://cgy.design" target="_blank" class="brand-link">
-            <div class="brand-logo">
-                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard">
-            </div>
-        </a>
-        <a href="https://curiolabs.dev" target="_blank" class="brand-link">
-            <div class="brand-logo">
-                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs">
-            </div>
-        </a>
-        <a href="https://vision97.vision" target="_blank" class="brand-link">
-            <div class="brand-logo">
-                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97">
-            </div>
-        </a>
-    </div>
+        function setPlaying(track) {
+            const id = track.title + track.artist;
+            if (id === currentId) return;
+            currentId = id;
 
-    <div class="social-icons">
-        <a href="https://instagram.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Instagram">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-        </a>
-        <a href="https://twitter.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Twitter">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-        </a>
-        <a href="https://www.behance.net/kwameamo" target="_blank" class="social-icon" aria-label="Behance">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/>
-            </svg>
-        </a>
-        <a href="https://linkedin.com/in/kwameamo" target="_blank" class="social-icon" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-            </svg>
-        </a>
-        <a href="https://pinterest.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Pinterest">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/>
-            </svg>
-        </a>
-        <a href="mailto:kwameagain@icloud.com" class="social-icon" aria-label="Email">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/>
-            </svg>
-        </a>
-    </div>
+            playerEl.classList.add('playing');
+            nowTag.textContent = 'now playing';
+
+            textWrap.innerHTML = `
+                <span class="player-track">
+                    <a href="${track.track_url}" target="_blank" rel="noopener">${track.title}</a>
+                </span>
+                <span class="player-artist">${track.artist}</span>
+            `;
+        }
+
+        function setIdle() {
+            if (currentId === null) return;
+            currentId = null;
+            playerEl.classList.remove('playing');
+            nowTag.textContent = 'idle';
+            textWrap.innerHTML = `<span class="player-idle">not playing</span>`;
+        }
+
+        async function fetchNowPlaying() {
+            try {
+                const res  = await fetch('https://npc-api.aikins.xyz/v1/users/kwameamo/now');
+                const data = await res.json();
+                if (data && data.status === 'playing') setPlaying(data.track);
+            } catch (_) {}
+        }
+
+        fetchNowPlaying();
+
+        const socket = new WebSocket('wss://npc-api.aikins.xyz/v1/users/kwameamo/ws');
+        socket.addEventListener('message', (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.event === 'update' && msg.data && msg.data.provider !== 'system') {
+                    if (msg.data.status === 'playing') {
+                        setPlaying(msg.data.track);
+                    } else {
+                        setIdle();
+                    }
+                }
+            } catch (_) {}
+        });
+
+    </script>
 </body>
 </html>
