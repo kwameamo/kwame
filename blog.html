@@ -6,631 +6,303 @@
     <title>Blog — David Kwame Amo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;600;800&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ink: #0f0f0f;
-            --paper: #f8f7f4;
-            --mid: #9e9e9e;
-            --line: #e2e0db;
-            --hover-bg: #f0eeea;
+            --white: #ffffff;
+            --black: #000000;
+            --g1: #f4f4f4;
+            --g2: #e4e4e4;
+            --g3: #aaaaaa;
+            --g4: #555555;
+            --nav-h: 56px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Syne', sans-serif; background: var(--white); color: var(--black); line-height: 1.5; overflow-x: hidden; }
+
+        /* NAV */
+        .site-nav { position: sticky; top: 0; z-index: 100; height: var(--nav-h); background: var(--white); border-bottom: 1px solid var(--g2); transition: border-color 0.3s; }
+        .site-nav.dark { border-bottom-color: var(--black); }
+        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 40px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .nav-back { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--g3); text-decoration: none; transition: color 0.2s; }
+        .nav-back:hover { color: var(--black); }
+        .nav-center { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: 15px; letter-spacing: 0.02em; }
+        .nav-right { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g3); }
+
+        /* HERO */
+        .blog-hero { border-bottom: 1px solid var(--g2); }
+        .hero-inner { max-width: 1280px; margin: 0 auto; padding: 64px 40px 48px; animation: fadeUp 0.5s ease forwards; will-change: opacity, transform; }
+        .hero-eyebrow { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g3); margin-bottom: 1rem; }
+        .hero-title { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: clamp(2.25rem, 5vw, 4rem); line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 0.75rem; }
+        .hero-sub { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--g3); }
+
+        /* POSTS BAR */
+        .posts-bar { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+        .posts-count-row { padding: 20px 0; border-bottom: 1px solid var(--g2); }
+        .posts-count-lbl { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
+
+        /* GRID */
+        .blog-section { max-width: 1280px; margin: 0 auto; padding: 0 40px 80px; }
+        .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--g2); gap: 1px; border: 1px solid var(--g2); animation: fadeUp 0.5s ease 0.1s both; will-change: opacity, transform; }
+        .blog-card { background: var(--white); padding: 28px 28px 40px; cursor: pointer; position: relative; transition: background 0.18s; }
+        .blog-card:hover { background: var(--g1); }
+        .blog-arrow { position: absolute; bottom: 24px; right: 24px; font-size: 13px; color: var(--g3); opacity: 0; transform: translateX(-4px); transition: opacity 0.18s, transform 0.18s, color 0.18s; pointer-events: none; }
+        .blog-card:hover .blog-arrow { opacity: 1; transform: translateX(0); color: var(--black); }
+        .blog-date { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g3); margin-bottom: 14px; }
+        .blog-title { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; line-height: 1.3; margin-bottom: 10px; padding-right: 1.5rem; }
+        .blog-excerpt { font-size: 12.5px; color: var(--g4); line-height: 1.6; }
+
+        /* MODAL */
+        .blog-modal { display: none; position: fixed; inset: 0; background: var(--white); z-index: 200; overflow-y: auto; opacity: 0; transition: opacity 0.22s ease; }
+        .blog-modal.active { display: block; }
+        .blog-modal.visible { opacity: 1; }
+
+        .modal-nav { position: sticky; top: 0; background: var(--white); border-bottom: 1px solid var(--g2); height: var(--nav-h); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 10; }
+        .modal-close { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--black); background: none; border: 1px solid var(--g2); padding: 0.45rem 1rem; cursor: pointer; transition: all 0.2s; }
+        .modal-close:hover { border-color: var(--black); background: var(--black); color: var(--white); }
+        .modal-nav-counter { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); letter-spacing: 0.1em; }
+        .modal-nav-btns { display: flex; gap: 0.4rem; }
+        .modal-nav-btn { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: var(--black); background: none; border: 1px solid var(--g2); padding: 0.45rem 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .modal-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--black); color: var(--white); }
+        .modal-nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+
+        .modal-content { max-width: 680px; margin: 0 auto; padding: 3.5rem 40px 6rem; }
+        .modal-eyebrow { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g3); margin-bottom: 1rem; }
+        .modal-title { font-family: 'Fraunces', Georgia, serif; font-weight: 300; font-size: clamp(1.75rem, 4vw, 2.75rem); line-height: 1.1; letter-spacing: -0.01em; margin-bottom: 0.75rem; }
+        .modal-date { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--g3); letter-spacing: 0.06em; padding-bottom: 2rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--g2); }
+
+        .modal-body { font-size: 15px; line-height: 1.85; color: #2a2a2a; }
+        .modal-body p { margin-bottom: 1.5rem; }
+        .modal-body h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: -0.01em; margin: 2.5rem 0 1rem; }
+        .modal-body strong { color: var(--black); font-weight: 700; }
+        .modal-body a { color: var(--black); text-decoration: none; border-bottom: 1px solid var(--g2); transition: border-color 0.2s; }
+        .modal-body a:hover { border-bottom-color: var(--black); }
+
+        .modal-footer { max-width: 680px; margin: 0 auto; padding: 2rem 40px 4rem; border-top: 1px solid var(--g2); display: flex; align-items: center; justify-content: space-between; }
+        .mf-btn { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.04em; color: var(--black); background: none; border: 1px solid var(--g2); padding: 0.55rem 1.1rem; cursor: pointer; transition: all 0.2s; }
+        .mf-btn:hover:not(:disabled) { border-color: var(--black); background: var(--black); color: var(--white); }
+        .mf-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+        .mf-counter { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); letter-spacing: 0.1em; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 960px) {
+            .nav-inner, .hero-inner, .posts-bar, .blog-section { padding-left: 24px; padding-right: 24px; }
+            .blog-grid { grid-template-columns: repeat(2, 1fr); }
+            .modal-nav, .modal-content, .modal-footer { padding-left: 24px; padding-right: 24px; }
+            .nav-right { display: none; }
         }
-
-        body {
-            font-family: 'Syne Mono', monospace;
-            background: var(--paper);
-            color: var(--ink);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Grain overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 100;
-            opacity: 0.6;
-        }
-
-        /* ══════════════════════════════
-           HEADER
-        ══════════════════════════════ */
-        .site-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: var(--paper);
-            border-bottom: 1px solid var(--line);
-            padding: 0 2rem;
-            height: 58px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Subtle backdrop blur on header scroll */
-        .site-header::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .site-header.scrolled::after {
-            opacity: 1;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .back-link {
-            text-decoration: none;
-            color: var(--mid);
-            font-size: 11px;
-            letter-spacing: 0.06em;
-            text-transform: lowercase;
-            transition: color 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .back-link:hover {
-            color: var(--ink);
-        }
-
-        .header-divider {
-            width: 1px;
-            height: 16px;
-            background: var(--line);
-        }
-
-        .header-name {
-            font-size: 12px;
-            color: var(--mid);
-            letter-spacing: 0.04em;
-            text-decoration: none;
-        }
-
-
-
-        .header-blog-label {
-            font-family: 'Fraunces', Georgia, serif;
-            font-weight: 300;
-            font-size: 14px;
-            letter-spacing: 0.04em;
-            text-transform: lowercase;
-            color: var(--ink);
-        }
-
-        .header-right {
-            font-size: 11px;
-            color: var(--mid);
-            letter-spacing: 0.06em;
-            text-transform: lowercase;
-            min-width: 80px;
-            text-align: right;
-        }
-
-        /* ══════════════════════════════
-           HERO SECTION
-        ══════════════════════════════ */
-        .blog-hero {
-            padding: 4rem 2rem 3rem;
-            max-width: 840px;
-            margin: 0 auto;
-            opacity: 0;
-            animation: fadeUp 0.6s ease 0.1s forwards;
-        }
-
-        @keyframes fadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .blog-hero-eyebrow {
-            font-size: 10px;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--mid);
-            margin-bottom: 0.75rem;
-        }
-
-        .blog-hero-title {
-            font-family: 'Fraunces', Georgia, serif;
-            font-weight: 300;
-            font-size: clamp(2rem, 6vw, 3.5rem);
-            line-height: 1.1;
-            letter-spacing: -0.01em;
-            color: var(--ink);
-            margin-bottom: 1rem;
-        }
-
-        .blog-hero-sub {
-            font-size: 12px;
-            color: var(--mid);
-            letter-spacing: 0.04em;
-        }
-
-        /* ══════════════════════════════
-           GRID
-        ══════════════════════════════ */
-        .blog-section {
-            max-width: 840px;
-            margin: 0 auto;
-            padding: 0 2rem 6rem;
-        }
-
-        .posts-count {
-            font-size: 10px;
-            color: var(--mid);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .blog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1px;
-            background: var(--line);
-            border: 1px solid var(--line);
-            opacity: 0;
-            transform: translateY(8px);
-            animation: fadeUp 0.6s ease 0.2s forwards;
-        }
-
-        .blog-card {
-            background: var(--paper);
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: background 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .blog-card::after {
-            content: '→';
-            position: absolute;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            font-size: 11px;
-            color: var(--mid);
-            opacity: 0;
-            transform: translateX(-4px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-
-        .blog-card:hover {
-            background: var(--hover-bg);
-        }
-
-        .blog-card:hover::after {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .blog-date {
-            font-size: 10px;
-            color: var(--mid);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            margin-bottom: 0.85rem;
-        }
-
-        .blog-card-title {
-            font-size: 13.5px;
-            margin-bottom: 0.6rem;
-            font-weight: normal;
-            line-height: 1.4;
-            letter-spacing: 0.01em;
-            padding-right: 1.5rem;
-        }
-
-        .blog-excerpt {
-            font-size: 11.5px;
-            color: var(--mid);
-            line-height: 1.55;
-        }
-
-        /* ══════════════════════════════
-           MODAL / READER
-        ══════════════════════════════ */
-        .blog-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--paper);
-            z-index: 200;
-            overflow-y: auto;
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-
-        .blog-modal.active {
-            display: block;
-        }
-
-        .blog-modal.visible {
-            opacity: 1;
-        }
-
-        /* Modal header */
-        .modal-header {
-            position: sticky;
-            top: 0;
-            background: var(--paper);
-            border-bottom: 1px solid var(--line);
-            height: 58px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            z-index: 10;
-        }
-
-        .modal-header::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: -1;
-        }
-
-        .close-btn {
-            background: none;
-            border: 1px solid var(--line);
-            padding: 0.45rem 1rem;
-            cursor: pointer;
-            font-family: 'Syne Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.04em;
-            color: var(--ink);
-            transition: all 0.2s ease;
-        }
-
-        .close-btn:hover {
-            border-color: var(--ink);
-            background: var(--ink);
-            color: var(--paper);
-        }
-
-        .modal-nav-label {
-            font-size: 10px;
-            color: var(--mid);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        /* Modal content */
-        .modal-content {
-            max-width: 640px;
-            margin: 0 auto;
-            padding: 3rem 2rem 5rem;
-        }
-
-        .modal-eyebrow {
-            font-size: 10px;
-            color: var(--mid);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            margin-bottom: 0.75rem;
-        }
-
-        .modal-title {
-            font-family: 'Fraunces', Georgia, serif;
-            font-weight: 300;
-            font-size: clamp(1.5rem, 5vw, 2.25rem);
-            line-height: 1.15;
-            letter-spacing: -0.01em;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-date {
-            font-size: 11px;
-            color: var(--mid);
-            letter-spacing: 0.06em;
-            margin-bottom: 2.5rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .modal-body {
-            font-size: 13.5px;
-            line-height: 1.85;
-            color: #2a2a2a;
-        }
-
-        .modal-body p {
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-body h2 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 600;
-            font-size: 16px;
-            margin: 2.5rem 0 1rem;
-            letter-spacing: -0.01em;
-        }
-
-        .modal-body a {
-            color: var(--ink);
-            text-decoration: none;
-            border-bottom: 1px solid var(--line);
-            transition: border-color 0.2s;
-        }
-
-        .modal-body a:hover {
-            border-bottom-color: var(--ink);
-        }
-
-        /* Modal footer nav */
-        .modal-footer-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 4rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--line);
-            max-width: 640px;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
-
-        .nav-btn {
-            background: none;
-            border: 1px solid var(--line);
-            padding: 0.6rem 1.2rem;
-            cursor: pointer;
-            font-family: 'Syne Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.04em;
-            color: var(--ink);
-            transition: all 0.2s ease;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            border-color: var(--ink);
-            background: var(--ink);
-            color: var(--paper);
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-        }
-
-        .nav-counter {
-            font-size: 10px;
-            color: var(--mid);
-            letter-spacing: 0.1em;
-        }
-
-        /* ══════════════════════════════
-           RESPONSIVE
-        ══════════════════════════════ */
-        @media (max-width: 768px) {
-            .blog-hero { padding: 2.5rem 1.25rem 2rem; }
-            .blog-section { padding: 0 1.25rem 4rem; }
-            .modal-content { padding: 2rem 1.25rem 4rem; }
-            .modal-footer-nav { padding-left: 1.25rem; padding-right: 1.25rem; }
-            .site-header { padding: 0 1.25rem; }
+        @media (max-width: 600px) {
             .blog-grid { grid-template-columns: 1fr; }
-            .header-right { display: none; }
-            .header-divider { display: none; }
-            .header-name { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ── Site Header ── -->
-    <header class="site-header" id="site-header">
-        <div class="header-left">
-            <a href="index.html" class="back-link">← back</a>
-            <div class="header-divider"></div>
-            <a href="index.html" class="header-name">David Kwame Amo</a>
-        </div>
-        <span class="header-blog-label">Blog</span>
-    </header>
+<header class="site-nav" id="site-nav">
+    <div class="nav-inner">
+        <a href="index.html" class="nav-back">← back</a>
+        <span class="nav-center">Blog</span>
+        <span class="nav-right" id="nav-right-count"></span>
+    </div>
+</header>
 
-    <section class="blog-hero">
-        <p class="blog-hero-eyebrow">Writing & Thinking</p>
-        <h1 class="blog-hero-title">Notes from the build.</h1>
-        <p class="blog-hero-sub">on design, tools, culture, and the work behind the work.</p>
-    </section>
+<section class="blog-hero">
+    <div class="hero-inner">
+        <p class="hero-eyebrow">Writing & Thinking</p>
+        <h1 class="hero-title">Notes from the build.</h1>
+        <p class="hero-sub">on design, tools, culture, and the work behind the work.</p>
+    </div>
+</section>
 
-    <!-- ── Posts ── -->
-    <section class="blog-section">
-        <div class="posts-count" id="posts-count">loading posts...</div>
-        <div class="blog-grid" id="blog-grid"></div>
-    </section>
+<div class="posts-bar">
+    <div class="posts-count-row">
+        <span class="posts-count-lbl" id="posts-count">loading posts...</span>
+    </div>
+</div>
 
-    <!-- ── Post Modal ── -->
-    <div class="blog-modal" id="blog-modal">
-        <div class="modal-header">
-            <button class="close-btn" onclick="closePost()">✕ close</button>
-            <span class="modal-nav-label" id="modal-nav-label"></span>
-            <div style="display:flex; gap:0.5rem;">
-                <button class="nav-btn" id="prev-btn" onclick="navigatePost(-1)">← prev</button>
-                <button class="nav-btn" id="next-btn" onclick="navigatePost(1)">next →</button>
-            </div>
-        </div>
+<section class="blog-section">
+    <div class="blog-grid" id="blog-grid"></div>
+</section>
 
-        <div class="modal-content">
-            <p class="modal-eyebrow" id="modal-eyebrow">Post</p>
-            <h2 class="modal-title" id="modal-title"></h2>
-            <div class="modal-date" id="modal-date"></div>
-            <div class="modal-body" id="modal-body"></div>
-        </div>
-
-        <div class="modal-footer-nav">
-            <button class="nav-btn" id="prev-btn-foot" onclick="navigatePost(-1)">← previous</button>
-            <span class="nav-counter" id="nav-counter"></span>
-            <button class="nav-btn" id="next-btn-foot" onclick="navigatePost(1)">next →</button>
+<div class="blog-modal" id="blog-modal">
+    <div class="modal-nav">
+        <button type="button" class="modal-close" onclick="closePost()">✕ close</button>
+        <span class="modal-nav-counter" id="modal-counter"></span>
+        <div class="modal-nav-btns">
+            <button type="button" class="modal-nav-btn" id="prev-btn" onclick="navigatePost(-1)">← prev</button>
+            <button type="button" class="modal-nav-btn" id="next-btn" onclick="navigatePost(1)">next →</button>
         </div>
     </div>
+    <div class="modal-content">
+        <p class="modal-eyebrow" id="modal-eyebrow"></p>
+        <h2 class="modal-title" id="modal-title"></h2>
+        <div class="modal-date" id="modal-date"></div>
+        <div class="modal-body" id="modal-body"></div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="mf-btn" id="prev-btn-foot" onclick="navigatePost(-1)">← previous</button>
+        <span class="mf-counter" id="mf-counter"></span>
+        <button type="button" class="mf-btn" id="next-btn-foot" onclick="navigatePost(1)">next →</button>
+    </div>
+</div>
 
-    <script>
-        let posts = [];
-        let currentPostIndex = 0;
+<script>
+    let posts = [];
+    let currentPostIndex = 0;
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-        function formatDate(date) {
-            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    function fmtDate(d) { return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+
+    function setPostContent(html, container) {
+        container.replaceChildren();
+        const parsed = new DOMParser().parseFromString(html, 'text/html');
+        Array.from(parsed.body.childNodes).forEach(node => {
+            container.appendChild(document.importNode(node, true));
+        });
+    }
+
+    async function loadPosts() {
+        try {
+            const res = await fetch('blog-posts.json');
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            posts = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+            posts.forEach(p => { p.displayDate = fmtDate(new Date(p.date)); });
+        } catch (_) {
+            posts = [{
+                id: 1,
+                date: new Date().toISOString(),
+                displayDate: fmtDate(new Date()),
+                title: 'Welcome to the Blog',
+                excerpt: 'Blog posts will appear here once blog-posts.json is configured.',
+                content: '<p>Add your blog posts to blog-posts.json to see them here.</p>'
+            }];
         }
+        renderCards();
 
-        async function loadPosts() {
-            try {
-                const response = await fetch('blog-posts.json');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                posts = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-                posts.forEach(post => { post.displayDate = formatDate(new Date(post.date)); });
-            } catch (error) {
-                console.error('Error loading blog posts:', error);
-                posts = [{
-                    id: 1,
-                    date: new Date().toISOString(),
-                    displayDate: formatDate(new Date()),
-                    title: "Welcome to the Blog",
-                    excerpt: "Blog posts will appear here once blog-posts.json is configured.",
-                    content: "<p>Add your blog posts to blog-posts.json to see them here.</p>"
-                }];
-            }
-
-            renderBlogCards();
-
-            // Restore open post after refresh
-            const savedPost = sessionStorage.getItem('blog_openPost');
-            if (savedPost !== null) {
-                openPost(parseInt(savedPost), true);
-            }
-
-            // Restore grid scroll if no post was open
-            if (savedPost === null) {
-                const y = sessionStorage.getItem('blog_scrollY');
-                if (y) requestAnimationFrame(() => window.scrollTo(0, parseInt(y)));
-            }
-        }
-
-        function renderBlogCards() {
-            const grid = document.getElementById('blog-grid');
-            grid.innerHTML = posts.map((post, index) => `
-                <div class="blog-card" onclick="openPost(${index})">
-                    <div class="blog-date">${post.displayDate}</div>
-                    <h3 class="blog-card-title">${post.title}</h3>
-                    <p class="blog-excerpt">${post.excerpt}</p>
-                </div>
-            `).join('');
-
-            const n = posts.length;
-            const label = `${n} ${n === 1 ? 'post' : 'posts'}`;
-            document.getElementById('posts-count').textContent = label;
-            document.getElementById('post-count-header').textContent = label;
-        }
-
-        function openPost(index, skipScrollRestore) {
-            currentPostIndex = index;
-            const post = posts[index];
-
-            document.getElementById('modal-title').textContent = post.title;
-            document.getElementById('modal-date').textContent = post.displayDate;
-            document.getElementById('modal-body').innerHTML = post.content;
-            document.getElementById('modal-eyebrow').textContent = `Post ${index + 1} of ${posts.length}`;
-
-            const modal = document.getElementById('blog-modal');
-            modal.classList.add('active');
-            requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('visible')));
-
-            document.body.style.overflow = 'hidden';
-            updateNavButtons();
-
-            // Restore modal scroll or go to top
-            const savedScroll = sessionStorage.getItem('blog_modalScrollY_' + index);
-            if (!skipScrollRestore && savedScroll !== null) {
-                requestAnimationFrame(() => { modal.scrollTop = parseInt(savedScroll); });
-            } else {
-                modal.scrollTop = 0;
-            }
-
-            sessionStorage.setItem('blog_openPost', index);
-
-            modal.onscroll = () => {
-                sessionStorage.setItem('blog_modalScrollY_' + currentPostIndex, modal.scrollTop);
-            };
-        }
-
-        function closePost() {
-            const modal = document.getElementById('blog-modal');
-            modal.classList.remove('visible');
-            setTimeout(() => {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
-            }, 250);
-
-            sessionStorage.removeItem('blog_openPost');
-
+        const saved = sessionStorage.getItem('blog_openPost');
+        if (saved !== null) openPost(parseInt(saved), true);
+        else {
             const y = sessionStorage.getItem('blog_scrollY');
             if (y) requestAnimationFrame(() => window.scrollTo(0, parseInt(y)));
         }
+    }
 
-        function navigatePost(direction) {
-            const newIndex = currentPostIndex + direction;
-            if (newIndex >= 0 && newIndex < posts.length) {
-                openPost(newIndex, false);
-            }
-        }
+    function renderCards() {
+        const grid = document.getElementById('blog-grid');
+        const frag = document.createDocumentFragment();
 
-        function updateNavButtons() {
-            const atStart = currentPostIndex === 0;
-            const atEnd   = currentPostIndex === posts.length - 1;
-            const label   = `${currentPostIndex + 1} / ${posts.length}`;
-            document.getElementById('prev-btn').disabled      = atStart;
-            document.getElementById('next-btn').disabled      = atEnd;
-            document.getElementById('prev-btn-foot').disabled = atStart;
-            document.getElementById('next-btn-foot').disabled = atEnd;
-            document.getElementById('nav-counter').textContent      = label;
-            document.getElementById('modal-nav-label').textContent  = label;
-        }
+        posts.forEach((post, i) => {
+            const card = document.createElement('div');
+            card.className = 'blog-card';
+            card.addEventListener('click', () => openPost(i));
 
-        document.addEventListener('keydown', (e) => {
-            const modal = document.getElementById('blog-modal');
-            if (modal.classList.contains('active')) {
-                if (e.key === 'Escape')     closePost();
-                if (e.key === 'ArrowLeft')  navigatePost(-1);
-                if (e.key === 'ArrowRight') navigatePost(1);
-            }
+            const date = document.createElement('div');
+            date.className = 'blog-date';
+            date.textContent = post.displayDate;
+
+            const title = document.createElement('h3');
+            title.className = 'blog-title';
+            title.textContent = post.title;
+
+            const excerpt = document.createElement('p');
+            excerpt.className = 'blog-excerpt';
+            excerpt.textContent = post.excerpt;
+
+            const arrow = document.createElement('span');
+            arrow.className = 'blog-arrow';
+            arrow.textContent = '→';
+
+            card.appendChild(date);
+            card.appendChild(title);
+            card.appendChild(excerpt);
+            card.appendChild(arrow);
+            frag.appendChild(card);
         });
 
-        window.addEventListener('scroll', () => {
-            document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
-            sessionStorage.setItem('blog_scrollY', window.scrollY);
-        });
+        grid.appendChild(frag);
 
-        loadPosts();
-    </script>
+        const n = posts.length;
+        const label = n + (n === 1 ? ' post' : ' posts');
+        document.getElementById('posts-count').textContent = label;
+        document.getElementById('nav-right-count').textContent = label;
+    }
+
+    function openPost(index, skipScrollRestore) {
+        currentPostIndex = index;
+        const post = posts[index];
+
+        document.getElementById('modal-title').textContent = post.title;
+        document.getElementById('modal-date').textContent = post.displayDate;
+        document.getElementById('modal-eyebrow').textContent = 'Post ' + (index + 1) + ' of ' + posts.length;
+
+        setPostContent(post.content, document.getElementById('modal-body'));
+
+        const modal = document.getElementById('blog-modal');
+        modal.classList.add('active');
+        requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add('visible')));
+        document.body.style.overflow = 'hidden';
+        updateNavBtns();
+
+        const savedScroll = sessionStorage.getItem('blog_modalScrollY_' + index);
+        if (!skipScrollRestore && savedScroll !== null) {
+            requestAnimationFrame(() => { modal.scrollTop = parseInt(savedScroll); });
+        } else {
+            modal.scrollTop = 0;
+        }
+
+        sessionStorage.setItem('blog_openPost', index);
+        modal.onscroll = () => {
+            sessionStorage.setItem('blog_modalScrollY_' + currentPostIndex, modal.scrollTop);
+        };
+    }
+
+    function closePost() {
+        const modal = document.getElementById('blog-modal');
+        modal.classList.remove('visible');
+        setTimeout(() => {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }, 220);
+        sessionStorage.removeItem('blog_openPost');
+        const y = sessionStorage.getItem('blog_scrollY');
+        if (y) requestAnimationFrame(() => window.scrollTo(0, parseInt(y)));
+    }
+
+    function navigatePost(dir) {
+        const next = currentPostIndex + dir;
+        if (next >= 0 && next < posts.length) openPost(next, false);
+    }
+
+    function updateNavBtns() {
+        const atStart = currentPostIndex === 0;
+        const atEnd   = currentPostIndex === posts.length - 1;
+        const label   = (currentPostIndex + 1) + ' / ' + posts.length;
+        document.getElementById('prev-btn').disabled      = atStart;
+        document.getElementById('next-btn').disabled      = atEnd;
+        document.getElementById('prev-btn-foot').disabled = atStart;
+        document.getElementById('next-btn-foot').disabled = atEnd;
+        document.getElementById('modal-counter').textContent = label;
+        document.getElementById('mf-counter').textContent    = label;
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const modal = document.getElementById('blog-modal');
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape')     closePost();
+        if (e.key === 'ArrowLeft')  navigatePost(-1);
+        if (e.key === 'ArrowRight') navigatePost(1);
+    });
+
+    window.addEventListener('scroll', () => {
+        document.getElementById('site-nav').classList.toggle('dark', window.scrollY > 10);
+        sessionStorage.setItem('blog_scrollY', window.scrollY);
+    });
+
+    loadPosts();
+</script>
 </body>
 </html>

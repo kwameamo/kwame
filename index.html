@@ -3,562 +3,551 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David Kwame Amo</title>
+    <title>David Kwame Amo — Designer, Brand Architect, Builder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --ink: #0f0f0f;
-            --paper: #f8f7f4;
-            --mid: #9e9e9e;
-            --line: #e2e0db;
-            --accent: #1a1a1a;
+            --white: #ffffff;
+            --black: #000000;
+            --g1: #f4f4f4;
+            --g2: #e4e4e4;
+            --g3: #aaaaaa;
+            --g4: #555555;
+            --nav-h: 56px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Syne', sans-serif; background: var(--white); color: var(--black); line-height: 1.5; overflow-x: hidden; }
+
+        /* NAV */
+        .site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h); background: var(--white); border-bottom: 1px solid var(--g2); transition: border-color 0.3s; }
+        .site-nav.dark { border-bottom-color: var(--black); }
+        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 40px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .nav-brand { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--black); text-decoration: none; }
+        .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
+        .nav-links a { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--g4); text-decoration: none; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--black); }
+        .nav-cta { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-decoration: none; color: var(--white); background: var(--black); padding: 0.5rem 1.1rem; transition: opacity 0.2s; }
+        .nav-cta:hover { opacity: 0.7; }
+
+        /* HERO */
+        .hero { min-height: 100vh; padding-top: var(--nav-h); display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--g2); animation: fadeUp 0.6s ease forwards; }
+        .hero-left { padding: 80px 40px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--g2); }
+        .hero-index { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
+        .hero-title-block { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 0; }
+        .hero-discipline { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); margin-bottom: 1.75rem; }
+        .hero-name { font-weight: 800; font-size: clamp(52px, 6vw, 92px); line-height: 0.9; letter-spacing: -0.03em; margin-bottom: 2.5rem; }
+        .hero-tagline { font-size: 15px; line-height: 1.65; color: var(--g4); max-width: 380px; }
+        .hero-footer { display: flex; align-items: center; justify-content: space-between; }
+        .hero-location { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g3); }
+        .hero-scroll { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--g3); }
+        .hero-right { padding: 80px 40px; display: flex; flex-direction: column; justify-content: space-between; }
+        .hero-image-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 0; user-select: none; }
+        .hero-image-wrap img { max-height: 160px; width: auto; pointer-events: none; -webkit-user-drag: none; }
+
+        /* NOW PLAYING */
+        .np-card { border: 1px solid var(--g2); padding: 14px 16px; transition: border-color 0.3s; }
+        .np-card.playing { border-color: var(--black); }
+        .np-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .np-label { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g3); }
+        .np-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g2); transition: background 0.3s; }
+        .np-card.playing .np-dot { background: var(--black); animation: npulse 1.4s ease-in-out infinite; }
+        @keyframes npulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+        .np-body { display: flex; align-items: center; gap: 10px; }
+        .np-art { width: 40px; height: 40px; background: var(--g1); border: 1px solid var(--g2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .np-art svg { width: 14px; height: 14px; fill: var(--g2); }
+        .np-info { flex: 1; overflow: hidden; display: none; }
+        .np-card.playing .np-info { display: block; }
+        .np-track { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .np-track a { color: inherit; text-decoration: none; }
+        .np-artist { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .np-idle { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--g3); }
+        .np-card.playing .np-idle { display: none; }
+        .np-eq { display: flex; align-items: flex-end; gap: 2px; height: 16px; flex-shrink: 0; opacity: 0; transition: opacity 0.3s; }
+        .np-card.playing .np-eq { opacity: 1; }
+        .np-eq span { display: block; width: 3px; border-radius: 1px; background: var(--black); height: 3px; }
+        .np-card.playing .np-eq span:nth-child(1) { animation: npeq 0.9s ease-in-out infinite; }
+        .np-card.playing .np-eq span:nth-child(2) { animation: npeq 0.7s ease-in-out 0.15s infinite; }
+        .np-card.playing .np-eq span:nth-child(3) { animation: npeq 1.1s ease-in-out 0.05s infinite; }
+        .np-card.playing .np-eq span:nth-child(4) { animation: npeq 0.8s ease-in-out 0.3s infinite; }
+        @keyframes npeq { 0%,100%{height:3px} 50%{height:15px} }
+
+        /* SECTION BASE */
+        .section { border-bottom: 1px solid var(--g2); }
+        .section-hd { max-width: 1280px; margin: 0 auto; padding: 40px 40px 0; display: flex; align-items: baseline; gap: 1.25rem; }
+        .s-num { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--g3); }
+        .s-title { font-weight: 800; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .s-count { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); margin-left: auto; }
+
+        /* WORK GRID */
+        .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
+        .wi { background: var(--white); overflow: hidden; transition: background 0.2s; }
+        .wi:hover { background: var(--g1); }
+        .wi-b1 { grid-column: 1 / 3; }
+        .wi-b2 { grid-column: 3 / 4; }
+        .wi-web { grid-column: 1 / -1; }
+        .wi-c1 { grid-column: 1 / 2; }
+        .wi-c2 { grid-column: 2 / -1; }
+        .wi-img { width: 100%; aspect-ratio: 4/3; background-color: var(--g1); background-image: repeating-linear-gradient(-45deg, transparent, transparent 6px, rgba(0,0,0,0.04) 6px, rgba(0,0,0,0.04) 12px); position: relative; display: flex; align-items: center; justify-content: center; }
+        .wi-web .wi-img { aspect-ratio: 16/6; }
+        .wi-img-lbl { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
+        .wi-meta { padding: 20px 24px 28px; }
+        .wi-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 10px; }
+        .wi-tag { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g3); border: 1px solid var(--g2); padding: 2px 7px; }
+        .wi-name { font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .wi-desc { font-size: 13px; color: var(--g4); line-height: 1.6; }
+        .wi-link { display: inline-block; margin-top: 12px; font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--g3); text-decoration: none; border-bottom: 1px solid transparent; transition: color 0.2s, border-color 0.2s; }
+        .wi:hover .wi-link { color: var(--black); border-bottom-color: var(--black); }
+
+        /* SERVICES */
+        .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
+        .svc { background: var(--white); padding: 48px 40px; }
+        .svc-idx { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--g3); margin-bottom: 2rem; }
+        .svc-name { font-weight: 800; font-size: 26px; letter-spacing: -0.025em; line-height: 1.0; margin-bottom: 6px; }
+        .svc-price { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--g3); margin-bottom: 2rem; }
+        .svc-list { list-style: none; margin-bottom: 2.5rem; }
+        .svc-list li { font-size: 13px; color: var(--g4); padding: 10px 0; border-bottom: 1px solid var(--g2); display: flex; align-items: center; gap: 0.6rem; }
+        .svc-list li::before { content: '—'; font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); flex-shrink: 0; }
+        .svc-cta { display: inline-block; font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--black); text-decoration: none; border: 1px solid var(--black); padding: 0.6rem 1.2rem; transition: background 0.2s, color 0.2s; }
+        .svc-cta:hover { background: var(--black); color: var(--white); }
+
+        /* BRANDS */
+        .brands-strip { border-bottom: 1px solid var(--g2); }
+        .brands-inner { max-width: 1280px; margin: 0 auto; padding: 32px 40px; display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; }
+        .brands-lbl { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g3); white-space: nowrap; }
+        .brands-list { display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
+        .brand-link { opacity: 0.45; transition: opacity 0.2s; display: flex; align-items: center; }
+        .brand-link:hover { opacity: 1; }
+        .brand-link img { height: 30px; width: auto; filter: grayscale(1); }
+
+        /* ABOUT */
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
+        .about-text { background: var(--white); padding: 60px 40px; }
+        .about-bio { font-size: 15px; line-height: 1.8; color: var(--g4); max-width: 480px; }
+        .about-bio p { margin-bottom: 1.25rem; }
+        .about-bio p:last-child { margin-bottom: 0; }
+        .about-bio a { color: var(--black); text-decoration: none; border-bottom: 1px solid var(--g2); transition: border-color 0.2s; }
+        .about-bio a:hover { border-bottom-color: var(--black); }
+        .about-img-col { background: var(--white); padding: 60px 40px; }
+        .about-photo { width: 100%; height: 400px; overflow: hidden; background: var(--g1); }
+        .about-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* INQUIRE */
+        .inquire-grid { display: grid; grid-template-columns: 1fr 1.6fr; background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
+        .inquire-left { background: var(--white); padding: 60px 40px; }
+        .inquire-hl { font-weight: 800; font-size: clamp(28px, 3vw, 48px); letter-spacing: -0.03em; line-height: 1.0; margin-bottom: 1.5rem; }
+        .inquire-sub { font-size: 14px; color: var(--g4); line-height: 1.65; max-width: 300px; }
+        .inquire-right { background: var(--white); padding: 60px 40px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .fg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+        .fg-lbl { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
+        .f-input, .f-select, .f-textarea { font-family: 'Syne', sans-serif; font-size: 13px; color: var(--black); background: var(--white); border: 1px solid var(--g2); padding: 10px 12px; outline: none; width: 100%; appearance: none; -webkit-appearance: none; transition: border-color 0.2s; }
+        .f-input:focus, .f-select:focus, .f-textarea:focus { border-color: var(--black); }
+        .f-textarea { resize: vertical; min-height: 120px; }
+        .f-sel-wrap { position: relative; }
+        .f-sel-wrap::after { content: '↓'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--g3); pointer-events: none; }
+        .f-submit { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: var(--white); background: var(--black); border: none; padding: 12px 28px; cursor: pointer; transition: opacity 0.2s; margin-top: 0.5rem; }
+        .f-submit:hover { opacity: 0.7; }
+        .f-success { display: none; border: 1px solid var(--g2); padding: 3rem 2rem; text-align: center; }
+        .f-success.show { display: block; }
+        .f-success-title { font-weight: 700; font-size: 20px; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .f-success-sub { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--g3); letter-spacing: 0.04em; }
+
+        /* FOOTER */
+        .site-footer { border-top: 1px solid var(--g2); }
+        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 32px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+        .footer-left { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .footer-brand { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+        .footer-socials { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .footer-soc { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g3); text-decoration: none; transition: color 0.2s; }
+        .footer-soc:hover { color: var(--black); }
+        .footer-stamp { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--g3); }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* RESPONSIVE */
+        @media (max-width: 960px) {
+            .nav-links { display: none; }
+            .hero { grid-template-columns: 1fr; min-height: auto; }
+            .hero-left { border-right: none; border-bottom: 1px solid var(--g2); padding: 64px 24px 40px; }
+            .hero-right { padding: 40px 24px 60px; }
+            .work-grid { grid-template-columns: 1fr; }
+            .wi-b1, .wi-b2, .wi-web, .wi-c1, .wi-c2 { grid-column: 1; }
+            .wi-web .wi-img { aspect-ratio: 4/3; }
+            .services-grid { grid-template-columns: 1fr; }
+            .about-grid { grid-template-columns: 1fr; }
+            .about-text { padding: 40px 24px; }
+            .about-img-col { padding: 0 24px 40px; }
+            .about-photo { height: 300px; }
+            .inquire-grid { grid-template-columns: 1fr; }
+            .inquire-left { padding: 40px 24px; }
+            .inquire-right { padding: 40px 24px; }
+            .form-row { grid-template-columns: 1fr; }
+            .section-hd { padding: 32px 24px 0; }
+            .brands-inner { padding: 28px 24px; }
+            .footer-inner { padding: 28px 24px; }
+            .nav-inner { padding: 0 24px; }
         }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Syne Mono', monospace;
-            background: var(--paper);
-            color: var(--ink);
-            line-height: 1.6;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Grain overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 100;
-            opacity: 0.6;
-        }
-
-        /* ── Page fade-in ── */
-        .page-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            opacity: 0;
-            transform: translateY(12px);
-            animation: fadeUp 0.7s ease forwards;
-        }
-
-        @keyframes fadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ── Hero ── */
-        .hero-image {
-            height: 90px;
-            margin-top: 4rem;
-            margin-bottom: 0.75rem;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .hero-image img {
-            height: 100%;
-            width: auto;
-            object-fit: contain;
-            pointer-events: none;
-            -webkit-user-drag: none;
-            clip-path: inset(0 100% 0 0);
-            animation: writeIn 1.4s cubic-bezier(0.25, 0.1, 0.2, 1) 0.2s forwards;
-        }
-
-        @keyframes writeIn {
-            0%   { clip-path: inset(0 100% 0 0); }
-            60%  { clip-path: inset(0 8%   0 0); }
-            80%  { clip-path: inset(0 2%   0 0); }
-            100% { clip-path: inset(0 0%   0 0); }
-        }
-
-        /* ── Now Playing Widget ── */
-        .player-wrap {
-            margin: 1rem 0 1.75rem;
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-        }
-
-        .player {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            font-size: 11px;
-            letter-spacing: 0.04em;
-            color: var(--mid);
-            transition: opacity 0.4s ease;
-        }
-
-        .player.playing {
-            color: var(--ink);
-        }
-
-        /* Equalizer bars */
-        .eq-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 2px;
-            height: 14px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .player.playing .eq-bars {
-            opacity: 1;
-        }
-
-        .eq-bars span {
-            display: block;
-            width: 2.5px;
-            background: var(--ink);
-            border-radius: 1px;
-            animation: none;
-            height: 3px;
-        }
-
-        .player.playing .eq-bars span:nth-child(1) { animation: bar 0.9s ease-in-out infinite; }
-        .player.playing .eq-bars span:nth-child(2) { animation: bar 0.7s ease-in-out 0.15s infinite; }
-        .player.playing .eq-bars span:nth-child(3) { animation: bar 1.1s ease-in-out 0.05s infinite; }
-        .player.playing .eq-bars span:nth-child(4) { animation: bar 0.8s ease-in-out 0.3s infinite; }
-
-        @keyframes bar {
-            0%, 100% { height: 3px; }
-            50% { height: 13px; }
-        }
-
-        .player-text-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            max-width: 280px;
-            overflow: hidden;
-        }
-
-        .player-track {
-            font-size: 12px;
-            color: var(--ink);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 220px;
-            display: block;
-        }
-
-        .player-track a {
-            color: inherit;
-            text-decoration: none;
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .player-track a:hover {
-            border-bottom-color: var(--ink);
-        }
-
-        .player-artist {
-            font-size: 10px;
-            color: var(--mid);
-            letter-spacing: 0.06em;
-            text-transform: lowercase;
-        }
-
-        .player-idle {
-            font-size: 11px;
-            color: var(--mid);
-            letter-spacing: 0.06em;
-        }
-
-        /* Pill tag when playing */
-        .now-tag {
-            font-size: 9px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            border: 1px solid var(--line);
-            padding: 2px 6px;
-            color: var(--mid);
-            background: transparent;
-            white-space: nowrap;
-        }
-
-        .player.playing .now-tag {
-            border-color: var(--ink);
-            color: var(--ink);
-        }
-
-        /* ── Bio ── */
-        .bio {
-            max-width: 580px;
-            text-align: center;
-            margin-bottom: 1rem;
-            animation: fadeUp 0.7s ease 0.1s both;
-        }
-
-        .bio p {
-            font-size: 12.5px;
-            line-height: 1.75;
-            margin-bottom: 0.85rem;
-            color: #3a3a3a;
-        }
-
-        .bio p:last-child {
-            margin-bottom: 0;
-        }
-
-        .bio a {
-            color: inherit;
-            text-decoration: none;
-            border-bottom: 1px dotted currentColor;
-        }
-
-        /* ── Blog link ── */
-        .blog-cta {
-            margin-bottom: 1rem;
-            animation: fadeUp 0.7s ease 0.15s both;
-        }
-
-        .blog-cta a {
-            text-decoration: none;
-            color: var(--ink);
-            font-size: 12px;
-            letter-spacing: 0.04em;
-            border: 1px solid var(--line);
-            padding: 0.55rem 1.2rem;
-            display: inline-block;
-            transition: all 0.25s ease;
-            position: relative;
-            background: transparent;
-        }
-
-        .blog-cta a:hover {
-            border-color: var(--ink);
-            background: var(--ink);
-            color: var(--paper);
-        }
-
-        /* ── Brands ── */
-        .brands {
-            display: flex;
-            gap: 2.5rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            animation: fadeUp 0.7s ease 0.2s both;
-        }
-
-        .brand-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--ink);
-            transition: opacity 0.25s ease, transform 0.25s ease;
-        }
-
-        .brand-link:hover {
-            opacity: 0.45;
-            transform: translateY(-2px);
-        }
-
-        .brand-logo {
-            width: 76px;
-            height: 76px;
-        }
-
-        .brand-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* ── Divider ── */
-        .divider {
-            width: 40px;
-            height: 1px;
-            background: var(--line);
-            margin-bottom: 0.5rem;
-        }
-
-        /* ── Social ── */
-        .social-icons {
-            display: flex;
-            gap: 1rem;
-            animation: fadeUp 0.7s ease 0.25s both;
-        }
-
-        .social-icon {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: var(--mid);
-            transition: color 0.2s ease, transform 0.2s ease;
-            border: 1px solid transparent;
-        }
-
-        .social-icon:hover {
-            color: var(--ink);
-            transform: translateY(-2px);
-        }
-
-        .social-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        /* ── Footer stamp ── */
-        .stamp {
-            margin-top: 3rem;
-            font-size: 10px;
-            color: var(--line);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-
-        /* ══════════════════════════════
-           MOBILE ONLY — ≤768px
-        ══════════════════════════════ */
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .hero-image {
-                height: 60px;
-                margin-top: 1.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .player-wrap {
-                margin: 0.5rem 0 0.75rem;
-                min-height: 28px;
-            }
-
-            .bio {
-                padding: 0 0.75rem;
-                margin-bottom: 1rem;
-            }
-
-            .bio p {
-                font-size: 11px;
-                line-height: 1.6;
-                margin-bottom: 0.6rem;
-            }
-
-            .blog-cta {
-                margin-bottom: 1.25rem;
-            }
-
-            .blog-cta a {
-                font-size: 11px;
-                padding: 0.4rem 1rem;
-            }
-
-            .brands {
-                gap: 1.5rem;
-                margin-bottom: 1rem;
-            }
-
-            .brand-logo {
-                width: 62px;
-                height: 62px;
-            }
-
-            .divider {
-                margin-bottom: 0.75rem;
-            }
-
-            .social-icons {
-                gap: 0.5rem;
-            }
-
-            .social-icon {
-                width: 30px;
-                height: 30px;
-            }
-
-            .social-icon svg {
-                width: 15px;
-                height: 15px;
-            }
-        }
-
-        /* ── Very small screens — ≤380px ── */
-        @media (max-width: 380px) {
-            .bio p {
-                font-size: 10.5px;
-            }
-
-            .brand-logo {
-                width: 52px;
-                height: 52px;
-            }
-
-            .brands {
-                gap: 1.25rem;
-            }
-
-            .social-icons {
-                gap: 0.35rem;
-            }
+        @media (max-width: 480px) {
+            .hero-name { font-size: 46px; }
+            .svc { padding: 36px 24px; }
+            .footer-left { flex-direction: column; align-items: flex-start; gap: 1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="page-wrap">
-        <div class="hero-image" oncontextmenu="return false;">
-            <img src="photos/kwame-scrib.png" alt="David Kwame Amo" oncontextmenu="return false;" ondragstart="return false;">
-        </div>
 
-        <!-- Now Playing -->
-        <div class="player-wrap">
-            <div class="player" id="player">
-                <div class="eq-bars">
+<!-- NAV -->
+<nav class="site-nav" id="site-nav">
+    <div class="nav-inner">
+        <a href="#" class="nav-brand">David Kwame Amo</a>
+        <ul class="nav-links">
+            <li><a href="#work">Work</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="blog.html">Blog</a></li>
+        </ul>
+        <a href="#inquire" class="nav-cta">Commission Work →</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-left">
+        <span class="hero-index">01 / Introduction</span>
+        <div class="hero-title-block">
+            <p class="hero-discipline">Designer · Brand Architect · Builder</p>
+            <h1 class="hero-name">David<br>Kwame<br>Amo</h1>
+            <p class="hero-tagline">Operating at the intersection of culture, code, and commerce. Based in Ghana, working globally.</p>
+        </div>
+        <div class="hero-footer">
+            <span class="hero-location">Koforidua, Ghana · GMT</span>
+            <span class="hero-scroll">↓ scroll to work</span>
+        </div>
+    </div>
+    <div class="hero-right">
+        <div class="hero-image-wrap" oncontextmenu="return false;">
+            <img src="photos/kwame-scrib.png" alt="David Kwame Amo" ondragstart="return false;" oncontextmenu="return false;">
+        </div>
+        <!-- Now Playing Card -->
+        <div class="np-card" id="np-card">
+            <div class="np-top">
+                <span class="np-label">Listening</span>
+                <div class="np-dot"></div>
+            </div>
+            <div class="np-body">
+                <div class="np-art">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                </div>
+                <span class="np-idle">not playing</span>
+                <div class="np-info">
+                    <div class="np-track"><a id="np-link" target="_blank" rel="noopener"></a></div>
+                    <div class="np-artist" id="np-artist"></div>
+                </div>
+                <div class="np-eq">
                     <span></span><span></span><span></span><span></span>
                 </div>
-                <div class="player-text-wrap" id="player-text">
-                    <span class="player-idle">not playing</span>
-                </div>
-                <div class="now-tag" id="now-tag">idle</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WORK -->
+<section class="section" id="work">
+    <div class="section-hd">
+        <span class="s-num">02</span>
+        <h2 class="s-title">Selected Work</h2>
+        <span class="s-count">5 projects</span>
+    </div>
+    <div class="work-grid">
+
+        <div class="wi wi-b1">
+            <div class="wi-img"><span class="wi-img-lbl">Add image — Gye Owuo Corp</span></div>
+            <div class="wi-meta">
+                <div class="wi-tags"><span class="wi-tag">Branding</span><span class="wi-tag">Creative Direction</span></div>
+                <h3 class="wi-name">Gye Owuo Corp</h3>
+                <p class="wi-desc">Full creative direction and visual identity for a Ghanaian creative house rooted in cultural pride and purpose. Brand language, typography system, and product execution from the ground up.</p>
+                <span class="wi-link">Update with case study →</span>
             </div>
         </div>
 
-        <!-- Bio -->
-        <div class="bio">
-            <p>designer and builder operating at the intersection of culture, code, and commerce through <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a>, <a href="https://instagram.com/foldsvtg/" target="_blank" rel="noopener">FoldsVTG</a>, and <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>.</p>
-            <p>founder of <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>, a brand rooted in clarity of purpose. lead designer at <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, creating designs and garments, and building practical digital tools at <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a> to solve real operational problems. <a href="https://instagram.com/foldsvtg/" target="_blank" rel="noopener">FoldsVTG</a> is a space for experimentation in vintage and storytelling through clothing.</p>
-            <p>collaborated with <a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a>, <a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a>, <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, and <a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a> to name a few on merchandise and visual identity. provides full creative direction and design for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, shaping brand language and product execution.</p>
+        <div class="wi wi-b2">
+            <div class="wi-img"><span class="wi-img-lbl">Add image — Cherié by A</span></div>
+            <div class="wi-meta">
+                <div class="wi-tags"><span class="wi-tag">Branding</span><span class="wi-tag">Packaging</span></div>
+                <h3 class="wi-name">Cherié by A</h3>
+                <p class="wi-desc">Brand identity, art direction, and packaging for a luxury feminine brand. Elevated visual language from mark to every customer touchpoint.</p>
+                <span class="wi-link">Update with case study →</span>
+            </div>
         </div>
 
-        <!-- Blog CTA -->
-        <div class="blog-cta">
-            <a href="blog.html">read blog →</a>
+        <div class="wi wi-web">
+            <div class="wi-img"><span class="wi-img-lbl">Add image — CurioLabs</span></div>
+            <div class="wi-meta">
+                <div class="wi-tags"><span class="wi-tag">Web Design</span><span class="wi-tag">Development</span><span class="wi-tag">SaaS</span></div>
+                <h3 class="wi-name">CurioLabs Platform</h3>
+                <p class="wi-desc">Full-stack design and development of a suite of digital tools solving real operational problems for African businesses — vehicle registration, designer pricing intelligence, email infrastructure, and file export automation. UI architecture, product design, and deployment.</p>
+                <span class="wi-link">Update with case study →</span>
+            </div>
         </div>
 
-        <!-- Brands -->
-        <div class="brands">
-            <a href="https://cgy.design" target="_blank" class="brand-link" title="CurioGraphicsYard">
-                <div class="brand-logo">
-                    <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard">
-                </div>
-            </a>
-            <a href="https://vision97.vision" target="_blank" class="brand-link" title="Vision'97">
-                <div class="brand-logo">
-                    <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97">
-                </div>
-            </a>
-            <a href="https://curiolabs.dev" target="_blank" class="brand-link" title="CurioLabs">
-                <div class="brand-logo">
-                    <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs">
-                </div>
-            </a>
+        <div class="wi wi-c1">
+            <div class="wi-img"><span class="wi-img-lbl">Add image — FoldsVTG</span></div>
+            <div class="wi-meta">
+                <div class="wi-tags"><span class="wi-tag">Clothing</span><span class="wi-tag">Editorial</span></div>
+                <h3 class="wi-name">FoldsVTG</h3>
+                <p class="wi-desc">Vintage-inspired garments curated for character. Storytelling through clothing — each piece selected or designed to carry a specific narrative.</p>
+                <span class="wi-link">Update with case study →</span>
+            </div>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Social -->
-        <div class="social-icons">
-            <a href="https://instagram.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Instagram">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            </a>
-            <a href="https://twitter.com/KwameHasVision" target="_blank" class="social-icon" aria-label="X / Twitter">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="https://www.behance.net/kwameamo" target="_blank" class="social-icon" aria-label="Behance">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7v-2h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14h-8.027c.13 3.211 3.483 3.312 4.588 2.029h3.168zm-7.686-4h4.965c-.105-1.547-1.136-2.219-2.477-2.219-1.466 0-2.277.768-2.488 2.219zm-9.574 6.988h-6.466v-14.967h6.953c5.476.081 5.58 5.444 2.72 6.906 3.461 1.26 3.577 8.061-3.207 8.061zm-3.466-8.988h3.584c2.508 0 2.906-3-.312-3h-3.272v3zm3.391 3h-3.391v3.016h3.341c3.055 0 2.868-3.016.05-3.016z"/></svg>
-            </a>
-            <a href="https://linkedin.com/in/kwameamo" target="_blank" class="social-icon" aria-label="LinkedIn">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-            </a>
-            <a href="https://pinterest.com/KwameHasVision" target="_blank" class="social-icon" aria-label="Pinterest">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.627 0-12 5.372-12 12 0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
-            </a>
-            <a href="/cdn-cgi/l/email-protection#4d263a2c20282c2a2c24230d242e21223829632e2220" class="social-icon" aria-label="Email">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg>
-            </a>
+        <div class="wi wi-c2">
+            <div class="wi-img"><span class="wi-img-lbl">Add image — Vision'97</span></div>
+            <div class="wi-meta">
+                <div class="wi-tags"><span class="wi-tag">Clothing</span><span class="wi-tag">Brand</span></div>
+                <h3 class="wi-name">Vision'97</h3>
+                <p class="wi-desc">Founder-led streetwear brand built on clarity of purpose. Cut-and-sew garment design, graphic work, and full brand identity for a movement rooted in the belief that circumstance is not destiny.</p>
+                <span class="wi-link">Update with case study →</span>
+            </div>
         </div>
-
 
     </div>
+</section>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        const playerEl  = document.getElementById('player');
-        const textWrap  = document.getElementById('player-text');
-        const nowTag    = document.getElementById('now-tag');
-        let currentId   = null;
+<!-- SERVICES -->
+<section class="section" id="services">
+    <div class="section-hd">
+        <span class="s-num">03</span>
+        <h2 class="s-title">Services</h2>
+    </div>
+    <div class="services-grid">
+        <div class="svc">
+            <p class="svc-idx">01 / Branding</p>
+            <h3 class="svc-name">Brand<br>Identity</h3>
+            <p class="svc-price">Starting at $800</p>
+            <ul class="svc-list">
+                <li>Logo design + mark system</li>
+                <li>Visual identity guidelines</li>
+                <li>Color + typography system</li>
+                <li>Brand voice & positioning</li>
+                <li>Stationery & print collateral</li>
+                <li>Social media kit</li>
+            </ul>
+            <a href="#inquire" class="svc-cta">Start a project →</a>
+        </div>
+        <div class="svc">
+            <p class="svc-idx">02 / Clothing</p>
+            <h3 class="svc-name">Garment<br>Design</h3>
+            <p class="svc-price">Starting at $400</p>
+            <ul class="svc-list">
+                <li>Graphic & print design</li>
+                <li>Tech pack preparation</li>
+                <li>Cut-and-sew design</li>
+                <li>Merchandise collections</li>
+                <li>Print-ready production files</li>
+                <li>Creative direction for shoots</li>
+            </ul>
+            <a href="#inquire" class="svc-cta">Start a project →</a>
+        </div>
+        <div class="svc">
+            <p class="svc-idx">03 / Digital</p>
+            <h3 class="svc-name">Web Design<br>+ Dev</h3>
+            <p class="svc-price">Starting at $1,200</p>
+            <ul class="svc-list">
+                <li>UI/UX design</li>
+                <li>Full front-end development</li>
+                <li>Responsive, deployed sites</li>
+                <li>Web app & tool development</li>
+                <li>CMS integration</li>
+                <li>Ongoing maintenance</li>
+            </ul>
+            <a href="#inquire" class="svc-cta">Start a project →</a>
+        </div>
+    </div>
+</section>
 
-        function setPlaying(track) {
-            const id = track.title + track.artist;
-            if (id === currentId) return;
-            currentId = id;
+<!-- BRANDS -->
+<div class="brands-strip">
+    <div class="brands-inner">
+        <span class="brands-lbl">My Brands</span>
+        <div class="brands-list">
+            <a href="https://cgy.design" target="_blank" class="brand-link" title="CurioGraphicsYard">
+                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard">
+            </a>
+            <a href="https://vision97.vision" target="_blank" class="brand-link" title="Vision'97">
+                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97">
+            </a>
+            <a href="https://curiolabs.dev" target="_blank" class="brand-link" title="CurioLabs">
+                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs">
+            </a>
+        </div>
+    </div>
+</div>
 
-            playerEl.classList.add('playing');
-            nowTag.textContent = 'now playing';
+<!-- ABOUT -->
+<section class="section" id="about">
+    <div class="section-hd">
+        <span class="s-num">04</span>
+        <h2 class="s-title">About</h2>
+    </div>
+    <div class="about-grid">
+        <div class="about-text">
+            <div class="about-bio">
+                <p>Designer and builder operating at the intersection of culture, code, and commerce. Founder of <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>, a brand rooted in clarity of purpose. Lead designer at <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, creating identities and garments. Building practical digital tools at <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a> that solve real operational problems.</p>
+                <p>Collaborated with <a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a>, <a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a>, <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, and <a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a> on merchandise and visual identity. Full creative direction for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>.</p>
+                <p><a href="blog.html">Read the blog →</a> for thinking on design, tools, culture, and the work behind the work.</p>
+            </div>
+        </div>
+        <div class="about-img-col">
+            <div class="about-photo">
+                <img src="photos/me.jpg" alt="David Kwame Amo">
+            </div>
+        </div>
+    </div>
+</section>
 
-            textWrap.innerHTML = `
-                <span class="player-track">
-                    <a href="${track.track_url}" target="_blank" rel="noopener">${track.title}</a>
-                </span>
-                <span class="player-artist">${track.artist}</span>
-            `;
-        }
+<!-- INQUIRE -->
+<section class="section" id="inquire">
+    <div class="section-hd">
+        <span class="s-num">05</span>
+        <h2 class="s-title">Inquire</h2>
+    </div>
+    <div class="inquire-grid">
+        <div class="inquire-left">
+            <h2 class="inquire-hl">Let's build something worth remembering.</h2>
+            <p class="inquire-sub">Tell me what you're working on. I'll get back to you within 48 hours with thoughts and next steps.</p>
+        </div>
+        <div class="inquire-right">
+            <form id="inquire-form">
+                <div class="form-row">
+                    <div class="fg">
+                        <label class="fg-lbl">First Name</label>
+                        <input type="text" class="f-input" placeholder="First name" required>
+                    </div>
+                    <div class="fg">
+                        <label class="fg-lbl">Last Name</label>
+                        <input type="text" class="f-input" placeholder="Last name" required>
+                    </div>
+                </div>
+                <div class="fg">
+                    <label class="fg-lbl">Email</label>
+                    <input type="email" class="f-input" placeholder="your@email.com" required>
+                </div>
+                <div class="form-row">
+                    <div class="fg">
+                        <label class="fg-lbl">Project Type</label>
+                        <div class="f-sel-wrap">
+                            <select class="f-select" required>
+                                <option value="" disabled selected>Select type</option>
+                                <option>Brand Identity</option>
+                                <option>Garment Design</option>
+                                <option>Web Design + Dev</option>
+                                <option>Creative Direction</option>
+                                <option>Merchandise</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="fg">
+                        <label class="fg-lbl">Budget Range</label>
+                        <div class="f-sel-wrap">
+                            <select class="f-select">
+                                <option value="" disabled selected>Select range</option>
+                                <option>$400 – $800</option>
+                                <option>$800 – $1,500</option>
+                                <option>$1,500 – $3,000</option>
+                                <option>$3,000+</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="fg">
+                    <label class="fg-lbl">Tell me about the project</label>
+                    <textarea class="f-textarea" placeholder="What are you building? What's the goal? Any timeline?" required></textarea>
+                </div>
+                <button type="submit" class="f-submit">Send Inquiry →</button>
+            </form>
+            <div class="f-success" id="f-success">
+                <p class="f-success-title">Message received.</p>
+                <p class="f-success-sub">I'll be in touch within 48 hours.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-        function setIdle() {
-            if (currentId === null) return;
-            currentId = null;
-            playerEl.classList.remove('playing');
-            nowTag.textContent = 'idle';
-            textWrap.innerHTML = `<span class="player-idle">not playing</span>`;
-        }
+<!-- FOOTER -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-left">
+            <span class="footer-brand">David Kwame Amo</span>
+            <div class="footer-socials">
+                <a href="https://instagram.com/KwameHasVision" target="_blank" class="footer-soc">Instagram</a>
+                <a href="https://twitter.com/KwameHasVision" target="_blank" class="footer-soc">X</a>
+                <a href="https://www.behance.net/kwameamo" target="_blank" class="footer-soc">Behance</a>
+                <a href="https://linkedin.com/in/kwameamo" target="_blank" class="footer-soc">LinkedIn</a>
+                <a href="https://pinterest.com/KwameHasVision" target="_blank" class="footer-soc">Pinterest</a>
+            </div>
+        </div>
+        <span class="footer-stamp">© 2026 · Koforidua, Ghana</span>
+    </div>
+</footer>
 
-        async function fetchNowPlaying() {
-            try {
-                const res  = await fetch('https://npc-api.aikins.xyz/v1/users/kwameamo/now');
-                const data = await res.json();
-                if (data && data.status === 'playing') setPlaying(data.track);
-            } catch (_) {}
-        }
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+    const npCard   = document.getElementById('np-card');
+    const npLink   = document.getElementById('np-link');
+    const npArtist = document.getElementById('np-artist');
+    let currentId  = null;
 
-        fetchNowPlaying();
+    function setPlaying(track) {
+        const id = track.title + track.artist;
+        if (id === currentId) return;
+        currentId = id;
+        npLink.textContent = track.title;
+        npLink.href = /^https?:\/\//.test(track.track_url) ? track.track_url : '#';
+        npArtist.textContent = track.artist;
+        npCard.classList.add('playing');
+    }
 
-        const socket = new WebSocket('wss://npc-api.aikins.xyz/v1/users/kwameamo/ws');
-        socket.addEventListener('message', (event) => {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.event === 'update' && msg.data && msg.data.provider !== 'system') {
-                    if (msg.data.status === 'playing') {
-                        setPlaying(msg.data.track);
-                    } else {
-                        setIdle();
-                    }
-                }
-            } catch (_) {}
-        });
+    function setIdle() {
+        if (currentId === null) return;
+        currentId = null;
+        npCard.classList.remove('playing');
+    }
 
-    </script>
+    async function fetchNowPlaying() {
+        try {
+            const res  = await fetch('https://npc-api.aikins.xyz/v1/users/kwameamo/now');
+            const data = await res.json();
+            if (data && data.status === 'playing') setPlaying(data.track);
+        } catch (_) {}
+    }
+
+    fetchNowPlaying();
+
+    const ws = new WebSocket('wss://npc-api.aikins.xyz/v1/users/kwameamo/ws');
+    ws.addEventListener('message', (e) => {
+        try {
+            const msg = JSON.parse(e.data);
+            if (msg.event === 'update' && msg.data && msg.data.provider !== 'system') {
+                if (msg.data.status === 'playing') setPlaying(msg.data.track);
+                else setIdle();
+            }
+        } catch (_) {}
+    });
+
+    window.addEventListener('scroll', () => {
+        document.getElementById('site-nav').classList.toggle('dark', window.scrollY > 20);
+    });
+
+    document.getElementById('inquire-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        this.style.display = 'none';
+        document.getElementById('f-success').classList.add('show');
+    });
+</script>
 </body>
 </html>
