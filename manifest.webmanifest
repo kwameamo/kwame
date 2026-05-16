@@ -12,10 +12,16 @@
   "categories": ["design", "portfolio", "business"],
   "icons": [
     {
-      "src": "/icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/photos/pwa-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/photos/pwa-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
@@ -24,14 +30,14 @@
       "short_name": "Blog",
       "description": "Read notes on design, tools, and culture",
       "url": "/blog.html",
-      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/photos/pwa-icon.png", "sizes": "512x512", "type": "image/png" }]
     },
     {
       "name": "Commission Work",
       "short_name": "Hire",
       "description": "Start a branding, clothing, or web project",
       "url": "/#inquire",
-      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/photos/pwa-icon.png", "sizes": "512x512", "type": "image/png" }]
     }
   ]
 }

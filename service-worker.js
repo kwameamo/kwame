@@ -20,7 +20,7 @@ const PRECACHE_URLS = [
     '/blog-posts.json',
     '/photos/kwame-scrib.png',
     '/photos/me.jpg',
-    '/icons/icon.svg',
+    '/photos/pwa-icon.png',
     '/manifest.webmanifest',
     'https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg',
     'https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg',
