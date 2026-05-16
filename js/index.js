@@ -67,6 +67,26 @@
 
 
     /* ─────────────────────────────────────────
+       INQUIRY FORM — combine first + last name
+       formsubmit.cloud requires a field called
+       "name"; we populate it from the two inputs
+       before the native POST fires.
+    ───────────────────────────────────────── */
+    var inquireForm = document.getElementById('inquire-form');
+    if (inquireForm) {
+        inquireForm.addEventListener('submit', function () {
+            var first     = inquireForm.querySelector('[name="first_name"]');
+            var last      = inquireForm.querySelector('[name="last_name"]');
+            var nameField = document.getElementById('f-name');
+            if (first && last && nameField) {
+                nameField.value = [first.value.trim(), last.value.trim()]
+                    .filter(Boolean).join(' ');
+            }
+        });
+    }
+
+
+    /* ─────────────────────────────────────────
        COMING SOON CARDS — toast on click/Enter
     ───────────────────────────────────────── */
     var toastTimer = null;
