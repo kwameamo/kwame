@@ -6,20 +6,15 @@
        Updates every second. START_YEAR drives
        the "years active" stat in the hero panel.
     ───────────────────────────────────────── */
-    var START_YEAR  = 2021;
-    var yearEl      = document.getElementById('hero-year');
-    var clockEl     = document.getElementById('hero-clock');
-    var statYearsEl = document.getElementById('stat-years');
+    var yearEl  = document.getElementById('hero-year');
+    var clockEl = document.getElementById('hero-clock');
 
     function pad(n) { return n < 10 ? '0' + n : String(n); }
 
     function tick() {
         var now = new Date();
-        var currentYear = now.getUTCFullYear();
-
-        if (yearEl)      yearEl.textContent      = currentYear;
-        if (clockEl)     clockEl.textContent      = pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes());
-        if (statYearsEl) statYearsEl.textContent  = (currentYear - START_YEAR) + '+';
+        if (yearEl)  yearEl.textContent  = now.getUTCFullYear();
+        if (clockEl) clockEl.textContent = pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes());
     }
 
     tick();
@@ -238,9 +233,30 @@
 
     /* ─────────────────────────────────────────
        SERVICE WORKER
+       When a new SW is found, tell it to skip
+       waiting so users get updates immediately
+       without having to close all tabs.
     ───────────────────────────────────────── */
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js');
+        navigator.serviceWorker.register('/service-worker.js').then(function (reg) {
+            reg.addEventListener('updatefound', function () {
+                var next = reg.installing;
+                if (!next) return;
+                next.addEventListener('statechange', function () {
+                    if (next.state === 'installed' && navigator.serviceWorker.controller) {
+                        next.postMessage({ type: 'SKIP_WAITING' });
+                    }
+                });
+            });
+        });
+
+        /* Reload once the new SW takes control */
+        var reloading = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (reloading) return;
+            reloading = true;
+            window.location.reload();
+        });
     }
 
 }());

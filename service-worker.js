@@ -1,14 +1,14 @@
-const CACHE_NAME = 'kwame-v1';
+const CACHE_NAME = 'kwame-v3';
 
 const PRECACHE_URLS = [
     '/',
     '/index.html',
     '/blog.html',
-    '/work/gye-owuo-corp.html',
-    '/work/cherie-by-a.html',
-    '/work/curiolabs.html',
-    '/work/foldsvtg.html',
-    '/work/vision97.html',
+    '/work/fooseline-fest.html',
+    '/work/chopright.html',
+    '/work/kwaeemu-resort.html',
+    '/work/akrofi-bene-foundation.html',
+    '/work/akrofi-bene-web.html',
     '/css/base.css',
     '/css/index.css',
     '/css/blog.css',
@@ -27,7 +27,23 @@ const PRECACHE_URLS = [
     'https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg',
 ];
 
-// Install — precache all static assets
+/* Pages that should always reflect the latest deployed version */
+const HTML_PATHS = new Set([
+    '/',
+    '/index.html',
+    '/blog.html',
+    '/work/fooseline-fest.html',
+    '/work/chopright.html',
+    '/work/kwaeemu-resort.html',
+    '/work/akrofi-bene-foundation.html',
+    '/work/akrofi-bene-web.html',
+]);
+
+function isHTMLRequest(pathname) {
+    return HTML_PATHS.has(pathname) || pathname.startsWith('/work/');
+}
+
+/* ── Install: precache static assets ── */
 self.addEventListener('install', function (event) {
     event.waitUntil(
         caches.open(CACHE_NAME).then(function (cache) {
@@ -37,7 +53,7 @@ self.addEventListener('install', function (event) {
     self.skipWaiting();
 });
 
-// Activate — remove old caches
+/* ── Activate: remove every old cache ── */
 self.addEventListener('activate', function (event) {
     event.waitUntil(
         caches.keys().then(function (keys) {
@@ -51,19 +67,29 @@ self.addEventListener('activate', function (event) {
     self.clients.claim();
 });
 
-// Fetch — strategy varies by request type
+/* ── Message: page can trigger skipWaiting immediately ── */
+self.addEventListener('message', function (event) {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+/* ── Fetch ── */
 self.addEventListener('fetch', function (event) {
-    var url = event.request.url;
+    var url = new URL(event.request.url);
 
-    // Skip non-GET and browser extension requests
+    /* Ignore non-GET, chrome-extension, and live API requests */
     if (event.request.method !== 'GET') return;
-    if (url.startsWith('chrome-extension://')) return;
+    if (url.protocol === 'chrome-extension:') return;
+    if (url.hostname === 'npc-api.aikins.xyz') return;
+    if (url.hostname === 'open.er-api.com') return;
 
-    // Skip now-playing API and WebSocket — always live
-    if (url.includes('npc-api.aikins.xyz')) return;
-
-    // Network-first for blog-posts.json — keep content fresh
-    if (url.includes('blog-posts.json')) {
+    /* ── Network-first for HTML pages ──────────────────────────
+       Ensures Safari (and all browsers) always load the latest
+       version of each page when online. Falls back to cache only
+       when the network is unavailable (true offline mode).
+    ─────────────────────────────────────────────────────────── */
+    if (url.origin === self.location.origin && isHTMLRequest(url.pathname)) {
         event.respondWith(
             fetch(event.request)
                 .then(function (response) {
@@ -80,12 +106,29 @@ self.addEventListener('fetch', function (event) {
         return;
     }
 
-    // Cache-first for everything else (HTML, CSS, JS, images, fonts)
+    /* ── Network-first for blog-posts.json ── */
+    if (url.pathname === '/blog-posts.json') {
+        event.respondWith(
+            fetch(event.request)
+                .then(function (response) {
+                    var clone = response.clone();
+                    caches.open(CACHE_NAME).then(function (cache) {
+                        cache.put(event.request, clone);
+                    });
+                    return response;
+                })
+                .catch(function () {
+                    return caches.match(event.request);
+                })
+        );
+        return;
+    }
+
+    /* ── Cache-first for CSS, JS, images, fonts ── */
     event.respondWith(
         caches.match(event.request).then(function (cached) {
             if (cached) return cached;
             return fetch(event.request).then(function (response) {
-                // Only cache valid same-origin or opaque responses
                 if (!response || response.status === 206) return response;
                 var clone = response.clone();
                 caches.open(CACHE_NAME).then(function (cache) {
