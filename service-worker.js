@@ -44,6 +44,7 @@ self.addEventListener('fetch', function (event) {
     if (url.hostname === 'npc-api.aikins.xyz')   return;
     if (url.hostname === 'open.er-api.com')      return;
     if (url.hostname === 'formsubmit.co')        return;
+    if (url.hostname === 'formsubmit.cloud')     return;
     if (url.hostname === 'fonts.googleapis.com') return;
     if (url.hostname === 'fonts.gstatic.com')    return;
 
