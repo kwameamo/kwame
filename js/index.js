@@ -231,32 +231,4 @@
     }
 
 
-    /* ─────────────────────────────────────────
-       SERVICE WORKER
-       When a new SW is found, tell it to skip
-       waiting so users get updates immediately
-       without having to close all tabs.
-    ───────────────────────────────────────── */
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then(function (reg) {
-            reg.addEventListener('updatefound', function () {
-                var next = reg.installing;
-                if (!next) return;
-                next.addEventListener('statechange', function () {
-                    if (next.state === 'installed' && navigator.serviceWorker.controller) {
-                        next.postMessage({ type: 'SKIP_WAITING' });
-                    }
-                });
-            });
-        });
-
-        /* Reload once the new SW takes control */
-        var reloading = false;
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
-            if (reloading) return;
-            reloading = true;
-            window.location.reload();
-        });
-    }
-
-}());
+}()); /* SW registration is handled by sw-updater.js */
