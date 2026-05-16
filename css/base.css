@@ -1,0 +1,33 @@
+/* ── Variables ── */
+:root {
+    --white: #ffffff;
+    --black: #000000;
+    --g1: #f4f4f4;
+    --g2: #e4e4e4;
+    --g3: #aaaaaa;
+    --g4: #555555;
+    --nav-h: 56px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Syne', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* ── Shared animation ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

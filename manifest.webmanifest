@@ -1,0 +1,37 @@
+{
+  "name": "David Kwame Amo",
+  "short_name": "DKA",
+  "description": "Designer, Brand Architect, Builder — Koforidua, Ghana. Branding, garment design, and web development.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "lang": "en",
+  "categories": ["design", "portfolio", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Blog",
+      "short_name": "Blog",
+      "description": "Read notes on design, tools, and culture",
+      "url": "/blog.html",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Commission Work",
+      "short_name": "Hire",
+      "description": "Start a branding, clothing, or web project",
+      "url": "/#inquire",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    }
+  ]
+}

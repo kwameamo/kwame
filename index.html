@@ -4,199 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>David Kwame Amo — Designer, Brand Architect, Builder</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="DKA">
+    <link rel="apple-touch-icon" href="/icons/icon.svg">
+
+    <!-- SEO -->
+    <meta name="description" content="David Kwame Amo — Designer, Brand Architect, and Builder based in Koforidua, Ghana. Branding, garment design, and web development.">
+    <meta name="author" content="David Kwame Amo">
+    <meta property="og:title" content="David Kwame Amo">
+    <meta property="og:description" content="Designer, Brand Architect, Builder — operating at the intersection of culture, code, and commerce.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kwame.vision">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --white: #ffffff;
-            --black: #000000;
-            --g1: #f4f4f4;
-            --g2: #e4e4e4;
-            --g3: #aaaaaa;
-            --g4: #555555;
-            --nav-h: 56px;
-        }
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Syne', sans-serif; background: var(--white); color: var(--black); line-height: 1.5; overflow-x: hidden; }
-
-        /* NAV */
-        .site-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: var(--nav-h); background: var(--white); border-bottom: 1px solid var(--g2); transition: border-color 0.3s; }
-        .site-nav.dark { border-bottom-color: var(--black); }
-        .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 40px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
-        .nav-brand { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--black); text-decoration: none; }
-        .nav-links { display: flex; align-items: center; gap: 2.5rem; list-style: none; }
-        .nav-links a { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--g4); text-decoration: none; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--black); }
-        .nav-cta { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-decoration: none; color: var(--white); background: var(--black); padding: 0.5rem 1.1rem; transition: opacity 0.2s; }
-        .nav-cta:hover { opacity: 0.7; }
-
-        /* HERO */
-        .hero { min-height: 100vh; padding-top: var(--nav-h); display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--g2); animation: fadeUp 0.6s ease forwards; }
-        .hero-left { padding: 80px 40px; display: flex; flex-direction: column; justify-content: space-between; border-right: 1px solid var(--g2); }
-        .hero-index { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
-        .hero-title-block { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 0; }
-        .hero-discipline { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); margin-bottom: 1.75rem; }
-        .hero-name { font-weight: 800; font-size: clamp(52px, 6vw, 92px); line-height: 0.9; letter-spacing: -0.03em; margin-bottom: 2.5rem; }
-        .hero-tagline { font-size: 15px; line-height: 1.65; color: var(--g4); max-width: 380px; }
-        .hero-footer { display: flex; align-items: center; justify-content: space-between; }
-        .hero-location { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g3); }
-        .hero-scroll { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--g3); }
-        .hero-right { padding: 80px 40px; display: flex; flex-direction: column; justify-content: space-between; }
-        .hero-image-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 0; user-select: none; }
-        .hero-image-wrap img { max-height: 160px; width: auto; pointer-events: none; -webkit-user-drag: none; }
-
-        /* NOW PLAYING */
-        .np-card { border: 1px solid var(--g2); padding: 14px 16px; transition: border-color 0.3s; }
-        .np-card.playing { border-color: var(--black); }
-        .np-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .np-label { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g3); }
-        .np-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g2); transition: background 0.3s; }
-        .np-card.playing .np-dot { background: var(--black); animation: npulse 1.4s ease-in-out infinite; }
-        @keyframes npulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-        .np-body { display: flex; align-items: center; gap: 10px; }
-        .np-art { width: 40px; height: 40px; background: var(--g1); border: 1px solid var(--g2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .np-art svg { width: 14px; height: 14px; fill: var(--g2); }
-        .np-info { flex: 1; overflow: hidden; display: none; }
-        .np-card.playing .np-info { display: block; }
-        .np-track { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .np-track a { color: inherit; text-decoration: none; }
-        .np-artist { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .np-idle { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--g3); }
-        .np-card.playing .np-idle { display: none; }
-        .np-eq { display: flex; align-items: flex-end; gap: 2px; height: 16px; flex-shrink: 0; opacity: 0; transition: opacity 0.3s; }
-        .np-card.playing .np-eq { opacity: 1; }
-        .np-eq span { display: block; width: 3px; border-radius: 1px; background: var(--black); height: 3px; }
-        .np-card.playing .np-eq span:nth-child(1) { animation: npeq 0.9s ease-in-out infinite; }
-        .np-card.playing .np-eq span:nth-child(2) { animation: npeq 0.7s ease-in-out 0.15s infinite; }
-        .np-card.playing .np-eq span:nth-child(3) { animation: npeq 1.1s ease-in-out 0.05s infinite; }
-        .np-card.playing .np-eq span:nth-child(4) { animation: npeq 0.8s ease-in-out 0.3s infinite; }
-        @keyframes npeq { 0%,100%{height:3px} 50%{height:15px} }
-
-        /* SECTION BASE */
-        .section { border-bottom: 1px solid var(--g2); }
-        .section-hd { max-width: 1280px; margin: 0 auto; padding: 40px 40px 0; display: flex; align-items: baseline; gap: 1.25rem; }
-        .s-num { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: var(--g3); }
-        .s-title { font-weight: 800; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
-        .s-count { font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); margin-left: auto; }
-
-        /* WORK GRID */
-        .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
-        .wi { background: var(--white); overflow: hidden; transition: background 0.2s; }
-        .wi:hover { background: var(--g1); }
-        .wi-b1 { grid-column: 1 / 3; }
-        .wi-b2 { grid-column: 3 / 4; }
-        .wi-web { grid-column: 1 / -1; }
-        .wi-c1 { grid-column: 1 / 2; }
-        .wi-c2 { grid-column: 2 / -1; }
-        .wi-img { width: 100%; aspect-ratio: 4/3; background-color: var(--g1); background-image: repeating-linear-gradient(-45deg, transparent, transparent 6px, rgba(0,0,0,0.04) 6px, rgba(0,0,0,0.04) 12px); position: relative; display: flex; align-items: center; justify-content: center; }
-        .wi-web .wi-img { aspect-ratio: 16/6; }
-        .wi-img-lbl { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
-        .wi-meta { padding: 20px 24px 28px; }
-        .wi-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 10px; }
-        .wi-tag { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--g3); border: 1px solid var(--g2); padding: 2px 7px; }
-        .wi-name { font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin-bottom: 6px; }
-        .wi-desc { font-size: 13px; color: var(--g4); line-height: 1.6; }
-        .wi-link { display: inline-block; margin-top: 12px; font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.06em; color: var(--g3); text-decoration: none; border-bottom: 1px solid transparent; transition: color 0.2s, border-color 0.2s; }
-        .wi:hover .wi-link { color: var(--black); border-bottom-color: var(--black); }
-
-        /* SERVICES */
-        .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
-        .svc { background: var(--white); padding: 48px 40px; }
-        .svc-idx { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--g3); margin-bottom: 2rem; }
-        .svc-name { font-weight: 800; font-size: 26px; letter-spacing: -0.025em; line-height: 1.0; margin-bottom: 6px; }
-        .svc-price { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--g3); margin-bottom: 2rem; }
-        .svc-list { list-style: none; margin-bottom: 2.5rem; }
-        .svc-list li { font-size: 13px; color: var(--g4); padding: 10px 0; border-bottom: 1px solid var(--g2); display: flex; align-items: center; gap: 0.6rem; }
-        .svc-list li::before { content: '—'; font-family: 'Syne Mono', monospace; font-size: 10px; color: var(--g3); flex-shrink: 0; }
-        .svc-cta { display: inline-block; font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--black); text-decoration: none; border: 1px solid var(--black); padding: 0.6rem 1.2rem; transition: background 0.2s, color 0.2s; }
-        .svc-cta:hover { background: var(--black); color: var(--white); }
-
-        /* BRANDS */
-        .brands-strip { border-bottom: 1px solid var(--g2); }
-        .brands-inner { max-width: 1280px; margin: 0 auto; padding: 32px 40px; display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; }
-        .brands-lbl { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--g3); white-space: nowrap; }
-        .brands-list { display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
-        .brand-link { opacity: 0.45; transition: opacity 0.2s; display: flex; align-items: center; }
-        .brand-link:hover { opacity: 1; }
-        .brand-link img { height: 30px; width: auto; filter: grayscale(1); }
-
-        /* ABOUT */
-        .about-grid { display: grid; grid-template-columns: 1fr 1fr; background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
-        .about-text { background: var(--white); padding: 60px 40px; }
-        .about-bio { font-size: 15px; line-height: 1.8; color: var(--g4); max-width: 480px; }
-        .about-bio p { margin-bottom: 1.25rem; }
-        .about-bio p:last-child { margin-bottom: 0; }
-        .about-bio a { color: var(--black); text-decoration: none; border-bottom: 1px solid var(--g2); transition: border-color 0.2s; }
-        .about-bio a:hover { border-bottom-color: var(--black); }
-        .about-img-col { background: var(--white); padding: 60px 40px; }
-        .about-photo { width: 100%; height: 400px; overflow: hidden; background: var(--g1); }
-        .about-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-        /* INQUIRE */
-        .inquire-grid { display: grid; grid-template-columns: 1fr 1.6fr; background: var(--g2); gap: 1px; border-top: 1px solid var(--g2); margin-top: 40px; }
-        .inquire-left { background: var(--white); padding: 60px 40px; }
-        .inquire-hl { font-weight: 800; font-size: clamp(28px, 3vw, 48px); letter-spacing: -0.03em; line-height: 1.0; margin-bottom: 1.5rem; }
-        .inquire-sub { font-size: 14px; color: var(--g4); line-height: 1.65; max-width: 300px; }
-        .inquire-right { background: var(--white); padding: 60px 40px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .fg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
-        .fg-lbl { font-family: 'Syne Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g3); }
-        .f-input, .f-select, .f-textarea { font-family: 'Syne', sans-serif; font-size: 13px; color: var(--black); background: var(--white); border: 1px solid var(--g2); padding: 10px 12px; outline: none; width: 100%; appearance: none; -webkit-appearance: none; transition: border-color 0.2s; }
-        .f-input:focus, .f-select:focus, .f-textarea:focus { border-color: var(--black); }
-        .f-textarea { resize: vertical; min-height: 120px; }
-        .f-sel-wrap { position: relative; }
-        .f-sel-wrap::after { content: '↓'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--g3); pointer-events: none; }
-        .f-submit { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: var(--white); background: var(--black); border: none; padding: 12px 28px; cursor: pointer; transition: opacity 0.2s; margin-top: 0.5rem; }
-        .f-submit:hover { opacity: 0.7; }
-        .f-success { display: none; border: 1px solid var(--g2); padding: 3rem 2rem; text-align: center; }
-        .f-success.show { display: block; }
-        .f-success-title { font-weight: 700; font-size: 20px; letter-spacing: -0.02em; margin-bottom: 6px; }
-        .f-success-sub { font-family: 'Syne Mono', monospace; font-size: 11px; color: var(--g3); letter-spacing: 0.04em; }
-
-        /* FOOTER */
-        .site-footer { border-top: 1px solid var(--g2); }
-        .footer-inner { max-width: 1280px; margin: 0 auto; padding: 32px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
-        .footer-left { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-        .footer-brand { font-family: 'Syne Mono', monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
-        .footer-socials { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-        .footer-soc { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g3); text-decoration: none; transition: color 0.2s; }
-        .footer-soc:hover { color: var(--black); }
-        .footer-stamp { font-family: 'Syne Mono', monospace; font-size: 10px; letter-spacing: 0.08em; color: var(--g3); }
-
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* RESPONSIVE */
-        @media (max-width: 960px) {
-            .nav-links { display: none; }
-            .hero { grid-template-columns: 1fr; min-height: auto; }
-            .hero-left { border-right: none; border-bottom: 1px solid var(--g2); padding: 64px 24px 40px; }
-            .hero-right { padding: 40px 24px 60px; }
-            .work-grid { grid-template-columns: 1fr; }
-            .wi-b1, .wi-b2, .wi-web, .wi-c1, .wi-c2 { grid-column: 1; }
-            .wi-web .wi-img { aspect-ratio: 4/3; }
-            .services-grid { grid-template-columns: 1fr; }
-            .about-grid { grid-template-columns: 1fr; }
-            .about-text { padding: 40px 24px; }
-            .about-img-col { padding: 0 24px 40px; }
-            .about-photo { height: 300px; }
-            .inquire-grid { grid-template-columns: 1fr; }
-            .inquire-left { padding: 40px 24px; }
-            .inquire-right { padding: 40px 24px; }
-            .form-row { grid-template-columns: 1fr; }
-            .section-hd { padding: 32px 24px 0; }
-            .brands-inner { padding: 28px 24px; }
-            .footer-inner { padding: 28px 24px; }
-            .nav-inner { padding: 0 24px; }
-        }
-        @media (max-width: 480px) {
-            .hero-name { font-size: 46px; }
-            .svc { padding: 36px 24px; }
-            .footer-left { flex-direction: column; align-items: flex-start; gap: 1rem; }
-        }
-    </style>
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
 
@@ -232,7 +65,6 @@
         <div class="hero-image-wrap" oncontextmenu="return false;">
             <img src="photos/kwame-scrib.png" alt="David Kwame Amo" ondragstart="return false;" oncontextmenu="return false;">
         </div>
-        <!-- Now Playing Card -->
         <div class="np-card" id="np-card">
             <div class="np-top">
                 <span class="np-label">Listening</span>
@@ -289,7 +121,7 @@
             <div class="wi-meta">
                 <div class="wi-tags"><span class="wi-tag">Web Design</span><span class="wi-tag">Development</span><span class="wi-tag">SaaS</span></div>
                 <h3 class="wi-name">CurioLabs Platform</h3>
-                <p class="wi-desc">Full-stack design and development of a suite of digital tools solving real operational problems for African businesses — vehicle registration, designer pricing intelligence, email infrastructure, and file export automation. UI architecture, product design, and deployment.</p>
+                <p class="wi-desc">Full-stack design and development of a suite of digital tools solving real operational problems for African businesses — vehicle registration, designer pricing intelligence, email infrastructure, and file export automation.</p>
                 <span class="wi-link">Update with case study →</span>
             </div>
         </div>
@@ -309,7 +141,7 @@
             <div class="wi-meta">
                 <div class="wi-tags"><span class="wi-tag">Clothing</span><span class="wi-tag">Brand</span></div>
                 <h3 class="wi-name">Vision'97</h3>
-                <p class="wi-desc">Founder-led streetwear brand built on clarity of purpose. Cut-and-sew garment design, graphic work, and full brand identity for a movement rooted in the belief that circumstance is not destiny.</p>
+                <p class="wi-desc">Founder-led streetwear brand built on clarity of purpose. Cut-and-sew garment design, graphic work, and full brand identity rooted in the belief that circumstance is not destiny.</p>
                 <span class="wi-link">Update with case study →</span>
             </div>
         </div>
@@ -496,58 +328,7 @@
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-<script>
-    const npCard   = document.getElementById('np-card');
-    const npLink   = document.getElementById('np-link');
-    const npArtist = document.getElementById('np-artist');
-    let currentId  = null;
-
-    function setPlaying(track) {
-        const id = track.title + track.artist;
-        if (id === currentId) return;
-        currentId = id;
-        npLink.textContent = track.title;
-        npLink.href = /^https?:\/\//.test(track.track_url) ? track.track_url : '#';
-        npArtist.textContent = track.artist;
-        npCard.classList.add('playing');
-    }
-
-    function setIdle() {
-        if (currentId === null) return;
-        currentId = null;
-        npCard.classList.remove('playing');
-    }
-
-    async function fetchNowPlaying() {
-        try {
-            const res  = await fetch('https://npc-api.aikins.xyz/v1/users/kwameamo/now');
-            const data = await res.json();
-            if (data && data.status === 'playing') setPlaying(data.track);
-        } catch (_) {}
-    }
-
-    fetchNowPlaying();
-
-    const ws = new WebSocket('wss://npc-api.aikins.xyz/v1/users/kwameamo/ws');
-    ws.addEventListener('message', (e) => {
-        try {
-            const msg = JSON.parse(e.data);
-            if (msg.event === 'update' && msg.data && msg.data.provider !== 'system') {
-                if (msg.data.status === 'playing') setPlaying(msg.data.track);
-                else setIdle();
-            }
-        } catch (_) {}
-    });
-
-    window.addEventListener('scroll', () => {
-        document.getElementById('site-nav').classList.toggle('dark', window.scrollY > 20);
-    });
-
-    document.getElementById('inquire-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        this.style.display = 'none';
-        document.getElementById('f-success').classList.add('show');
-    });
-</script>
+<script defer src="/js/now-playing.js"></script>
+<script defer src="/js/index.js"></script>
 </body>
 </html>
