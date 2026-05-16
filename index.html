@@ -132,7 +132,7 @@
                 <p class="wi-desc">The only Ghana vehicle duty calculator that matches what GRA actually charges — a private rates API tracks daily customs exchange rates and serves a line-by-line breakdown across 1,500+ vehicles.</p>
                 <span class="wi-link">View case study →</span>
             </div>
-        </a>
+        </a><!--  -->
 
         <a href="/work/chopright.html" class="wi wi-b2">
             <div class="wi-img"><img src="/photos/chopright-cover.jpg" alt="ChopRight"></div>
@@ -298,12 +298,13 @@
             <p class="inquire-sub">Tell me what you're working on. I'll get back to you within 48 hours with thoughts and next steps.</p>
         </div>
         <div class="inquire-right">
-            <form id="inquire-form" action="https://formsubmit.cloud/f/1163b60f-c6a0-4b9c-aab0-030ccdc8a471/" method="POST">
-                <!-- Spam honeypot — hidden from humans -->
-                <input type="text" name="_gotcha" class="f-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty">
-                <input type="hidden" name="_next" value="https://kwame.vision/#inquire">
-                <!-- Combined name field required by formsubmit.cloud — populated by JS on submit -->
+            <form id="inquire-form" action="https://api.web3forms.com/submit" method="POST">
+                <input type="hidden" name="access_key" value="2b75ecd3-2979-4b92-a1ed-93b3a432a536">
+                <input type="hidden" name="redirect" value="https://kwame.vision/#inquire">
+                <!-- Combined name for web3forms — populated by JS on submit -->
                 <input type="hidden" name="name" id="f-name">
+                <!-- Spam honeypot — bots check this, humans don't -->
+                <input type="checkbox" name="botcheck" class="f-honeypot" tabindex="-1" aria-hidden="true" aria-label="Leave this field empty">
 
                 <div class="form-row">
                     <div class="fg">
