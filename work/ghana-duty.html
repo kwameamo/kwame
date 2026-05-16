@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghana Duty Calc — David Kwame Amo</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/photos/favicon.png">
+    <meta name="description" content="The only Ghana vehicle duty calculator that matches what GRA actually charges — line for line, levy for levy.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/case-study.css">
+</head>
+<body>
+
+<nav class="cs-nav" id="cs-nav">
+    <div class="cs-nav-inner">
+        <a href="/index.html#work" class="cs-back">← All Work</a>
+        <span class="cs-nav-label">01 / Web App</span>
+        <a href="/index.html#inquire" class="cs-nav-cta">Hire me →</a>
+    </div>
+</nav>
+
+<section class="cs-hero">
+    <div class="cs-hero-inner">
+        <p class="cs-cat">Web App · React · Node · API Engineering · Tax Tech</p>
+        <h1 class="cs-title">Ghana Duty Calc</h1>
+        <p class="cs-tagline">The only Ghana vehicle duty calculator that matches what GRA actually charges — line for line, levy for levy.</p>
+    </div>
+</section>
+
+<div class="cs-cover">
+    <span class="cs-placeholder-lbl">Add image — Ghana Duty Calc UI or Bill of Entry breakdown</span>
+</div>
+
+<div class="cs-meta">
+    <div class="cs-meta-inner">
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Client</div>
+            <div class="cs-meta-value">CurioLabs (self-initiated)</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Year</div>
+            <div class="cs-meta-value">April 2026 → present</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Stack</div>
+            <div class="cs-meta-value">React · Vite · Node · Express · Fly.io · Netlify · Cloudflare</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Live</div>
+            <div class="cs-meta-value">ghanaduty.app</div>
+        </div>
+    </div>
+</div>
+
+<div class="cs-content">
+
+    <div class="cs-section">
+        <div class="cs-section-label">Overview</div>
+        <div class="cs-section-body">
+            <p>Ghana's vehicle import duty isn't one number — it's a stack of 15+ levies applied on CIF × a customs multiplier, recalculated daily against a moving exchange rate. Existing calculators are outdated, oversimplified, or wrong. Ghana Duty Calc is the only tool that returns a line-by-line breakdown matching what GRA actually charges at the Bill of Entry, for 1,500+ vehicles across 80+ brands.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row two">
+        <div class="cs-img-cell"><span class="cs-placeholder-lbl">Add image — duty breakdown output, line-by-line</span></div>
+        <div class="cs-img-cell"><span class="cs-placeholder-lbl">Add image — vehicle search UI or results screen</span></div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">The Hard Part</div>
+        <div class="cs-section-body">
+            <p>GRA doesn't publish a structured API for duty rates, levy schedules, or its daily customs exchange rate. The official rates exist only inside ICUMS (Integrated Customs Management System) and in scattered PDF notices. Any calculator built on hardcoded values is wrong within weeks.</p>
+            <p>So the first thing I built wasn't the calculator. It was the data layer.</p>
+            <p><strong>Private rates API — deployed on Fly.io.</strong> Scrapes and normalises the daily GRA/ICUMS customs exchange rate. Parses GRA levy notices into a structured schedule: rate, base, applies-to. Maintains a versioned snapshot of the duty schedule so historical calculations stay reproducible. Exposes a single clean JSON endpoint to the frontend with cache headers tuned for daily refresh. Status is surfaced in the UI as a live/loading/stale indicator — users always know the basis of the calculation.</p>
+            <p>The frontend trusts one source. The source has one job. Updates to GRA rates ship without touching the React bundle.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <div class="cs-img-cell"><span class="cs-placeholder-lbl">Add image — architecture diagram or API response JSON</span></div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Regulatory Correctness</div>
+        <div class="cs-section-body">
+            <p>The 2024 public transport EV waiver applies only to commercial fleets — private EVs are still charged 20%, not 5%. Caught and corrected before launch.</p>
+            <p>For a tool people use to negotiate six-figure cedi purchases, a wrong rate is worse than no tool. Regulatory correctness was a hard requirement, not a nice-to-have. Every levy in the schedule was verified against the published GRA notice before the calculation engine was written.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Engineering</div>
+        <div class="cs-section-body">
+            <p><strong>Circular import resolved by context extraction.</strong> Bundling broke because App.jsx and the Bill of Entry Guide both imported each other's theme. Pulled ThemeCtx and the useT hook into a standalone theme.js module. Both screens now consume the context without referencing each other.</p>
+            <p><strong>Stale service worker debug.</strong> A blank-page crash on deploy traced to a service worker holding a cached useAuth.jsx chunk that no longer existed in the new bundle. Reviewed registration, added version-keyed cache invalidation to the deploy pipeline.</p>
+            <p><strong>Vehicle data as a runtime asset.</strong> 1,500+ models served as a runtime-fetched JSON, not bundled. New vehicles ship without a redeploy. Custom searchable dropdown handles the scale that breaks a native select element.</p>
+            <p><strong>Security at the edge.</strong> Strict CSP, CORS whitelist, rate limiting, structured request logging, pinned dependencies, Netlify _headers and netlify.toml enforcing security headers before requests hit the app. Cloudflare Web Analytics — no cookies, no PII.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row two">
+        <div class="cs-img-cell"><span class="cs-placeholder-lbl">Add image — mobile view of the calculator</span></div>
+        <div class="cs-img-cell"><span class="cs-placeholder-lbl">Add image — rate status indicator or live/stale badge</span></div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Architecture</div>
+        <div class="cs-section-body">
+            <p><strong>React + Vite SPA</strong> served from Netlify handles all user interaction — vehicle search, form state, duty calculation, Bill of Entry rendering. No server-side rendering; the calculation is client-side once rate data arrives.</p>
+            <p><strong>Private Rates API</strong> on Fly.io (Node/Express) is the only backend. It scrapes GRA/ICUMS for the daily customs exchange rate, parses the levy schedule, and returns a single structured JSON response. The frontend polls it once per session and caches the result in localStorage with a timestamp.</p>
+            <p><strong>Cloudflare</strong> sits in front of both. Security headers, DDoS mitigation, analytics without cookies.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Why It Exists</div>
+        <div class="cs-section-body">
+            <p>The information asymmetry in Ghana's vehicle import market is real and consequential. Buyers walk into negotiations not knowing what they owe. Clearing agents who do know have no incentive to tell you. A wrong estimate at the start of an import process can mean hundreds of thousands of cedis in unexpected cost.</p>
+            <p>Ghana Duty Calc is small infrastructure that redistributes one specific piece of that information. It doesn't replace a clearing agent — but it means you sit across the table from one knowing your numbers.</p>
+        </div>
+    </div>
+
+</div>
+
+<section class="cs-next">
+    <a href="/work/chopright.html" class="cs-next-link">
+        <div>
+            <span class="cs-next-label">Next Project</span>
+            <span class="cs-next-name">ChopRight</span>
+        </div>
+        <span class="cs-next-arrow">→</span>
+    </a>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <a href="/index.html" class="footer-brand">David Kwame Amo</a>
+        <span class="footer-stamp">Engineered by CurioLabs · © <span id="footer-year">2026</span></span>
+    </div>
+</footer>
+
+<script defer src="/js/case-study.js"></script>
+<script defer src="/js/sw-updater.js"></script>
+</body>
+</html>
