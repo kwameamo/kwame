@@ -144,7 +144,7 @@
     ───────────────────────────────────────── */
     var GHS_FALLBACK = 15.5;
     var ghsRate      = GHS_FALLBACK;
-    var activeCur    = 'usd';
+    var activeCur    = 'ghs'; /* GHS shown by default */
 
     function formatPrice(usdAmount, currency, rate) {
         if (currency === 'usd') {
@@ -185,6 +185,35 @@
             switchCurrency(btn.getAttribute('data-currency'));
         });
     });
+
+    /* Render GHS prices immediately on load */
+    renderPrices();
+
+    /* ─────────────────────────────────────────
+       SERVICES SCROLL DOTS
+       Updates active dot as user swipes between
+       service cards on mobile.
+    ───────────────────────────────────────── */
+    var svcWrap = document.querySelector('.services-scroll-wrap');
+    var svcCards = document.querySelectorAll('.svc');
+    var svcDots  = document.querySelectorAll('.svc-dot');
+
+    if (svcWrap && svcDots.length) {
+        function updateDots() {
+            var wrapLeft = svcWrap.getBoundingClientRect().left;
+            var closestIdx = 0;
+            var closestDist = Infinity;
+            svcCards.forEach(function (card, i) {
+                var dist = Math.abs(card.getBoundingClientRect().left - wrapLeft);
+                if (dist < closestDist) { closestDist = dist; closestIdx = i; }
+            });
+            svcDots.forEach(function (d, i) {
+                d.classList.toggle('active', i === closestIdx);
+            });
+        }
+        svcWrap.addEventListener('scroll', updateDots, { passive: true });
+        updateDots();
+    }
 
     async function fetchRate() {
         var rateEl = document.getElementById('cur-rate');

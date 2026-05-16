@@ -832,7 +832,9 @@
 .brand-link:hover,
 .brand-link:active { opacity: 1; }
 
-.brand-link img { height: 30px; width: auto; filter: grayscale(1); }
+.brand-link img { height: 30px; width: auto; }
+
+.services-dots { display: none; }
 
 
 /* ═══════════════════════════════
@@ -1264,7 +1266,7 @@
     .wi-web .wi-img { aspect-ratio: 4 / 3; }
     .wi-img { aspect-ratio: 16 / 9; }
 
-    /* Services: horizontal scroll on mobile */
+    /* Services: full-screen snap scroll on mobile */
     .services-scroll-wrap {
         overflow-x: auto;
         scroll-snap-type: x mandatory;
@@ -1274,7 +1276,7 @@
     .services-scroll-wrap::-webkit-scrollbar { display: none; }
 
     .services-grid {
-        grid-template-columns: 80vw 80vw 80vw;
+        grid-template-columns: calc(100vw - 48px) calc(100vw - 48px) calc(100vw - 48px);
         min-width: max-content;
         background: transparent;
         gap: 8px;
@@ -1288,6 +1290,26 @@
         scroll-snap-align: start;
         padding: 32px 28px;
     }
+
+    /* Scroll indicator dots */
+    .services-dots {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--g2);
+    }
+
+    .svc-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--g2);
+        transition: background 0.25s ease;
+        flex-shrink: 0;
+    }
+
+    .svc-dot.active { background: var(--black); }
 
     .section-hd { padding: 32px 24px 0; }
     .about-grid { grid-template-columns: 1fr; }
