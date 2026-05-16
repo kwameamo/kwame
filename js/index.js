@@ -67,6 +67,45 @@
 
 
     /* ─────────────────────────────────────────
+       COMING SOON CARDS — toast on click/Enter
+    ───────────────────────────────────────── */
+    var toastTimer = null;
+
+    function showToast(msg) {
+        var existing = document.getElementById('wi-toast');
+        if (existing) {
+            clearTimeout(toastTimer);
+            existing.remove();
+        }
+        var t = document.createElement('div');
+        t.id        = 'wi-toast';
+        t.className = 'wi-toast';
+        t.textContent = msg;
+        t.setAttribute('aria-live', 'polite');
+        document.body.appendChild(t);
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () { t.classList.add('show'); });
+        });
+        toastTimer = setTimeout(function () {
+            t.classList.remove('show');
+            setTimeout(function () { t.remove(); }, 240);
+        }, 2600);
+    }
+
+    document.querySelectorAll('[data-coming-soon]').forEach(function (card) {
+        card.addEventListener('click', function () {
+            showToast('Still in progress — check back soon.');
+        });
+        card.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                showToast('Still in progress — check back soon.');
+            }
+        });
+    });
+
+
+    /* ─────────────────────────────────────────
        MOBILE CTA — hide when inquire is visible
     ───────────────────────────────────────── */
     var inquireSection = document.getElementById('inquire');

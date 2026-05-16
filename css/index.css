@@ -566,6 +566,100 @@
     position: absolute;
 }
 
+/* ── Coming Soon cards ── */
+
+/* Hide img tag when src is empty — swap in real src to reveal */
+[data-coming-soon] .wi-img img:not([src]),
+[data-coming-soon] .wi-img img[src=""] {
+    display: none;
+}
+
+/* Shimmer sweep over the placeholder background */
+[data-coming-soon] .wi-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.55) 50%,
+        transparent 70%
+    );
+    transform: translateX(-120%);
+    animation: wi-shimmer 2.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes wi-shimmer {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(220%); }
+}
+
+/* In Progress badge */
+.wi-cs-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--black);
+    color: var(--white);
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.wi-cs-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ca8a04;
+    flex-shrink: 0;
+    animation: cs-dot 1.8s ease-in-out infinite;
+}
+
+@keyframes cs-dot {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+}
+
+/* "Coming soon" link label */
+.wi-link-soon {
+    color: var(--g3);
+    border-bottom-color: transparent;
+}
+
+[data-coming-soon] { cursor: pointer; }
+
+/* Toast notification */
+.wi-toast {
+    position: fixed;
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 10px 20px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    pointer-events: none;
+    z-index: 500;
+}
+
+.wi-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
 .wi-meta { padding: 20px 24px 28px; }
 
 .wi-tags {
