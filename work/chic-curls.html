@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chic Curls — Link-in-Bio & Booking — David Kwame Amo</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" type="image/png" href="/photos/favicon.png">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Link-in-bio landing page with integrated booking system for Chic Curls — a luxury lash extensions studio in Accra, Ghana.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/case-study.css">
+</head>
+<body>
+
+<nav class="cs-nav" id="cs-nav">
+    <div class="cs-nav-inner">
+        <a href="/index.html#work" class="cs-back">← All Work</a>
+        <span class="cs-nav-label">04 / Web Development</span>
+        <a href="/index.html#inquire" class="cs-nav-cta">Hire me →</a>
+    </div>
+</nav>
+
+<section class="cs-hero">
+    <div class="cs-hero-inner">
+        <p class="cs-cat">Web Design · Web Development · UX Design</p>
+        <h1 class="cs-title">Chic Curls</h1>
+        <p class="cs-tagline">A mobile-first link-in-bio landing page with a fully custom booking system — built for a luxury lash extensions studio in Accra and optimised for the Ghanaian digital ecosystem.</p>
+    </div>
+</section>
+
+<div class="cs-cover">
+    <img src="/photos/chic-curls-cover.jpg" alt="Chic Curls — luxury lash extensions, Accra">
+</div>
+
+<div class="cs-meta">
+    <div class="cs-meta-inner">
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Client</div>
+            <div class="cs-meta-value">Chic Curls</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Location</div>
+            <div class="cs-meta-value">Sakumono Estate, Accra, Ghana</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Year</div>
+            <div class="cs-meta-value">February 2026</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Role</div>
+            <div class="cs-meta-value">UI/UX Designer, Developer</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Stack</div>
+            <div class="cs-meta-value">HTML5, CSS3, Vanilla JavaScript, Vercel</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Live Site</div>
+            <div class="cs-meta-value"><a href="https://chic-curls.vercel.app/" target="_blank" rel="noopener">chic-curls.vercel.app</a></div>
+        </div>
+    </div>
+</div>
+
+<div class="cs-content">
+
+    <!-- 00 -->
+    <div class="cs-section">
+        <div class="cs-section-label">00 / Context</div>
+        <div class="cs-section-body">
+            <p>In Ghana, most small beauty businesses live on Instagram. The link in their bio is the only bridge between a follower and a booking — and most of the time, that link goes nowhere useful.</p>
+            <p>Chic Curls, a lash extensions studio in Sakumono, Accra, had the audience. What they needed was a destination: somewhere to send followers that showed what they do, what it costs, and how to book — without leaving the phone.</p>
+            <p>The constraint that shaped everything: WhatsApp is how Ghanaians confirm appointments. Not email. Not a booking platform. WhatsApp. Any solution that didn't account for that would be a solution nobody used.</p>
+        </div>
+    </div>
+
+    <!-- 01 -->
+    <div class="cs-section">
+        <div class="cs-section-label">01 / The Problem</div>
+        <div class="cs-section-body">
+            <p>Three things were broken before this project started.</p>
+            <p><strong>No central hub.</strong> Pricing lived in highlights. Hours were buried in captions. A potential client who wanted to book had to DM, wait for a response, get the price, confirm a time, and DM again. Every step was friction that cost a booking.</p>
+            <p><strong>No consistent format.</strong> When clients did book through DMs, the studio received incomplete information — no service selected, no time confirmed, a phone number buried in a paragraph. Prep was guesswork.</p>
+            <p><strong>Wrong audience, wrong design.</strong> Most Linktree and link-in-bio tools are built for a Western mobile context. The Chic Curls audience is Accra-based, mobile-first, and expects WhatsApp as the primary touchpoint. A generic template would have felt foreign.</p>
+        </div>
+    </div>
+
+    <!-- 02 -->
+    <div class="cs-section">
+        <div class="cs-section-label">02 / Design Direction</div>
+        <div class="cs-section-body">
+            <p>The brief called for something premium. Lash extensions are a luxury purchase in the Accra market — the experience before the appointment should match the experience during it.</p>
+            <p>The colour system is pink gradient: <strong>#FFE5EC to #FF6B9D</strong>. Soft enough to feel feminine and luxurious, saturated enough to feel confident and brand-owning. Not pastel. Not aggressive. Right in the middle, where the studio sits.</p>
+            <p>Typography is a deliberate split: <strong>Quicksand</strong> for display headings — rounded, elegant, with a softness that fits beauty — and <strong>Poppins</strong> for body and UI. Poppins doesn't compete with Quicksand; it just works. Readable at every size, every weight.</p>
+            <p>Component language: corners at 20–30px radius. Soft drop shadows. Glassmorphism on the booking modal steps. The components should feel like they belong in the same world as the lashes — detailed, intentional, delicate.</p>
+        </div>
+    </div>
+
+    <!-- 03 -->
+    <div class="cs-section">
+        <div class="cs-section-label">03 / The Booking Flow</div>
+        <div class="cs-section-body">
+            <p>The booking system is five steps. Each step does one thing. None of them ask for information before the client is ready to give it.</p>
+            <p><strong>Step 1 — Service Selection.</strong> Visual cards. Service name, description, price in GHS. The client picks one and moves. No dropdowns, no forms yet.</p>
+            <p><strong>Step 2 — Date Selection.</strong> A calendar generated dynamically from JavaScript — not a third-party widget, not a datepicker library. Sundays are disabled because the studio is closed. Past dates are disabled because past dates are meaningless. The calendar always opens to the current month and aligns every date with the correct day of the week, regardless of when it loads.</p>
+            <p><strong>Step 3 — Time Selection.</strong> Available slots vary by day. Weekdays: 3:30 PM – 8:00 PM. Saturdays: 8:00 AM – 8:00 PM. Slots are generated based on the selected date, with past slots on today's date removed in real time. Single-column layout on mobile; the tap targets are large enough to work without precision.</p>
+            <p><strong>Step 4 — Customer Details.</strong> Name and phone number. An optional notes field. Three fields. Nothing more than what the studio needs to prepare.</p>
+            <p><strong>Step 5 — Confirmation.</strong> A summary of the booking before the client commits. Service, date, time, contact details. One button. It opens WhatsApp Web with the booking pre-formatted — service, date, time, name, phone, notes — so the studio receives a message it can act on immediately.</p>
+            <p>Every step validates before advancing. Missing a required field produces a branded modal, not a browser alert. The modal matches the page. The page feels consistent.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <div class="cs-img-cell"><img src="/photos/chic-curls-1.jpg" alt="Chic Curls — landing page, service selection, and date picker"></div>
+    </div>
+
+    <div class="cs-img-row full">
+        <div class="cs-img-cell"><img src="/photos/chic-curls-2.jpg" alt="Chic Curls — time slot selection, customer details, and booking confirmation summary"></div>
+    </div>
+
+    <!-- 04 -->
+    <div class="cs-section">
+        <div class="cs-section-label">04 / Service Menu</div>
+        <div class="cs-section-body">
+            <p>All pricing displayed in Ghana Cedis. No ambiguity, no "contact for pricing." The client knows what they're booking before they start the flow.</p>
+            <p><strong>Classic Sets</strong> from GHS 150. <strong>Hybrid Sets</strong> from GHS 180. <strong>Volume Sets</strong> from GHS 220. <strong>Signature Sets</strong> from GHS 230 — up to GHS 340 for the flagship treatment. <strong>Refills</strong> from GHS 70. Extras for coloured lashes, button lashes, and removal.</p>
+            <p>The pricing structure being visible upfront does two things: it qualifies clients before they book, so the studio doesn't spend time on enquiries that go nowhere, and it builds confidence — a studio that shows its prices clearly is a studio that has nothing to hide.</p>
+        </div>
+    </div>
+
+    <!-- 05 -->
+    <div class="cs-section">
+        <div class="cs-section-label">05 / Build</div>
+        <div class="cs-section-body">
+            <p>No framework. No build step. One HTML file, one stylesheet, one script.</p>
+            <p>The decision was deliberate. A framework would have added complexity with no benefit for a single-page marketing and booking tool. Vanilla JavaScript is fast to load, fast to parse, and has no dependency graph to maintain. The client gets a site that works; there is nothing to update, no packages to audit, no build pipeline to break.</p>
+            <p>The calendar is a custom implementation. It generates the correct number of days for any month, aligns the first day with the right column in a 7-day grid, and handles leap years. There is no date library involved — the logic fits in under 80 lines.</p>
+            <p>State management across the five booking steps runs on a plain JavaScript object. Each step reads from and writes to it. The object is reset on modal close. No framework needed to manage five fields.</p>
+            <p>Scroll lock activates when any modal opens, so the booking flow doesn't compete with the page behind it. The lock releases cleanly on close. On mobile, this is what separates a modal that feels native from one that feels broken.</p>
+            <p>Deployment on Vercel. The site is on a CDN edge, loads under a second on a 4G connection, and has no server to maintain.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <div class="cs-img-cell"><img src="/photos/chic-curls-3.jpg" alt="Chic Curls — WhatsApp booking delivery and site confirmation modal"></div>
+    </div>
+
+    <!-- 06 -->
+    <div class="cs-section">
+        <div class="cs-section-label">06 / Mobile-First</div>
+        <div class="cs-section-body">
+            <p>The audience is on phones. Not laptops. Not tablets. Phones — and in most cases, iPhones on small screen sizes.</p>
+            <p>The calendar grid was the hardest mobile constraint. Seven columns on a 375px screen. Each cell needed to be large enough to tap without hitting the adjacent date. The solution was a 28–32px cell size with precise padding, calibrated on an iPhone 14 Pro. It fits. It works. It required actual iteration on actual hardware, not just viewport emulation in DevTools.</p>
+            <p>Time slots are single-column on mobile. Two columns on wider screens. The tap target for each slot is the full row, not just the text label.</p>
+            <p>Modal padding and font sizes reduce on small screens so the booking flow fits in the viewport without scrolling mid-step. The client sees the whole step, selects, and moves — no hidden content below the fold.</p>
+            <p>Minimum tap target across the entire page: 44×44px. No exceptions.</p>
+        </div>
+    </div>
+
+    <!-- 07 -->
+    <div class="cs-section">
+        <div class="cs-section-label">07 / Outcome</div>
+        <div class="cs-section-body">
+            <p>The studio went from scattered DMs to structured bookings. Every WhatsApp message from the new site arrives with the same format: service, date, time, name, phone, notes. The studio can confirm and prepare without a follow-up question.</p>
+            <p>The link in the bio is now a destination: pricing, services, hours, social links, and the booking flow — everything in one place, no app required, no account to create.</p>
+            <p>The WhatsApp integration was the right call. It met the client's customers where they already were. The tool that looked like a limitation — using a messaging app instead of a proper booking platform — turned out to be the feature. Ghanaian clients don't want to create an account to book a lash appointment. They want to send a WhatsApp message. The site makes that message automatic, complete, and professional.</p>
+        </div>
+    </div>
+
+    <!-- 08 -->
+    <div class="cs-section">
+        <div class="cs-section-label">08 / Reflection</div>
+        <div class="cs-section-body">
+            <p>The most important decision on this project wasn't a design decision. It was the WhatsApp integration. Everything else — the calendar logic, the step validation, the mobile tap targets — was execution. The integration was the insight.</p>
+            <p>Understanding how a market actually behaves, rather than how a software template assumes it should behave, is the difference between a solution that gets used and one that gets abandoned.</p>
+            <p>Build for where people are. Not for where your tools assume they are.</p>
+        </div>
+    </div>
+
+</div>
+
+<section class="cs-next">
+    <a href="/index.html#work" class="cs-next-link">
+        <div>
+            <span class="cs-next-label">All Projects</span>
+            <span class="cs-next-name">Back to Work</span>
+        </div>
+        <span class="cs-next-arrow">→</span>
+    </a>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <a href="/index.html" class="footer-brand">David Kwame Amo</a>
+        <span class="footer-stamp">© <span id="footer-year">2026</span> · Koforidua, Ghana</span>
+    </div>
+</footer>
+
+<script defer src="/js/case-study.js"></script>
+<script defer src="/js/sw-updater.js"></script>
+</body>
+</html>
