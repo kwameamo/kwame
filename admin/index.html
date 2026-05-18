@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>New Post</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Syne+Mono&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:      #0d0d0d;
+            --surface: #181818;
+            --border:  #2a2a2a;
+            --text:    #f0f0f0;
+            --muted:   #555;
+            --red:     #ff5c5c;
+            --green:   #4cde8f;
+        }
+
+        html {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100%;
+            /* Safe area for notched phones */
+            padding-top:    env(safe-area-inset-top);
+            padding-left:   env(safe-area-inset-left);
+            padding-right:  env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+            overflow-x: hidden;
+        }
+
+        /* ── System style overrides ── */
+
+        input, textarea, select, button {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            font-family: inherit;
+            border-radius: 0; /* Firefox mobile adds border-radius */
+        }
+
+        /* Kill autofill background */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        textarea:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 1000px var(--surface) inset !important;
+            -webkit-text-fill-color: var(--text) !important;
+            caret-color: var(--text);
+            transition: background-color 9999s ease;
+        }
+
+        /* Date picker */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.5) brightness(1.2);
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+        input[type="date"]::-webkit-inner-spin-button   { display: none; }
+        input[type="date"]::-webkit-datetime-edit        { color: var(--text); padding: 0; }
+        input[type="date"]::-webkit-datetime-edit-text   { color: var(--muted); }
+        input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+
+        /* Kill password reveal button (Edge, Safari, Chrome) */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-credentials-auto-fill-button,
+        input[type="password"]::-webkit-strong-password-auto-fill-button,
+        input[type="password"]::-webkit-contacts-auto-fill-button { display: none !important; }
+
+        /* Textarea resize — keep vertical, hide the handle glyph */
+        textarea { resize: vertical; }
+        textarea::-webkit-resizer { display: none; }
+
+        /* Focus ring */
+        :focus-visible { outline: none; }
+
+        /* ── Lock screen ── */
+
+        #lock {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+            padding: 40px 24px;
+            padding-bottom: calc(40px + env(safe-area-inset-bottom));
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #lock.exit {
+            opacity: 0;
+            transform: translateY(-16px);
+            pointer-events: none;
+        }
+
+        .lock-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        #lock-input {
+            width: 100%;
+            max-width: 300px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 16px; /* 16px prevents iOS zoom on focus */
+            letter-spacing: 0.14em;
+            padding: 14px 16px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        #lock-input:focus  { border-color: #444; }
+        #lock-input.error  { border-color: var(--red); }
+
+        @keyframes shake {
+            0%, 100% { translate: 0px; }
+            20%       { translate: -8px; }
+            40%       { translate: 8px; }
+            60%       { translate: -5px; }
+            80%       { translate: 5px; }
+        }
+        #lock-input.shake { animation: shake 0.35s ease forwards; }
+
+        .lock-hint {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+        }
+
+        .lock-error {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--red);
+            min-height: 18px;
+        }
+
+        /* ── Post form ── */
+
+        #post-wrap {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+            padding-bottom: calc(48px + env(safe-area-inset-bottom));
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        #post-wrap.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+
+        .logo {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+
+        .field { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 16px; /* 16px prevents iOS zoom */
+            padding: 12px 14px;
+            outline: none;
+            transition: border-color 0.15s;
+            line-height: 1.5;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        textarea:focus { border-color: #444; }
+
+        input.error, textarea.error { border-color: var(--red); }
+
+        textarea {
+            line-height: 1.65;
+            min-height: 80px;
+        }
+
+        /* ── Formatting toolbar ── */
+
+        .toolbar-wrap {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            display: flex;
+            background: #111;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .toolbar::-webkit-scrollbar { display: none; }
+
+        .toolbar-key {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 16px;
+            padding: 8px 12px;
+            background: #111;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar-key span {
+            font-family: 'Syne Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .toolbar-key code {
+            color: #888;
+        }
+
+        .tb {
+            flex-shrink: 0;
+            background: transparent;
+            color: #999;
+            border: none;
+            border-right: 1px solid var(--border);
+            border-radius: 0;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.1s, color 0.1s;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tb:last-child { border-right: none; }
+        .tb:active     { background: #1e1e1e; color: var(--text); }
+
+        .tb-h2   { font-family: 'Syne Mono', monospace; font-size: 12px; }
+        .tb-bold { font-style: normal; font-weight: 700; font-size: 15px; }
+        .tb-ital { font-style: italic; font-size: 15px; }
+        .tb-link { font-size: 18px; letter-spacing: 0; }
+        .tb-para { font-size: 16px; letter-spacing: 0; }
+
+        #content {
+            font-family: 'Syne Mono', monospace;
+            font-size: 14px;
+            min-height: 280px;
+            border: none;
+            border-radius: 0;
+        }
+
+        #content:focus { border-color: transparent; }
+
+        .toolbar-wrap:focus-within {
+            border-color: #444;
+        }
+
+        /* ── Buttons ── */
+
+        .btn-primary {
+            width: 100%;
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 15px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: opacity 0.15s;
+            letter-spacing: 0.01em;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 50px;
+        }
+
+        .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .btn-ghost {
+            display: none;
+            width: 100%;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 400;
+            padding: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: color 0.15s, border-color 0.15s;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 50px;
+        }
+        .btn-ghost:active { color: var(--text); border-color: #444; }
+
+        /* ── Status ── */
+
+        .status {
+            display: none;
+            margin-top: 16px;
+            padding: 13px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            align-items: center;
+            gap: 10px;
+        }
+        .status.success {
+            display: flex;
+            background: rgba(76,222,143,0.08);
+            border: 1px solid rgba(76,222,143,0.25);
+            color: var(--green);
+        }
+        .status.error {
+            display: flex;
+            background: rgba(255,92,92,0.08);
+            border: 1px solid rgba(255,92,92,0.25);
+            color: var(--red);
+        }
+        .status a {
+            color: inherit;
+            margin-left: auto;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Lock screen ── -->
+<div id="lock">
+    <p class="lock-label">David Kwame Amo</p>
+    <input
+        type="password"
+        id="lock-input"
+        autocomplete="current-password"
+        placeholder="Password"
+        aria-label="Admin password"
+    >
+    <p class="lock-hint">Press Enter to continue</p>
+    <p class="lock-error" id="lock-error" role="alert"></p>
+</div>
+
+<!-- ── Post form (hidden until unlocked) ── -->
+<div id="post-wrap" hidden>
+    <header>
+        <a href="/blog.html" class="logo">← Blog</a>
+        <h1>New Post</h1>
+    </header>
+
+    <form id="form" novalidate>
+
+        <div class="field">
+            <label for="date">Date</label>
+            <input type="date" id="date" required>
+        </div>
+
+        <div class="field">
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="Post title" autocomplete="off" required>
+        </div>
+
+        <div class="field">
+            <label for="excerpt">Excerpt</label>
+            <textarea id="excerpt" rows="3" placeholder="One or two sentences shown on the blog listing." required></textarea>
+        </div>
+
+        <div class="field">
+            <label for="content">Content</label>
+            <div class="toolbar-wrap">
+                <div class="toolbar" role="toolbar" aria-label="Formatting">
+                    <button type="button" class="tb tb-h2"   data-fmt="h2"     title="Heading (## )">H2</button>
+                    <button type="button" class="tb tb-bold" data-fmt="bold"   title="Bold (**text**)">B</button>
+                    <button type="button" class="tb tb-ital" data-fmt="italic" title="Italic (*text*)">I</button>
+                    <button type="button" class="tb tb-link" data-fmt="link"   title="Link ([text](url))">↗</button>
+                    <button type="button" class="tb tb-para" data-fmt="para"   title="New paragraph">¶</button>
+                </div>
+                <div class="toolbar-key">
+                    <span><code>##</code> h2</span>
+                    <span><code>**bold**</code></span>
+                    <span><code>*italic*</code></span>
+                    <span><code>[text](url)</code></span>
+                    <span><code>¶</code> new §</span>
+                </div>
+                <textarea id="content" placeholder="Write your post here..." required></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">Publish Post</button>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+        <button type="button" class="btn-ghost" id="another-btn">Write another post</button>
+
+    </form>
+</div>
+
+<script>
+(function () {
+
+    /* ── Lock ── */
+    var lockEl    = document.getElementById('lock');
+    var lockInput = document.getElementById('lock-input');
+    var lockError = document.getElementById('lock-error');
+    var postWrap  = document.getElementById('post-wrap');
+    var savedPw   = '';
+
+    lockInput.focus();
+
+    lockInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); attemptUnlock(); }
+    });
+
+    async function attemptUnlock() {
+        var pw = lockInput.value;
+        if (!pw) return;
+        lockInput.disabled = true;
+        lockError.textContent = '';
+
+        try {
+            var res = await fetch('/.netlify/functions/save-post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ verify: true, password: pw })
+            });
+
+            if (res.status === 401) {
+                lockInput.disabled = false;
+                lockInput.value = '';
+                lockInput.classList.remove('shake');
+                void lockInput.offsetWidth;
+                lockInput.classList.add('shake', 'error');
+                lockError.textContent = 'Wrong password.';
+                lockInput.focus();
+                return;
+            }
+
+            if (res.status !== 200) {
+                lockInput.disabled = false;
+                lockError.textContent = 'Server error (' + res.status + '). Try again.';
+                return;
+            }
+
+            savedPw = pw;
+            lockEl.classList.add('exit');
+            setTimeout(function () {
+                lockEl.hidden = true;
+                postWrap.hidden = false;
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        postWrap.classList.add('visible');
+                        document.getElementById('title').focus();
+                    });
+                });
+            }, 300);
+
+        } catch (_) {
+            lockInput.disabled = false;
+            lockError.textContent = 'Connection error. Try again.';
+        }
+    }
+
+    lockInput.addEventListener('input', function () {
+        lockInput.classList.remove('error', 'shake');
+        lockError.textContent = '';
+    });
+
+    /* ── Formatting toolbar ── */
+    var ta = document.getElementById('content');
+
+    // Store selection before toolbar button steals focus
+    var savedSel = { start: 0, end: 0 };
+    ta.addEventListener('keyup',   saveSel);
+    ta.addEventListener('mouseup', saveSel);
+    ta.addEventListener('touchend', saveSel);
+    ta.addEventListener('blur', saveSel);
+
+    function saveSel() {
+        savedSel.start = ta.selectionStart;
+        savedSel.end   = ta.selectionEnd;
+    }
+
+    function restoreSel() {
+        ta.focus();
+        ta.setSelectionRange(savedSel.start, savedSel.end);
+    }
+
+    document.querySelector('.toolbar').addEventListener('mousedown', function (e) {
+        // Prevent textarea from losing selection when clicking toolbar
+        e.preventDefault();
+    });
+
+    document.querySelector('.toolbar').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-fmt]');
+        if (!btn) return;
+        applyFormat(btn.dataset.fmt);
+    });
+
+    function applyFormat(action) {
+        restoreSel();
+        var start = ta.selectionStart;
+        var end   = ta.selectionEnd;
+        var val   = ta.value;
+        var sel   = val.slice(start, end);
+
+        if (action === 'h2') {
+            var lineStart = val.lastIndexOf('\n', start - 1) + 1;
+            if (val.slice(lineStart, lineStart + 3) === '## ') {
+                // Toggle off
+                ta.value = val.slice(0, lineStart) + val.slice(lineStart + 3);
+                ta.setSelectionRange(Math.max(lineStart, start - 3), Math.max(lineStart, end - 3));
+            } else {
+                ta.value = val.slice(0, lineStart) + '## ' + val.slice(lineStart);
+                ta.setSelectionRange(start + 3, end + 3);
+            }
+        } else if (action === 'bold') {
+            wrap('**', '**', sel, start, end, val);
+        } else if (action === 'italic') {
+            wrap('*', '*', sel, start, end, val);
+        } else if (action === 'link') {
+            if (sel) {
+                var replacement = '[' + sel + ']()';
+                ta.value = val.slice(0, start) + replacement + val.slice(end);
+                // Place cursor inside the ()
+                var cur = start + sel.length + 3;
+                ta.setSelectionRange(cur, cur);
+            } else {
+                var tpl = '[]()';
+                ta.value = val.slice(0, start) + tpl + val.slice(end);
+                // Select the placeholder text slot (inside [])
+                ta.setSelectionRange(start + 1, start + 1);
+            }
+        } else if (action === 'para') {
+            var ins = '\n\n';
+            ta.value = val.slice(0, start) + ins + val.slice(start);
+            ta.setSelectionRange(start + ins.length, start + ins.length);
+        }
+
+        ta.focus();
+        ta.dispatchEvent(new Event('input'));
+    }
+
+    function wrap(before, after, sel, start, end, val) {
+        if (sel) {
+            var rep = before + sel + after;
+            ta.value = val.slice(0, start) + rep + val.slice(end);
+            ta.setSelectionRange(start, start + rep.length);
+        } else {
+            var rep2 = before + after;
+            ta.value = val.slice(0, start) + rep2 + val.slice(end);
+            var mid = start + before.length;
+            ta.setSelectionRange(mid, mid);
+        }
+    }
+
+    /* ── Post form ── */
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+
+    function toHtml(raw) {
+        return raw.trim().split(/\n{2,}/).map(function (block) {
+            var t = block.trim();
+            if (!t) return '';
+            if (t.startsWith('## '))  return '<h2>'  + inline(t.slice(3).trim())  + '</h2>';
+            if (t.startsWith('### ')) return '<h3>'  + inline(t.slice(4).trim())  + '</h3>';
+            return '<p>' + t.split('\n').map(function (l) { return inline(l.trim()); }).join('<br>') + '</p>';
+        }).filter(Boolean).join('');
+    }
+
+    function inline(t) {
+        t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
+        return t;
+    }
+
+    var statusEl   = document.getElementById('status');
+    var submitBtn  = document.getElementById('submit-btn');
+    var anotherBtn = document.getElementById('another-btn');
+
+    function showError(msg) {
+        statusEl.className = 'status error';
+        while (statusEl.firstChild) statusEl.removeChild(statusEl.firstChild);
+        statusEl.textContent = msg;
+    }
+
+    function showSuccess() {
+        statusEl.className = 'status success';
+        while (statusEl.firstChild) statusEl.removeChild(statusEl.firstChild);
+        statusEl.textContent = '✓ Post saved. Live in ~30 seconds.';
+        var a = document.createElement('a');
+        a.href = '/blog.html';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = 'View blog →';
+        statusEl.appendChild(a);
+    }
+
+    function hideStatus() {
+        statusEl.className = 'status';
+        while (statusEl.firstChild) statusEl.removeChild(statusEl.firstChild);
+    }
+
+    document.getElementById('form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var fields = ['date', 'title', 'excerpt', 'content'];
+        var valid = true;
+        fields.forEach(function (id) {
+            var el = document.getElementById(id);
+            if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+            else el.classList.remove('error');
+        });
+        if (!valid) { showError('Fill in all fields before publishing.'); return; }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Publishing…';
+        hideStatus();
+
+        try {
+            var res = await fetch('/.netlify/functions/save-post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    password: savedPw,
+                    date:     document.getElementById('date').value.trim(),
+                    title:    document.getElementById('title').value.trim(),
+                    excerpt:  document.getElementById('excerpt').value.trim(),
+                    content:  toHtml(document.getElementById('content').value.trim())
+                })
+            });
+            var data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');
+
+            showSuccess();
+            anotherBtn.style.display = 'block';
+            ['title', 'excerpt', 'content'].forEach(function (id) {
+                var el = document.getElementById(id);
+                el.value = '';
+                el.classList.remove('error');
+            });
+            document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+
+        } catch (err) {
+            showError(err.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Publish Post';
+        }
+    });
+
+    anotherBtn.addEventListener('click', function () {
+        anotherBtn.style.display = 'none';
+        hideStatus();
+        document.getElementById('title').focus();
+    });
+
+    document.getElementById('form').querySelectorAll('input, textarea').forEach(function (el) {
+        el.addEventListener('input', function () { el.classList.remove('error'); });
+    });
+
+}());
+</script>
+</body>
+</html>
