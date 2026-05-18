@@ -1,4 +1,6 @@
-exports.handler = async function (event) {
+import { getStore } from '@netlify/blobs';
+
+export const handler = async function (event) {
   let body;
   try {
     body = JSON.parse(event.body);
@@ -20,60 +22,24 @@ exports.handler = async function (event) {
     return respond(400, { error: 'All fields are required.' });
   }
 
-  const token = process.env.BLOG_GITHUB_TOKEN;
-
-  // Debug: surface token state without exposing value
-  if (!token) {
-    return respond(500, { error: 'BLOG_GITHUB_TOKEN is not set in environment variables.' });
-  }
-
-  const tokenType = token.startsWith('github_pat_') ? 'fine-grained'
-                  : token.startsWith('ghp_')        ? 'classic'
-                  : 'unknown format';
-
-  const repo   = 'kwameamo/kwame';
-  const branch = 'main';
-  const path   = 'blog-posts.json';
-  const url    = `https://api.github.com/repos/${repo}/contents/${path}`;
-
-  const ghHeaders = {
-    'Authorization': `token ${token}`,
-    'Accept': 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent': 'kwame-blog-admin'
-  };
-
   try {
-    const getRes = await fetch(`${url}?ref=${branch}`, { headers: ghHeaders });
-    if (!getRes.ok) {
-      const e = await getRes.json();
-      throw new Error(`GitHub read failed (${getRes.status}): ${e.message}`);
-    }
-    const file = await getRes.json();
+    const store = getStore({ name: 'blog', consistency: 'strong' });
+    let posts = await store.get('posts', { type: 'json' });
 
-    const posts = JSON.parse(Buffer.from(file.content, 'base64').toString('utf-8'));
+    if (!posts) {
+      // First save — seed from the static JSON already in the repo
+      try {
+        const seed = await fetch(`${process.env.URL}/blog-posts.json`);
+        posts = seed.ok ? await seed.json() : [];
+      } catch {
+        posts = [];
+      }
+    }
+
     const nextId = posts.reduce((m, p) => Math.max(m, p.id || 0), 0) + 1;
     posts.push({ id: nextId, date, title, excerpt, content });
 
-    const encoded = Buffer.from(JSON.stringify(posts, null, 2)).toString('base64');
-    const putRes = await fetch(url, {
-      method: 'PUT',
-      headers: { ...ghHeaders, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: `blog: add "${title}"`,
-        content: encoded,
-        sha: file.sha,
-        branch
-      })
-    });
-
-    if (!putRes.ok) {
-      const e = await putRes.json();
-      throw new Error(
-        `GitHub write failed (${putRes.status}, token: ${tokenType}): ${e.message}` +
-        (e.documentation_url ? ` — ${e.documentation_url}` : '')
-      );
-    }
+    await store.setJSON('posts', posts);
 
     return respond(200, { ok: true });
   } catch (err) {

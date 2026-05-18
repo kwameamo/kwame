@@ -17,9 +17,10 @@
 
     async function loadPosts() {
         try {
-            var res = await fetch('blog-posts.json');
+            var res = await fetch('/.netlify/functions/get-posts');
             if (!res.ok) throw new Error();
             var data = await res.json();
+            if (!Array.isArray(data)) throw new Error();
             posts = data.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
             posts.forEach(function (p) { p.displayDate = fmtDate(new Date(p.date)); });
         } catch (_) {
