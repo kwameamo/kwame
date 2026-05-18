@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyamera Aesthetics — Rebrand & Platform Upgrade — David Kwame Amo</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" type="image/png" href="/photos/favicon.png">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Full rebrand and platform upgrade for Gyamera Aesthetics — new visual identity, Google Sheets booking backend, PWA, and expanded content layer. Follow-up to the Chic Curls link-in-bio.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/case-study.css">
+</head>
+<body>
+
+<nav class="cs-nav" id="cs-nav">
+    <div class="cs-nav-inner">
+        <a href="/index.html#work" class="cs-back">← All Work</a>
+        <span class="cs-nav-label">06 / Web Development</span>
+        <a href="/index.html#inquire" class="cs-nav-cta">Hire me →</a>
+    </div>
+</nav>
+
+<section class="cs-hero">
+    <div class="cs-hero-inner">
+        <p class="cs-cat">Web Design · Web Development · UX Design · Branding</p>
+        <h1 class="cs-title">Gyamera Aesthetics</h1>
+        <p class="cs-tagline">A complete rebrand and platform upgrade — new identity, real slot-blocking via Google Sheets, a PWA layer, and the trust-building content the original page was missing.</p>
+    </div>
+</section>
+
+<div class="cs-cover">
+    <!-- PLACEHOLDER: Gyamera Aesthetics — full hero / cover image -->
+    <img src="/photos/gyamera-aesthetics-cover.jpg" alt="Gyamera Aesthetics — rebrand and platform upgrade, Accra">
+</div>
+
+<div class="cs-meta">
+    <div class="cs-meta-inner">
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Client</div>
+            <div class="cs-meta-value">Gyamera Aesthetics</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Location</div>
+            <div class="cs-meta-value">Sakumono / Spintex, Accra, Ghana</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Year</div>
+            <div class="cs-meta-value">May 2026</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Role</div>
+            <div class="cs-meta-value">UI/UX Designer, Developer</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Stack</div>
+            <div class="cs-meta-value">HTML5, CSS3, Vanilla JavaScript, Google Sheets, Google Apps Script, PWA</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Follow-up to</div>
+            <div class="cs-meta-value"><a href="/work/chic-curls.html">Chic Curls Link-in-Bio</a></div>
+        </div>
+    </div>
+</div>
+
+<div class="cs-content">
+
+    <!-- 00 -->
+    <div class="cs-section">
+        <div class="cs-section-label">00 / Context</div>
+        <div class="cs-section-body">
+            <p>Six months after launching the Chic Curls link-in-bio, the studio rebranded completely — new name, new identity, new location. Gyamera Aesthetics called for more than a find-and-replace.</p>
+            <p>The rebrand became the trigger for a deeper conversation about what the platform was missing. The original page was lean by design: social links, a booking button, hours, a price list, and a WhatsApp-integrated booking flow. It worked. But the client had grown — new location, new name, a TikTok presence generating traffic from people who had never heard of the studio before. First-time visitors from TikTok need more than a booking button. They need proof.</p>
+            <p>The upgrade ran on two tracks simultaneously: visual identity overhaul and functional architecture expansion. Neither track could wait for the other.</p>
+        </div>
+    </div>
+
+    <!-- 01 -->
+    <div class="cs-section">
+        <div class="cs-section-label">01 / The Brief</div>
+        <div class="cs-section-body">
+            <p>Four clear requirements came out of the briefing.</p>
+            <p><strong>Rebrand everything.</strong> New name (Gyamera Aesthetics), new colour palette, new profile image, new location (Sakumono / Spintex), updated social handles. TikTok added as a third social channel. The Snapchat handle preserved in markup but hidden until it goes live.</p>
+            <p><strong>Add real slot blocking.</strong> The original booking flow sent a WhatsApp message and trusted the studio to manage conflicts manually. Two clients could request the same slot at the same time with nothing to prevent it. This needed to be solved — without introducing a traditional backend, a paid service, or anything that required ongoing infrastructure maintenance.</p>
+            <p><strong>Expand the content layer.</strong> Before/after gallery, client reviews, an FAQ, and aftercare guidance. These are the trust signals that convert a visitor who found the page through TikTok rather than a warm referral. Someone arriving cold from a viral video doesn't have the same context as a client referred by a friend — they need the page to do more work.</p>
+            <p><strong>Make it installable.</strong> The page should live on a client's home screen like an app, open without browser chrome, and stay fast on a slow connection.</p>
+        </div>
+    </div>
+
+    <!-- 02 -->
+    <div class="cs-section">
+        <div class="cs-section-label">02 / Identity & Design System</div>
+        <div class="cs-section-body">
+            <p>The pink gradient palette — <strong>#FFE5EC to #FF6B9D</strong> — was retired entirely. The new system is built from four values: <strong>#b6a593</strong> (warm taupe), <strong>#f9e8bf</strong> (champagne), <strong>#ded6c3</strong> (sandy beige), and <strong>#ffffff</strong>.</p>
+            <p>The background moved from gradient to a single flat <strong>#b6a593</strong>, with the card container becoming a clean white surface against it. The shift in register is deliberate: away from "beauty brand pink" and toward something quieter and more elevated. The palette reads as skincare, not candy — appropriate for a studio moving upmarket with its rebrand.</p>
+            <p>The rebrand touched every layer of the CSS: all six colour variables, every rgba() reference (seventeen distinct opacity values across the codebase), hardcoded hex values inside modal components, and gradient declarations. The title font size was pulled from 3rem to 2.2rem desktop and 1.8rem mobile to accommodate the longer brand name without overflow.</p>
+            <p>TikTok (ms.gyameraaa) was added as the third social channel alongside Instagram and WhatsApp. The Snapchat link was preserved in markup but hidden via a <strong>.social-link-hidden</strong> CSS class — a deliberate choice to keep the handle ready without surfacing it before it's active.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <!-- PLACEHOLDER: Gyamera Aesthetics — full site overview, above fold and design system -->
+        <div class="cs-img-cell"><img src="/photos/gyamera-aesthetics-1.jpg" alt="Gyamera Aesthetics — new identity, colour palette, and landing page above fold"></div>
+    </div>
+
+    <!-- 03 -->
+    <div class="cs-section">
+        <div class="cs-section-label">03 / Backend Architecture</div>
+        <div class="cs-section-body">
+            <p>The core infrastructure problem — duplicate slot booking — was solved without a traditional server, database, or paid service.</p>
+            <p><strong>Google Sheets holds all booking records.</strong> Column structure: Submitted timestamp, Date, Time, Service, Price, Name, Phone, Notes, Status. The studio already knew how to use Google Sheets. No new tooling to learn.</p>
+            <p><strong>Google Apps Script sits in front of it</strong> as a deployed web app, exposing two GET endpoints: <strong>?action=getBlocked</strong> returns a date-keyed map of confirmed time slots, and <strong>?action=save</strong> appends a pending booking row.</p>
+            <p>On booking modal open, the site fetches all blocked slots for the next 14 days in a single request, caches the result in memory, and uses it to grey out unavailable times in the calendar. If the fetch hasn't resolved by the time a user reaches the time selection step, a CSS spinner holds the view and slots render automatically when loading completes. The status workflow maps to a dropdown in the sheet with three values — pending, confirmed, declined. Changing a row to confirmed is the only action required to block that slot for all future visitors. No dashboard, no admin panel, no additional tooling.</p>
+            <p>Two non-obvious implementation details required specific fixes. Google Sheets auto-converts time strings like "3:30 PM" to internal time values — reading them back with <strong>String(row[2])</strong> produces a date-formatted string, not the original value. A <strong>toTimeStr()</strong> function using <strong>Utilities.formatDate(value, 'GMT', 'h:mm a')</strong> recovers the display format. Similarly, date cells require the spreadsheet's own timezone in <strong>formatDate</strong> to prevent day-boundary shifts.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <!-- PLACEHOLDER: Gyamera Aesthetics — booking calendar with blocked slots, Google Sheets backend view -->
+        <div class="cs-img-cell"><img src="/photos/gyamera-aesthetics-2.jpg" alt="Gyamera Aesthetics — booking calendar with live slot blocking and Google Sheets backend"></div>
+    </div>
+
+    <!-- 04 -->
+    <div class="cs-section">
+        <div class="cs-section-label">04 / New Content Sections</div>
+        <div class="cs-section-body">
+            <p>The original page was built for clients who already knew the studio. The upgrade was built for clients who didn't.</p>
+            <p><strong>Before & After Gallery.</strong> Six slots in a 3-column grid (2-column on mobile), each a styled placeholder awaiting a photo. Replacing a placeholder with an img tag is the only publishing step required — all styling applies automatically.</p>
+            <p><strong>Aftercare Tips.</strong> Six tips in a 2-column responsive grid. Practical information that reduces post-appointment messages and signals professional knowledge to a first-time visitor sizing up whether to book.</p>
+            <p><strong>FAQ.</strong> Six questions in an accordion pattern. One item open at a time. Smooth max-height transition with a rotating + icon as the state indicator. The questions answer what previously arrived as DMs: duration, longevity, how to prepare, mascara compatibility, the difference between set types. Every answered DM that doesn't need to be sent is friction removed from the booking path.</p>
+            <p><strong>Client Reviews.</strong> Three review cards with star ratings. Real testimonials replace the placeholder copy in a single HTML edit — the layout and styling are already built.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row cols-2">
+        <!-- PLACEHOLDER: Gyamera Aesthetics — before/after gallery and client reviews sections -->
+        <div class="cs-img-cell"><img src="/photos/gyamera-aesthetics-3.jpg" alt="Gyamera Aesthetics — before and after gallery section"></div>
+        <!-- PLACEHOLDER: Gyamera Aesthetics — FAQ accordion and aftercare tips sections -->
+        <div class="cs-img-cell"><img src="/photos/gyamera-aesthetics-4.jpg" alt="Gyamera Aesthetics — FAQ accordion and aftercare tips"></div>
+    </div>
+
+    <!-- 05 -->
+    <div class="cs-section">
+        <div class="cs-section-label">05 / Form Validation</div>
+        <div class="cs-section-body">
+            <p>The original booking flow surfaced errors via a branded modal after a user tapped Next. The upgraded version adds inline field-level validation on the contact details step.</p>
+            <p><strong>Name:</strong> required, minimum 2 characters. <strong>Phone:</strong> required, Ghana format regex — <strong>/^(\+233|0)[2-9]\d{8}$/</strong> — covering MTN, Telecel, and AirtelTigo prefixes with an optional country code prefix.</p>
+            <p>Errors render directly beneath the offending field, with a red border state on the input itself. Each field clears its error on first keystroke via input event listeners attached when the modal opens — no lingering red after the user has started correcting.</p>
+            <p>Steps 1–3 (service, date, and time selection) retain the error modal pattern, because those are selection failures rather than input failures. The distinction keeps inline validation where it adds clarity and avoids applying it where it would be noise.</p>
+        </div>
+    </div>
+
+    <!-- 06 -->
+    <div class="cs-section">
+        <div class="cs-section-label">06 / Progressive Web App</div>
+        <div class="cs-section-body">
+            <p>Three additions make the site installable and offline-capable.</p>
+            <p><strong>manifest.webmanifest</strong> declares the app name (Gyamera Aesthetics), short name (Gyamera), theme colour (#b6a593), standalone display mode, and icon references. Standalone mode removes browser chrome on launch — the site opens like a native app.</p>
+            <p><strong>sw.js</strong> implements a tiered caching strategy: core assets (index.html, logo, favicon) are pre-cached on service worker install; Google Fonts binaries are cached on first load; the booking API (Google Apps Script) and the Fonts stylesheet always bypass the cache to ensure live data and up-to-date font loading; everything else is cache-first with a network fallback. A client on a slow connection sees a working interface, not a blank screen.</p>
+            <p><strong>Service worker registration</strong> runs after page load with a silent catch — no error surfacing if the browser doesn't support it. The PWA layer is an enhancement, not a dependency.</p>
+            <p>The PWA functions only over HTTPS. On Chrome for Android, the install prompt appears after two visits. On iOS Safari — the primary device for a Ghanaian beauty clientele — users can add to Home Screen manually. The <strong>apple-mobile-web-app-capable</strong> and <strong>apple-touch-icon</strong> meta tags ensure the site launches without browser chrome and uses the correct icon.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <!-- PLACEHOLDER: Gyamera Aesthetics — PWA install prompt / home screen icon on Android and iOS -->
+        <div class="cs-img-cell"><img src="/photos/gyamera-aesthetics-5.jpg" alt="Gyamera Aesthetics — PWA install experience on mobile"></div>
+    </div>
+
+    <!-- 07 -->
+    <div class="cs-section">
+        <div class="cs-section-label">07 / Cross-Browser & Accessibility</div>
+        <div class="cs-section-body">
+            <p>Safari — and all iOS browsers, which share the WebKit engine — requires <strong>-webkit-backdrop-filter</strong> alongside <strong>backdrop-filter</strong>. All three modals (booking, success, error) were updated with the vendor prefix. This was a targeted fix for the primary device type in the market; an oversight here would have broken the experience for the majority of users.</p>
+            <p>Every button element received an explicit <strong>type="button"</strong> attribute, preventing unintended form submission behaviour in any browser. All inline styles that had accumulated across the codebase were extracted to named CSS classes: <strong>.footer-sub</strong>, <strong>.footer-brand</strong>, <strong>.time-closed</strong>, <strong>.btn-full</strong>. The Open/Closed badge and its pulse animation were implemented as CSS classes rather than JavaScript-injected styles — keeping the visual logic where it belongs and making it overridable without touching script.</p>
+            <p><strong>Open/Closed Indicator.</strong> A badge in the header reflects live studio status based on working hours. Ghana operates at UTC+0 with no daylight saving, so <strong>getUTCHours()</strong> gives local time directly — no timezone library needed. The badge updates every 60 seconds via <strong>setInterval</strong>. Monday–Friday open window: 15:30–20:00. Saturday: 08:00–20:00. Sunday: always closed.</p>
+        </div>
+    </div>
+
+    <!-- 08 -->
+    <div class="cs-section">
+        <div class="cs-section-label">08 / Outcome</div>
+        <div class="cs-section-body">
+            <p>The platform moved from a styled WhatsApp redirect to a functional booking system with a real data layer. Slot blocking is now enforced — confirmed bookings in the Google Sheet are invisible to future visitors at those times. Double-booking is no longer a manual coordination problem.</p>
+            <p>The content expansion gives a first-time visitor from TikTok or Instagram enough to decide without a prior conversation: before/after results, real client reviews, clear answers to the questions they were going to DM anyway, and aftercare guidance that signals competence before the appointment starts.</p>
+            <p>The PWA layer means repeat clients can add the page to their home screen and access it at app speed, even on a slow connection. The rebrand — new name, new palette, new location — is reflected consistently across every layer of the product.</p>
+            <p>The entire stack remains zero-cost at current booking volume. Google Sheets and Apps Script are free. Vercel's free tier handles deployment. The PWA runs client-side. The studio gets a product that performs like a custom-built booking platform without the infrastructure cost of one.</p>
+        </div>
+    </div>
+
+    <!-- 09 -->
+    <div class="cs-section">
+        <div class="cs-section-label">09 / Reflection</div>
+        <div class="cs-section-body">
+            <p>The original Chic Curls page was the right product for February 2026. A lean, fast, WhatsApp-integrated booking tool for a studio whose audience already knew it. The brief was narrow on purpose — solve the booking problem, don't over-engineer.</p>
+            <p>Gyamera Aesthetics is the same product six months later, with different constraints. The studio is bigger, the name is new, and the audience now includes people who have never heard of it. The content layer that wasn't needed in February became essential in May — not because the original was wrong, but because the studio had outgrown it.</p>
+            <p>The right time to add the gallery, reviews, and FAQ was when there was an audience that needed them. Building them into v1 would have been speculation. Building them now was a response to evidence. That's the sequence: ship what solves the problem today, then add what the growth of the product reveals you need.</p>
+        </div>
+    </div>
+
+</div>
+
+<section class="cs-next">
+    <a href="/work/chic-curls.html" class="cs-next-link">
+        <div>
+            <span class="cs-next-label">Previous Version</span>
+            <span class="cs-next-name">Chic Curls</span>
+        </div>
+        <span class="cs-next-arrow">→</span>
+    </a>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <a href="/index.html" class="footer-brand">David Kwame Amo</a>
+        <span class="footer-stamp">© <span id="footer-year">2026</span> · Koforidua, Ghana</span>
+    </div>
+</footer>
+
+<script defer src="/js/case-study.js"></script>
+<script defer src="/js/sw-updater.js"></script>
+</body>
+</html>
