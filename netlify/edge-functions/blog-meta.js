@@ -1,5 +1,5 @@
 const SITE  = 'https://kwame.vision';
-const IMAGE = `${SITE}/photos/me.PNG`;
+const IMAGE = `${SITE}/photos/me.jpg`;
 
 function esc(s) {
   return String(s)
