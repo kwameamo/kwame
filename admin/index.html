@@ -159,7 +159,55 @@
 
         /* ── Post form ── */
 
-        #post-wrap {
+        /* ── Menu ── */
+
+        #menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100dvh;
+            padding: 40px 24px;
+            padding-bottom: calc(40px + env(safe-area-inset-bottom));
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        #menu.visible { opacity: 1; transform: translateY(0); }
+
+        .menu-btn {
+            width: 100%;
+            max-width: 300px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 18px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            -webkit-tap-highlight-color: transparent;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .menu-btn:active { background: #222; border-color: #444; }
+
+        .menu-btn-icon  { font-size: 20px; line-height: 1; }
+        .menu-btn-label { flex: 1; text-align: left; }
+        .menu-btn-count {
+            font-size: 12px;
+            color: var(--muted);
+            font-family: 'Syne Mono', monospace;
+        }
+
+        /* ── Post form + List view shared ── */
+
+        #post-wrap,
+        #list-wrap {
             max-width: 600px;
             margin: 0 auto;
             padding: 28px 20px 48px;
@@ -169,7 +217,8 @@
             transition: opacity 0.35s ease, transform 0.35s ease;
         }
 
-        #post-wrap.visible {
+        #post-wrap.visible,
+        #list-wrap.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -556,10 +605,24 @@
     <p class="lock-error" id="lock-error" role="alert"></p>
 </div>
 
-<!-- ── Post form (hidden until unlocked) ── -->
+<!-- ── Menu ── -->
+<div id="menu" hidden>
+    <p class="lock-label">David Kwame Amo</p>
+    <button type="button" class="menu-btn" id="menu-add">
+        <span class="menu-btn-icon">+</span>
+        <span class="menu-btn-label">Add Post</span>
+    </button>
+    <button type="button" class="menu-btn" id="menu-list">
+        <span class="menu-btn-icon">≡</span>
+        <span class="menu-btn-label">Posts</span>
+        <span class="menu-btn-count" id="menu-count"></span>
+    </button>
+</div>
+
+<!-- ── Post form ── -->
 <div id="post-wrap" hidden>
     <header>
-        <a href="/blog.html" class="logo">← Blog</a>
+        <button type="button" class="logo" id="back-from-form">← Menu</button>
         <h1>New Post</h1>
     </header>
 
@@ -613,14 +676,22 @@
 
     </form>
 
+
+</div>
+
+<!-- ── Posts list ── -->
+<div id="list-wrap" hidden>
+    <header>
+        <button type="button" class="logo" id="back-from-list">← Menu</button>
+        <h1>Posts</h1>
+    </header>
     <div class="posts-wrap">
         <div class="posts-header">
-            <span class="posts-heading">Posts</span>
+            <span class="posts-heading" id="posts-heading">All Posts</span>
             <button type="button" class="posts-reload" id="posts-reload" title="Refresh">↻</button>
         </div>
         <ul class="posts-list" id="posts-list"></ul>
     </div>
-
 </div>
 
 <script>
@@ -630,8 +701,35 @@
     var lockEl    = document.getElementById('lock');
     var lockInput = document.getElementById('lock-input');
     var lockError = document.getElementById('lock-error');
+    var menuEl    = document.getElementById('menu');
     var postWrap  = document.getElementById('post-wrap');
+    var listWrap  = document.getElementById('list-wrap');
     var savedPw   = '';
+
+    function showView(viewEl, onShown) {
+        menuEl.classList.remove('visible');
+        setTimeout(function () {
+            menuEl.hidden = true;
+            viewEl.hidden = false;
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    viewEl.classList.add('visible');
+                    if (onShown) onShown();
+                });
+            });
+        }, 200);
+    }
+
+    function backToMenu(viewEl) {
+        viewEl.classList.remove('visible');
+        setTimeout(function () {
+            viewEl.hidden = true;
+            menuEl.hidden = false;
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () { menuEl.classList.add('visible'); });
+            });
+        }, 200);
+    }
 
     lockInput.focus();
 
@@ -673,11 +771,10 @@
             lockEl.classList.add('exit');
             setTimeout(function () {
                 lockEl.hidden = true;
-                postWrap.hidden = false;
+                menuEl.hidden = false;
                 requestAnimationFrame(function () {
                     requestAnimationFrame(function () {
-                        postWrap.classList.add('visible');
-                        document.getElementById('title').focus();
+                        menuEl.classList.add('visible');
                         syncPosts();
                     });
                 });
@@ -799,6 +896,8 @@
         } catch (_) {}
         nextId = allPosts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
         idEl.value = '#' + nextId;
+        var count = allPosts.length;
+        document.getElementById('menu-count').textContent = count > 0 ? count : '';
         renderPostList();
     }
 
@@ -892,6 +991,22 @@
     }
 
     document.getElementById('posts-reload').addEventListener('click', syncPosts);
+
+    // Menu buttons
+    document.getElementById('menu-add').addEventListener('click', function () {
+        showView(postWrap, function () { document.getElementById('title').focus(); });
+    });
+    document.getElementById('menu-list').addEventListener('click', function () {
+        showView(listWrap);
+    });
+
+    // Back buttons
+    document.getElementById('back-from-form').addEventListener('click', function () {
+        backToMenu(postWrap);
+    });
+    document.getElementById('back-from-list').addEventListener('click', function () {
+        backToMenu(listWrap);
+    });
 
     function toHtml(raw) {
         return raw.trim().split(/\n{2,}/).map(function (block) {
