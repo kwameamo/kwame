@@ -10,6 +10,9 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        /* Ensure [hidden] always wins over any display rule in this file */
+        [hidden] { display: none !important; }
+
         :root {
             --bg:      #0d0d0d;
             --surface: #181818;
