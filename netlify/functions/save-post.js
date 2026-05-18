@@ -21,7 +21,7 @@ exports.handler = async function (event) {
     return respond(400, { error: 'All fields are required.' });
   }
 
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.BLOG_GITHUB_TOKEN;
   const repo  = 'kwameamo/kwame';
   const branch = 'main';
   const path  = 'blog-posts.json';
