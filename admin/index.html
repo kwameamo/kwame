@@ -398,6 +398,146 @@
             text-underline-offset: 3px;
             white-space: nowrap;
         }
+
+        /* ── Posts list ── */
+
+        .posts-wrap {
+            margin-top: 36px;
+            padding-top: 28px;
+            border-top: 1px solid var(--border);
+        }
+
+        .posts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .posts-heading {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .posts-reload {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s;
+            min-width: 36px;
+            min-height: 36px;
+        }
+        .posts-reload:active { color: var(--text); }
+
+        .posts-list { list-style: none; }
+
+        .post-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--border);
+            transition: opacity 0.25s;
+        }
+        .post-row:last-child { border-bottom: none; }
+        .post-row.removing  { opacity: 0; pointer-events: none; }
+
+        .post-row-info { flex: 1; min-width: 0; }
+
+        .post-row-title {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-row-meta {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'Syne Mono', monospace;
+            margin-top: 3px;
+        }
+
+        .post-row-del {
+            flex-shrink: 0;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .post-row-del:active { color: var(--red); border-color: var(--red); }
+
+        /* Confirmation state */
+        .post-row-confirm {
+            display: none;
+            flex: 1;
+            align-items: center;
+            gap: 8px;
+        }
+        .post-row.confirming .post-row-info    { display: none; }
+        .post-row.confirming .post-row-confirm { display: flex; }
+        .post-row.confirming .post-row-del     { display: none; }
+
+        .post-row-confirm-label {
+            font-size: 13px;
+            color: var(--red);
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-del-yes {
+            flex-shrink: 0;
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 12px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 32px;
+        }
+
+        .btn-del-no {
+            flex-shrink: 0;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            padding: 7px 12px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 32px;
+        }
     </style>
 </head>
 <body>
@@ -472,6 +612,15 @@
         <button type="button" class="btn-ghost" id="another-btn">Write another post</button>
 
     </form>
+
+    <div class="posts-wrap">
+        <div class="posts-header">
+            <span class="posts-heading">Posts</span>
+            <button type="button" class="posts-reload" id="posts-reload" title="Refresh">↻</button>
+        </div>
+        <ul class="posts-list" id="posts-list"></ul>
+    </div>
+
 </div>
 
 <script>
@@ -529,7 +678,7 @@
                     requestAnimationFrame(function () {
                         postWrap.classList.add('visible');
                         document.getElementById('title').focus();
-                        loadNextId();
+                        syncPosts();
                     });
                 });
             }, 300);
@@ -636,20 +785,113 @@
     /* ── Post form ── */
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);
 
-    var nextId = 1;
-    var idEl = document.getElementById('post-id');
+    var nextId   = 1;
+    var allPosts = [];
+    var idEl     = document.getElementById('post-id');
 
-    async function loadNextId() {
+    async function syncPosts() {
         try {
-            var res = await fetch('/blog-posts.json?_=' + Date.now());
-            if (!res.ok) return;
-            var posts = await res.json();
-            nextId = posts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
-        } catch (_) {
-            // silently fall back to nextId = 1
-        }
+            var res = await fetch('/.netlify/functions/get-posts');
+            if (res.ok) {
+                var data = await res.json();
+                if (Array.isArray(data)) allPosts = data;
+            }
+        } catch (_) {}
+        nextId = allPosts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
         idEl.value = '#' + nextId;
+        renderPostList();
     }
+
+    function renderPostList() {
+        var list = document.getElementById('posts-list');
+        while (list.firstChild) list.removeChild(list.firstChild);
+
+        var sorted = allPosts.slice().sort(function (a, b) {
+            return new Date(b.date) - new Date(a.date);
+        });
+
+        if (sorted.length === 0) {
+            var empty = document.createElement('li');
+            empty.style.cssText = 'padding:14px 0;color:var(--muted);font-size:13px;text-align:center;';
+            empty.textContent = 'No posts yet.';
+            list.appendChild(empty);
+            return;
+        }
+
+        sorted.forEach(function (post) {
+            var li = document.createElement('li');
+            li.className = 'post-row';
+
+            // Info
+            var info = document.createElement('div');
+            info.className = 'post-row-info';
+            var t = document.createElement('span');
+            t.className = 'post-row-title';
+            t.textContent = post.title;
+            var m = document.createElement('span');
+            m.className = 'post-row-meta';
+            m.textContent = '#' + post.id + ' · ' + post.date;
+            info.appendChild(t);
+            info.appendChild(m);
+
+            // Confirm strip (shown on tap of ×)
+            var confirmStrip = document.createElement('div');
+            confirmStrip.className = 'post-row-confirm';
+            var label = document.createElement('span');
+            label.className = 'post-row-confirm-label';
+            label.textContent = 'Delete "' + post.title + '"?';
+            var yes = document.createElement('button');
+            yes.type = 'button';
+            yes.className = 'btn-del-yes';
+            yes.textContent = 'Delete';
+            yes.addEventListener('click', function () { deletePost(post.id, li); });
+            var no = document.createElement('button');
+            no.type = 'button';
+            no.className = 'btn-del-no';
+            no.textContent = 'Cancel';
+            no.addEventListener('click', function () { li.classList.remove('confirming'); });
+            confirmStrip.appendChild(label);
+            confirmStrip.appendChild(yes);
+            confirmStrip.appendChild(no);
+
+            // Delete button
+            var del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'post-row-del';
+            del.setAttribute('aria-label', 'Delete post');
+            del.textContent = '×';
+            del.addEventListener('click', function () { li.classList.add('confirming'); });
+
+            li.appendChild(info);
+            li.appendChild(confirmStrip);
+            li.appendChild(del);
+            list.appendChild(li);
+        });
+    }
+
+    async function deletePost(postId, rowEl) {
+        rowEl.classList.add('removing');
+        try {
+            var res = await fetch('/.netlify/functions/delete-post', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: postId, password: savedPw })
+            });
+            var data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'Delete failed.');
+
+            allPosts = allPosts.filter(function (p) { return p.id !== postId; });
+            nextId = allPosts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
+            idEl.value = '#' + nextId;
+            setTimeout(function () { rowEl.remove(); }, 250);
+        } catch (err) {
+            rowEl.classList.remove('removing');
+            rowEl.classList.remove('confirming');
+            showError('Delete failed: ' + err.message);
+        }
+    }
+
+    document.getElementById('posts-reload').addEventListener('click', syncPosts);
 
     function toHtml(raw) {
         return raw.trim().split(/\n{2,}/).map(function (block) {
@@ -735,6 +977,7 @@
             document.getElementById('date').value = new Date().toISOString().slice(0, 10);
             nextId += 1;
             idEl.value = '#' + nextId;
+            syncPosts();
 
         } catch (err) {
             showError(err.message);
