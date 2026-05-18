@@ -1,31 +1,33 @@
 import { getStore } from '@netlify/blobs';
 
-export const handler = async function () {
+export default async () => {
   try {
     const store = getStore({ name: 'blog', consistency: 'strong' });
     const posts = await store.get('posts', { type: 'json' });
 
     if (posts && posts.length > 0) {
-      return respond(200, posts);
+      return new Response(JSON.stringify(posts), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store'
+        }
+      });
     }
 
-    // Blob empty — fall back to the static JSON file
+    // Blob empty — fall back to the static JSON
     const seed = await fetch(`${process.env.URL}/blog-posts.json`);
     const fallback = seed.ok ? await seed.json() : [];
-    return respond(200, fallback);
 
+    return new Response(JSON.stringify(fallback), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store'
+      }
+    });
   } catch (err) {
-    return respond(500, { error: err.message });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
-
-function respond(status, body) {
-  return {
-    statusCode: status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-store'
-    },
-    body: JSON.stringify(body)
-  };
-}

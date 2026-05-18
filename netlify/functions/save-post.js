@@ -1,25 +1,31 @@
 import { getStore } from '@netlify/blobs';
 
-export const handler = async function (event) {
+const json = (body, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+export default async (req) => {
   let body;
   try {
-    body = JSON.parse(event.body);
+    body = await req.json();
   } catch {
-    return respond(400, { error: 'Invalid request body.' });
+    return json({ error: 'Invalid request body.' }, 400);
   }
 
   const { title, date, excerpt, content, password, verify } = body;
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
-    return respond(401, { error: 'Wrong password.' });
+    return json({ error: 'Wrong password.' }, 401);
   }
 
   if (verify === true) {
-    return respond(200, { ok: true });
+    return json({ ok: true });
   }
 
   if (!title || !date || !excerpt || !content) {
-    return respond(400, { error: 'All fields are required.' });
+    return json({ error: 'All fields are required.' }, 400);
   }
 
   try {
@@ -27,7 +33,6 @@ export const handler = async function (event) {
     let posts = await store.get('posts', { type: 'json' });
 
     if (!posts) {
-      // First save — seed from the static JSON already in the repo
       try {
         const seed = await fetch(`${process.env.URL}/blog-posts.json`);
         posts = seed.ok ? await seed.json() : [];
@@ -41,16 +46,8 @@ export const handler = async function (event) {
 
     await store.setJSON('posts', posts);
 
-    return respond(200, { ok: true });
+    return json({ ok: true });
   } catch (err) {
-    return respond(500, { error: err.message });
+    return json({ error: err.message }, 500);
   }
 };
-
-function respond(status, body) {
-  return {
-    statusCode: status,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  };
-}
