@@ -12,7 +12,6 @@ exports.handler = async function (event) {
     return respond(401, { error: 'Wrong password.' });
   }
 
-  // Password-only check — used by the lock screen before showing the form
   if (verify === true) {
     return respond(200, { ok: true });
   }
@@ -22,33 +21,40 @@ exports.handler = async function (event) {
   }
 
   const token = process.env.BLOG_GITHUB_TOKEN;
-  const repo  = 'kwameamo/kwame';
+
+  // Debug: surface token state without exposing value
+  if (!token) {
+    return respond(500, { error: 'BLOG_GITHUB_TOKEN is not set in environment variables.' });
+  }
+
+  const tokenType = token.startsWith('github_pat_') ? 'fine-grained'
+                  : token.startsWith('ghp_')        ? 'classic'
+                  : 'unknown format';
+
+  const repo   = 'kwameamo/kwame';
   const branch = 'main';
-  const path  = 'blog-posts.json';
-  const url   = `https://api.github.com/repos/${repo}/contents/${path}`;
+  const path   = 'blog-posts.json';
+  const url    = `https://api.github.com/repos/${repo}/contents/${path}`;
 
   const ghHeaders = {
-    'Authorization': `Bearer ${token}`,
+    'Authorization': `token ${token}`,
     'Accept': 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
     'User-Agent': 'kwame-blog-admin'
   };
 
   try {
-    // 1. Fetch current file + sha
     const getRes = await fetch(`${url}?ref=${branch}`, { headers: ghHeaders });
     if (!getRes.ok) {
       const e = await getRes.json();
-      throw new Error(`GitHub read failed: ${e.message}`);
+      throw new Error(`GitHub read failed (${getRes.status}): ${e.message}`);
     }
     const file = await getRes.json();
 
-    // 2. Decode → parse → append
     const posts = JSON.parse(Buffer.from(file.content, 'base64').toString('utf-8'));
     const nextId = posts.reduce((m, p) => Math.max(m, p.id || 0), 0) + 1;
     posts.push({ id: nextId, date, title, excerpt, content });
 
-    // 3. Encode → commit
     const encoded = Buffer.from(JSON.stringify(posts, null, 2)).toString('base64');
     const putRes = await fetch(url, {
       method: 'PUT',
@@ -63,7 +69,10 @@ exports.handler = async function (event) {
 
     if (!putRes.ok) {
       const e = await putRes.json();
-      throw new Error(`GitHub write failed: ${e.message}`);
+      throw new Error(
+        `GitHub write failed (${putRes.status}, token: ${tokenType}): ${e.message}` +
+        (e.documentation_url ? ` — ${e.documentation_url}` : '')
+      );
     }
 
     return respond(200, { ok: true });
