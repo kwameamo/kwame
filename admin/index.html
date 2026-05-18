@@ -195,6 +195,21 @@
 
         .field { margin-bottom: 18px; }
 
+        .field-row {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .field-row .field { margin-bottom: 0; }
+
+        #post-id {
+            color: var(--muted);
+            cursor: default;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+
         label {
             display: block;
             font-size: 11px;
@@ -410,9 +425,15 @@
 
     <form id="form" novalidate>
 
-        <div class="field">
-            <label for="date">Date</label>
-            <input type="date" id="date" required>
+        <div class="field-row">
+            <div class="field">
+                <label for="post-id">Post ID</label>
+                <input type="text" id="post-id" readonly tabindex="-1">
+            </div>
+            <div class="field">
+                <label for="date">Date</label>
+                <input type="date" id="date" required>
+            </div>
         </div>
 
         <div class="field">
@@ -508,6 +529,7 @@
                     requestAnimationFrame(function () {
                         postWrap.classList.add('visible');
                         document.getElementById('title').focus();
+                        loadNextId();
                     });
                 });
             }, 300);
@@ -614,6 +636,21 @@
     /* ── Post form ── */
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);
 
+    var nextId = 1;
+    var idEl = document.getElementById('post-id');
+
+    async function loadNextId() {
+        try {
+            var res = await fetch('/blog-posts.json?_=' + Date.now());
+            if (!res.ok) return;
+            var posts = await res.json();
+            nextId = posts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
+        } catch (_) {
+            // silently fall back to nextId = 1
+        }
+        idEl.value = '#' + nextId;
+    }
+
     function toHtml(raw) {
         return raw.trim().split(/\n{2,}/).map(function (block) {
             var t = block.trim();
@@ -696,6 +733,8 @@
                 el.classList.remove('error');
             });
             document.getElementById('date').value = new Date().toISOString().slice(0, 10);
+            nextId += 1;
+            idEl.value = '#' + nextId;
 
         } catch (err) {
             showError(err.message);
