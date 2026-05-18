@@ -35,6 +35,14 @@
         }
         renderCards();
 
+        // URL param takes precedence over session storage
+        var urlId = new URLSearchParams(location.search).get('post');
+        if (urlId) {
+            var targetId  = parseInt(urlId, 10);
+            var targetIdx = posts.findIndex(function (p) { return p.id === targetId; });
+            if (targetIdx >= 0) { openPost(targetIdx, true); return; }
+        }
+
         var saved = sessionStorage.getItem('blog_openPost');
         if (saved !== null) {
             openPost(parseInt(saved, 10), true);
@@ -114,6 +122,10 @@
         modal.onscroll = function () {
             sessionStorage.setItem('blog_modalScrollY_' + currentPostIndex, modal.scrollTop);
         };
+
+        // Push shareable URL
+        history.pushState({ postId: post.id }, '', '?post=' + post.id);
+        document.title = post.title + ' — David Kwame Amo';
     }
 
     function closePost() {
@@ -124,6 +136,8 @@
             document.body.style.overflow = '';
         }, 220);
         sessionStorage.removeItem('blog_openPost');
+        history.pushState(null, '', location.pathname);
+        document.title = 'Blog — David Kwame Amo';
         var y = sessionStorage.getItem('blog_scrollY');
         if (y) requestAnimationFrame(function () { window.scrollTo(0, parseInt(y, 10)); });
     }
@@ -144,6 +158,37 @@
         document.getElementById('modal-counter').textContent = label;
         document.getElementById('mf-counter').textContent    = label;
     }
+
+    function sharePost() {
+        var post = posts[currentPostIndex];
+        var url  = location.href;
+        var btn  = document.getElementById('modal-share-btn');
+
+        if (navigator.share) {
+            navigator.share({ title: post.title + ' — David Kwame Amo', url: url }).catch(function () {});
+            return;
+        }
+
+        var reset = function () { btn.textContent = '↗ share'; };
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(function () {
+                btn.textContent = '✓ copied';
+                setTimeout(reset, 2000);
+            }).catch(reset);
+        } else {
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.cssText = 'position:fixed;opacity:0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.textContent = '✓ copied';
+            setTimeout(reset, 2000);
+        }
+    }
+
+    document.getElementById('modal-share-btn').addEventListener('click', sharePost);
 
     document.addEventListener('keydown', function (e) {
         var modal = document.getElementById('blog-modal');
