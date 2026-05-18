@@ -315,19 +315,21 @@
     border-top: 1px solid var(--g2);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
 }
 
 .mf-btn {
+    flex: 1;
     font-family: 'Syne Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.04em;
     color: var(--black);
     background: none;
     border: 1px solid var(--g2);
-    padding: 0.55rem 1.1rem;
+    padding: 0.6rem 0.8rem;
     cursor: pointer;
     transition: all 0.2s;
+    text-align: center;
 }
 
 .mf-btn:hover:not(:disabled) {
@@ -337,13 +339,6 @@
 }
 
 .mf-btn:disabled { opacity: 0.25; cursor: not-allowed; }
-
-.mf-counter {
-    font-family: 'Syne Mono', monospace;
-    font-size: 10px;
-    color: var(--g3);
-    letter-spacing: 0.1em;
-}
 
 /* ── RESPONSIVE ── */
 @media (max-width: 960px) {
@@ -361,4 +356,31 @@
 @media (max-width: 600px) {
     .blog-grid { grid-template-columns: 1fr; }
     .blog-card { padding: 22px 22px 28px; }
+
+    /* Mobile modal: top bar = close + counter only */
+    .modal-nav-btns { display: none; }
+
+    /* Counter floats right when nav-btns are gone */
+    .modal-nav-counter { margin-left: auto; }
+
+    /* Sticky action bar at the bottom */
+    .modal-footer {
+        position: sticky;
+        bottom: 0;
+        max-width: 100%;
+        background: var(--white);
+        border-top: 1px solid var(--g2);
+        padding: 10px 16px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+        gap: 8px;
+        z-index: 5;
+    }
+
+    .mf-btn {
+        padding: 14px 8px;
+        font-size: 12px;
+    }
+
+    /* Extra bottom room so content doesn't hide behind sticky footer */
+    .modal-content { padding-bottom: 1.5rem; }
 }

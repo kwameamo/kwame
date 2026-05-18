@@ -156,7 +156,6 @@
         document.getElementById('prev-btn-foot').disabled = atStart;
         document.getElementById('next-btn-foot').disabled = atEnd;
         document.getElementById('modal-counter').textContent = label;
-        document.getElementById('mf-counter').textContent    = label;
     }
 
     function sharePost() {

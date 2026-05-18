@@ -69,7 +69,6 @@
         <button type="button" class="modal-close" onclick="closePost()">✕ close</button>
         <span class="modal-nav-counter" id="modal-counter"></span>
         <div class="modal-nav-btns">
-            <button type="button" class="modal-nav-btn" id="modal-share-btn">↗ share</button>
             <button type="button" class="modal-nav-btn" id="prev-btn" onclick="navigatePost(-1)">← prev</button>
             <button type="button" class="modal-nav-btn" id="next-btn" onclick="navigatePost(1)">next →</button>
         </div>
@@ -81,8 +80,8 @@
         <div class="modal-body" id="modal-body"></div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="mf-btn" id="prev-btn-foot" onclick="navigatePost(-1)">← previous</button>
-        <span class="mf-counter" id="mf-counter"></span>
+        <button type="button" class="mf-btn" id="prev-btn-foot" onclick="navigatePost(-1)">← prev</button>
+        <button type="button" class="mf-btn mf-share" id="modal-share-btn">↗ share</button>
         <button type="button" class="mf-btn" id="next-btn-foot" onclick="navigatePost(1)">next →</button>
     </div>
 </div>
