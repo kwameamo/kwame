@@ -1125,6 +1125,11 @@
 <script>
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function () {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) {
+                if (r.scope && r.scope.includes('/admin/')) r.unregister();
+            });
+        });
         navigator.serviceWorker.register('/_p7n3x/sw.js').catch(function () {});
     });
 }
