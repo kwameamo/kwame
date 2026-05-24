@@ -1,12 +1,24 @@
 import { getStore } from '@netlify/blobs';
+import { checkRateLimit, recordFailure, clearRateLimit } from './_ratelimit.js';
 
-const json = (body, status = 200) =>
+const json = (body, status = 200, extra = {}) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json', ...extra }
   });
 
-export default async (req) => {
+export default async (req, context) => {
+  const ip = context?.ip ?? req.headers.get('x-forwarded-for') ?? 'unknown';
+
+  const { limited, retryAfter } = await checkRateLimit(ip);
+  if (limited) {
+    return json(
+      { error: 'Too many failed attempts. Try again later.' },
+      429,
+      { 'Retry-After': String(retryAfter) }
+    );
+  }
+
   let body;
   try {
     body = await req.json();
@@ -17,8 +29,11 @@ export default async (req) => {
   const { title, date, excerpt, content, password, verify } = body;
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
+    await recordFailure(ip);
     return json({ error: 'Wrong password.' }, 401);
   }
+
+  await clearRateLimit(ip);
 
   if (verify === true) {
     return json({ ok: true });
