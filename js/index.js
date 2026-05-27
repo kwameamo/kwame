@@ -6,14 +6,17 @@
        Updates every second. START_YEAR drives
        the "years active" stat in the hero panel.
     ───────────────────────────────────────── */
-    var yearEl  = document.getElementById('hero-year');
-    var clockEl = document.getElementById('hero-clock');
+    var yearEl       = document.getElementById('hero-year');
+    var footerYearEl = document.getElementById('footer-year');
+    var clockEl      = document.getElementById('hero-clock');
 
     function pad(n) { return n < 10 ? '0' + n : String(n); }
 
     function tick() {
         var now = new Date();
-        if (yearEl)  yearEl.textContent  = now.getUTCFullYear();
+        var yr  = now.getUTCFullYear();
+        if (yearEl)       yearEl.textContent       = yr;
+        if (footerYearEl) footerYearEl.textContent = yr;
         if (clockEl) clockEl.textContent = pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes());
     }
 
