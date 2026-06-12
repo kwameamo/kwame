@@ -27,7 +27,40 @@
         return track.artwork_url || track.cover || track.artwork || track.album_art || track.coverArt || null;
     }
 
+    /* ── Track time ── */
+    var progEl = document.getElementById('np-progress');
+    var durEl  = document.getElementById('np-duration');
+    var prog   = { base: 0, dur: 0, at: 0, playing: false };
+
+    function fmtTime(ms) {
+        var s = Math.max(0, Math.floor(ms / 1000));
+        var m = Math.floor(s / 60);
+        s = s % 60;
+        return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function renderTime() {
+        if (!progEl || !durEl || !prog.playing || !prog.dur) return;
+        var cur = Math.min(prog.base + (Date.now() - prog.at), prog.dur);
+        progEl.textContent = fmtTime(cur);
+        durEl.textContent  = fmtTime(prog.dur);
+    }
+
+    // Tick locally between API updates; each update resyncs the baseline.
+    setInterval(renderTime, 1000);
+
+    function syncProgress(track) {
+        prog.base    = track.progress_ms || 0;
+        prog.dur     = track.duration_ms || 0;
+        prog.at      = Date.now();
+        prog.playing = true;
+        renderTime();
+    }
+
     function setPlaying(track) {
+        // Always resync time — progress moves even when the track doesn't change.
+        syncProgress(track);
+
         var id = track.title + track.artist;
         if (id === currentId) return;
         currentId = id;
@@ -52,6 +85,7 @@
     }
 
     function setIdle() {
+        prog.playing = false;
         if (currentId === null) return;
         currentId = null;
         card.classList.remove('playing', 'has-art');

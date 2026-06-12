@@ -363,7 +363,7 @@
 
 .np-art-wrap {
     width: 44px;
-    height: 44px;
+    height: 55px; /* 4:5, matches the gallery cards */
     flex-shrink: 0;
     background: var(--g1);
     border: 1px solid var(--g2);
@@ -429,6 +429,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.np-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--g3);
+    margin-top: 3px;
+}
+
+.np-time-sep { color: var(--g2); }
 
 .np-eq {
     display: flex;
