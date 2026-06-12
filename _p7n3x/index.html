@@ -215,7 +215,8 @@
         /* ── Post form + List view shared ── */
 
         #post-wrap,
-        #list-wrap {
+        #list-wrap,
+        #gallery-wrap {
             max-width: 600px;
             margin: 0 auto;
             padding: 28px 20px 48px;
@@ -226,7 +227,8 @@
         }
 
         #post-wrap.visible,
-        #list-wrap.visible {
+        #list-wrap.visible,
+        #gallery-wrap.visible {
             opacity: 1;
             transform: translateY(0);
         }
@@ -640,12 +642,60 @@
             text-align: center;
         }
 
-        .g-preview {
-            display: block;
-            width: 100%;
-            max-height: 320px;
-            object-fit: cover;
+        .g-previews {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            padding: 6px;
         }
+
+        .g-pv {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #222;
+        }
+
+        .g-pv img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .g-pv.busy::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(13, 13, 13, 0.55);
+        }
+
+        .g-pv-x {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 2;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .g-pv-x:active { background: var(--red); }
+
+        .g-addmore { display: none; }
+        .g-addmore[hidden] { display: none; }
+        .g-addmore.show { display: block; }
 
         /* List thumbnails reuse .post-row */
         .g-thumb {
@@ -778,16 +828,17 @@
 
     <form id="gallery-form" novalidate>
         <div class="field">
-            <label>Image</label>
-            <button type="button" class="g-drop" id="g-drop">
-                <input type="file" id="g-file" accept="image/jpeg,image/png,image/webp" hidden>
+            <label>Images</label>
+            <div class="g-drop" id="g-drop" role="button" tabindex="0" aria-label="Choose photos">
+                <input type="file" id="g-file" accept="image/jpeg,image/png,image/webp" multiple hidden>
                 <span class="g-drop-empty" id="g-drop-empty">
                     <span class="g-drop-icon">+</span>
-                    <span class="g-drop-text">Tap to choose a photo</span>
-                    <span class="g-drop-hint">JPG, PNG or WebP · resized automatically</span>
+                    <span class="g-drop-text">Tap to choose photos</span>
+                    <span class="g-drop-hint">JPG, PNG or WebP · pick one or many · resized automatically</span>
                 </span>
-                <img class="g-preview" id="g-preview" alt="" hidden>
-            </button>
+                <span class="g-previews" id="g-previews" hidden></span>
+            </div>
+            <button type="button" class="btn-ghost g-addmore" id="g-addmore" hidden>+ Add more photos</button>
         </div>
 
         <div class="field">
@@ -1234,17 +1285,19 @@
 
     /* ── Gallery ── */
     var galleryWrap = document.getElementById('gallery-wrap');
-    var gDrop    = document.getElementById('g-drop');
-    var gFile    = document.getElementById('g-file');
-    var gEmpty   = document.getElementById('g-drop-empty');
-    var gPreview = document.getElementById('g-preview');
-    var gCaption = document.getElementById('g-caption');
-    var gLink    = document.getElementById('g-link');
-    var gSubmit  = document.getElementById('g-submit');
-    var gStatus  = document.getElementById('g-status');
-    var gList    = document.getElementById('gallery-list');
+    var gDrop     = document.getElementById('g-drop');
+    var gFile     = document.getElementById('g-file');
+    var gEmpty    = document.getElementById('g-drop-empty');
+    var gPreviews = document.getElementById('g-previews');
+    var gAddMore  = document.getElementById('g-addmore');
+    var gCaption  = document.getElementById('g-caption');
+    var gLink     = document.getElementById('g-link');
+    var gSubmit   = document.getElementById('g-submit');
+    var gStatus   = document.getElementById('g-status');
+    var gList     = document.getElementById('gallery-list');
 
-    var pendingImage = null;     // base64 data URL ready to upload
+    var pending = [];            // [{ uid, dataUrl }] queued for upload
+    var uidSeq = 0;
     var galleryItems = [];
 
     function gShowStatus(cls, msg) {
@@ -1265,31 +1318,71 @@
     });
     document.getElementById('g-reload').addEventListener('click', syncGallery);
 
-    // File picker
-    gDrop.addEventListener('click', function (e) {
-        if (e.target === gFile) return;
-        gFile.click();
+    // Open the file picker
+    function openPicker() { gFile.click(); }
+    gDrop.addEventListener('click', function () { if (pending.length === 0) openPicker(); });
+    gDrop.addEventListener('keydown', function (e) {
+        if ((e.key === 'Enter' || e.key === ' ') && pending.length === 0) {
+            e.preventDefault(); openPicker();
+        }
     });
+    gAddMore.addEventListener('click', openPicker);
 
     gFile.addEventListener('change', function () {
-        var file = gFile.files && gFile.files[0];
-        if (!file) return;
-        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
-            gShowStatus('error', 'Please choose a JPG, PNG or WebP image.');
-            return;
-        }
+        var files = Array.prototype.slice.call(gFile.files || []);
+        gFile.value = ''; // allow re-picking the same file later
+        if (!files.length) return;
         gHideStatus();
-        downscale(file, 1600, 0.82).then(function (dataUrl) {
-            pendingImage = dataUrl;
-            gPreview.src = dataUrl;
-            gPreview.hidden = false;
-            gEmpty.hidden = true;
-            gDrop.classList.add('has-img');
-            gSubmit.disabled = false;
-        }).catch(function (err) {
-            gShowStatus('error', err.message || 'Could not read that image.');
+
+        var skipped = 0;
+        files.forEach(function (file) {
+            if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { skipped++; return; }
+            downscale(file, 1600, 0.82).then(function (dataUrl) {
+                pending.push({ uid: ++uidSeq, dataUrl: dataUrl });
+                renderPending();
+            }).catch(function () { /* skip unreadable file */ });
         });
+        if (skipped) gShowStatus('error', skipped + ' file(s) skipped — JPG, PNG or WebP only.');
     });
+
+    function renderPending() {
+        while (gPreviews.firstChild) gPreviews.removeChild(gPreviews.firstChild);
+
+        pending.forEach(function (p) {
+            var cell = document.createElement('span');
+            cell.className = 'g-pv';
+
+            var img = document.createElement('img');
+            img.src = p.dataUrl;
+            img.alt = '';
+            cell.appendChild(img);
+
+            var x = document.createElement('button');
+            x.type = 'button';
+            x.className = 'g-pv-x';
+            x.setAttribute('aria-label', 'Remove image');
+            x.textContent = '×';
+            x.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                pending = pending.filter(function (q) { return q.uid !== p.uid; });
+                renderPending();
+            });
+            cell.appendChild(x);
+
+            gPreviews.appendChild(cell);
+        });
+
+        var has = pending.length > 0;
+        gPreviews.hidden = !has;
+        gEmpty.hidden = has;
+        gDrop.classList.toggle('has-img', has);
+        gAddMore.hidden = !has;
+        gAddMore.classList.toggle('show', has);
+        gSubmit.disabled = !has;
+        gSubmit.textContent = has && pending.length > 1
+            ? 'Upload ' + pending.length + ' Images'
+            : 'Upload Image';
+    }
 
     // Shrink image client-side before upload — keeps payloads small + fast.
     function downscale(file, maxDim, quality) {
@@ -1320,55 +1413,63 @@
         });
     }
 
-    function resetGalleryForm() {
-        pendingImage = null;
-        gFile.value = '';
-        gPreview.src = '';
-        gPreview.hidden = true;
-        gEmpty.hidden = false;
-        gDrop.classList.remove('has-img');
-        gCaption.value = '';
-        gLink.value = '';
-        gSubmit.disabled = true;
-    }
-
     document.getElementById('gallery-form').addEventListener('submit', async function (e) {
         e.preventDefault();
-        if (!pendingImage) { gShowStatus('error', 'Choose an image first.'); return; }
+        if (pending.length === 0) { gShowStatus('error', 'Choose at least one image first.'); return; }
 
         var link = gLink.value.trim();
         if (link && !/^https?:\/\//i.test(link)) {
             gShowStatus('error', 'Link must start with http:// or https://');
             return;
         }
+        var caption = gCaption.value.trim();
 
         gSubmit.disabled = true;
-        gSubmit.textContent = 'Uploading…';
+        gAddMore.disabled = true;
         gHideStatus();
 
-        try {
-            var res = await fetch('/.netlify/functions/save-gallery', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    password: savedPw,
-                    caption:  gCaption.value.trim(),
-                    link:     link,
-                    image:    pendingImage
-                })
-            });
-            var data = await res.json();
-            if (!res.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
+        var queue = pending.slice();
+        var total = queue.length;
+        var done = 0;
+        var uploadedUids = [];
 
-            gShowStatus('success', '✓ Image added. Live in ~30 seconds.');
-            resetGalleryForm();
-            syncGallery();
-        } catch (err) {
-            gShowStatus('error', err.message);
-        } finally {
-            gSubmit.textContent = 'Upload Image';
-            gSubmit.disabled = !pendingImage;
+        // Upload sequentially so we stay within function payload limits.
+        for (var i = 0; i < queue.length; i++) {
+            var p = queue[i];
+            gSubmit.textContent = 'Uploading ' + (i + 1) + ' / ' + total + '…';
+            try {
+                var res = await fetch('/.netlify/functions/save-gallery', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: savedPw,
+                        caption:  caption,
+                        link:     link,
+                        image:    p.dataUrl
+                    })
+                });
+                var data = await res.json();
+                if (!res.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
+                done++;
+                uploadedUids.push(p.uid);
+            } catch (err) { /* leave this one queued */ }
         }
+
+        // Drop only the ones that actually uploaded; failures stay queued for retry.
+        pending = pending.filter(function (q) { return uploadedUids.indexOf(q.uid) === -1; });
+        var failed = total - done;
+
+        gAddMore.disabled = false;
+
+        if (failed === 0) {
+            gShowStatus('success', '✓ ' + done + ' image' + (done === 1 ? '' : 's') + ' added. Live in ~30 seconds.');
+            gCaption.value = '';
+            gLink.value = '';
+        } else {
+            gShowStatus('error', done + ' uploaded, ' + failed + ' failed — the failed ones are still queued, try again.');
+        }
+        renderPending();
+        syncGallery();
     });
 
     async function syncGallery() {
