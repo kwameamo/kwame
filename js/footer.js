@@ -79,27 +79,76 @@
         requestAnimationFrame(frame);
     }
 
-    // Statement decodes when the footer scrolls into view
+    // Self-drawing star: prime the stroke so it can draw in
+    var sigPath = document.getElementById('ft-sig-path');
+    var sigLen = 0;
+    if (sigPath && sigPath.getTotalLength) {
+        sigLen = sigPath.getTotalLength();
+        sigPath.style.strokeDasharray = sigLen;
+        sigPath.style.strokeDashoffset = sigLen;
+    }
+
+    // Statement decodes + star draws when the footer scrolls into view
     var line = document.getElementById('ft-line');
-    if (line && 'IntersectionObserver' in window) {
+    if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) {
             if (entries[0].isIntersecting) {
                 io.disconnect();
-                decode(line, 1300);
+                if (line) decode(line, 1300);
+                if (sigPath && sigLen) {
+                    requestAnimationFrame(function () {
+                        sigPath.style.strokeDashoffset = '0';
+                    });
+                }
             }
-        }, { threshold: 0.4 });
-        io.observe(line);
+        }, { threshold: 0.3 });
+        io.observe(footer);
     }
 
-    // Links decode on hover (fine pointers — pointless on touch)
-    if (window.matchMedia('(pointer: fine)').matches) {
-        footer.querySelectorAll('.footer-nav-link').forEach(function (a) {
-            a.addEventListener('mouseenter', function () { decode(a, 350); });
+    /* ── Nav links: index (01…) slides in on hover; label gets its own
+       span so the hover decode can't clobber the index node. ── */
+    var finePointer = window.matchMedia('(pointer: fine)').matches;
+
+    footer.querySelectorAll('.footer-nav-col').forEach(function (col) {
+        col.querySelectorAll('.footer-nav-link').forEach(function (a, i) {
+            var label = document.createElement('span');
+            label.className = 'ft-li-label';
+            label.textContent = a.textContent;
+            while (a.firstChild) a.removeChild(a.firstChild);
+
+            var idx = document.createElement('span');
+            idx.className = 'ft-li-idx';
+            idx.setAttribute('aria-hidden', 'true');
+            idx.textContent = pad(i + 1);
+
+            a.appendChild(idx);
+            a.appendChild(label);
+
+            if (finePointer) {
+                a.addEventListener('mouseenter', function () { decode(label, 350); });
+            }
         });
+    });
+
+    // Brand name decode on hover — set in Syne Mono, so no width jitter.
+    if (finePointer) {
+        var brand = footer.querySelector('.footer-brand');
+        if (brand) {
+            brand.addEventListener('mouseenter', function () { decode(brand, 420); });
+        }
     }
 
     /* ── Inversion orb ── */
     var orb = document.getElementById('ft-orb');
+    var hud = document.getElementById('ft-hud');
+
+    function padCoord(n) {
+        n = Math.max(0, Math.round(n));
+        var s = String(n);
+        while (s.length < 4) s = '0' + s;
+        return s;
+    }
+
     if (orb) {
         var fine = window.matchMedia('(pointer: fine)').matches;
         var pos = { x: 0, y: 0 };       // rendered position
@@ -113,6 +162,10 @@
             scale += (targetScale - scale) * 0.1;
             orb.style.transform =
                 'translate(' + (pos.x - 100) + 'px,' + (pos.y - 100) + 'px) scale(' + scale.toFixed(3) + ')';
+            if (hud) {
+                hud.textContent = '✦ ' + padCoord(pos.x) + ' × ' + padCoord(pos.y);
+                hud.classList.toggle('on', scale > 0.05);
+            }
             if (Math.abs(target.x - pos.x) > 0.1 || Math.abs(target.y - pos.y) > 0.1 ||
                 Math.abs(targetScale - scale) > 0.001 || targetScale > 0) {
                 rafId = requestAnimationFrame(renderOrb);

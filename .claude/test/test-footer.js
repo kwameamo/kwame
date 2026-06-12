@@ -56,11 +56,40 @@ const { chromium } = require('playwright');
     return m ? parseFloat(m[1]) > 0.5 : false;
   });
 
-  // Link hover decode restores its text
-  const linkText = await page.textContent('.footer-nav-link');
+  // HUD readout tracks the orb
+  results.hud = await page.evaluate(() => {
+    const h = document.getElementById('ft-hud');
+    return { on: h.classList.contains('on'), text: h.textContent,
+      format: /^✦ \d{4} × \d{4}$/.test(h.textContent) };
+  });
+
+  // Self-drawing star completed
+  results.starDrawn = await page.evaluate(() => {
+    const p = document.getElementById('ft-sig-path');
+    return p && p.style.strokeDashoffset === '0px' || p.style.strokeDashoffset === '0';
+  });
+
+  // Nav link: label decode restores text, index slides in on hover
+  const linkLabel = await page.textContent('.footer-nav-link .ft-li-label');
   await page.hover('.footer-nav-link');
   await page.waitForTimeout(700);
-  results.linkDecodeRestored = (await page.textContent('.footer-nav-link')) === linkText;
+  results.linkDecodeRestored =
+    (await page.textContent('.footer-nav-link .ft-li-label')) === linkLabel;
+  results.idxVisibleOnHover = await page.evaluate(() => {
+    const idx = document.querySelector('.footer-nav-link:hover .ft-li-idx');
+    return idx ? parseFloat(getComputedStyle(idx).opacity) > 0.8 : false;
+  });
+  results.idxCount = await page.locator('.ft-li-idx').count();
+
+  // Brand decode restores
+  const brandText = await page.textContent('.footer-brand');
+  await page.hover('.footer-brand');
+  await page.waitForTimeout(800);
+  results.brandDecodeRestored = (await page.textContent('.footer-brand')) === brandText;
+
+  // Hero clock has seconds too
+  results.heroClockSeconds = await page.evaluate(() =>
+    /^\d{2}:\d{2}:\d{2}$/.test(document.getElementById('hero-clock').textContent));
 
   // Magnetic CTA
   const cta = page.locator('.footer-cta');

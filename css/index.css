@@ -1514,6 +1514,57 @@
     .ft-orb { display: none; }
 }
 
+/* ── Orb coordinate readout ── */
+.ft-hud {
+    position: absolute;
+    top: 22px;
+    right: 40px;
+    z-index: 6;
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: var(--g3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.ft-hud.on { opacity: 1; }
+
+/* ── Self-drawing star ── */
+.ft-sig {
+    width: 22px;
+    height: 22px;
+}
+
+.ft-sig path {
+    fill: none;
+    stroke: var(--black);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+}
+
+/* ── Nav link index — slides in on hover ── */
+.ft-li-idx {
+    display: inline-block;
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateX(-6px);
+    font-size: 9px;
+    color: var(--g3);
+    transition: width 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+}
+
+.footer-nav-link:hover .ft-li-idx,
+.footer-nav-link:focus-visible .ft-li-idx {
+    width: 22px;
+    opacity: 1;
+    transform: translateX(0);
+}
+
 /* ── Statement ── */
 .ft-statement {
     display: flex;
@@ -1823,6 +1874,7 @@
     .footer-top { flex-direction: column; gap: 2rem; }
     .footer-nav { gap: 2rem; }
     .ft-statement { padding-bottom: 2rem; gap: 12px; }
+    .ft-hud { right: 24px; top: 16px; }
     .ft-line { font-size: 22px; }
     .footer-bottom { flex-direction: column-reverse; align-items: flex-start; gap: 1.25rem; }
     .ft-bottom-right { width: 100%; justify-content: space-between; }

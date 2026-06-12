@@ -17,7 +17,7 @@
         var yr  = now.getUTCFullYear();
         if (yearEl)       yearEl.textContent       = yr;
         if (footerYearEl) footerYearEl.textContent = yr;
-        if (clockEl) clockEl.textContent = pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes());
+        if (clockEl) clockEl.textContent = pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes()) + ':' + pad(now.getUTCSeconds());
     }
 
     tick();
