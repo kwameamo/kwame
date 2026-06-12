@@ -450,16 +450,52 @@
 </section>
 
 <!-- FOOTER -->
-<footer class="site-footer">
+<footer class="site-footer" id="footer">
+
+    <!-- Ticker — looping service strip -->
+    <div class="ft-ticker" aria-hidden="true">
+        <div class="ft-ticker-track">
+            <div class="ft-ticker-group">
+                <span>Brand Identity</span><span class="ft-tick-star">✦</span>
+                <span>Garment Design</span><span class="ft-tick-star">✦</span>
+                <span>Web Design + Dev</span><span class="ft-tick-star">✦</span>
+                <span>Creative Direction</span><span class="ft-tick-star">✦</span>
+                <span>Merchandise</span><span class="ft-tick-star">✦</span>
+                <span>Koforidua → Worldwide</span><span class="ft-tick-star">✦</span>
+            </div>
+            <div class="ft-ticker-group">
+                <span>Brand Identity</span><span class="ft-tick-star">✦</span>
+                <span>Garment Design</span><span class="ft-tick-star">✦</span>
+                <span>Web Design + Dev</span><span class="ft-tick-star">✦</span>
+                <span>Creative Direction</span><span class="ft-tick-star">✦</span>
+                <span>Merchandise</span><span class="ft-tick-star">✦</span>
+                <span>Koforidua → Worldwide</span><span class="ft-tick-star">✦</span>
+            </div>
+        </div>
+    </div>
+
     <div class="footer-inner">
+
+        <!-- Statement -->
+        <div class="ft-statement ft-reveal">
+            <span class="ft-kicker">06 / Outro</span>
+            <p class="ft-line" id="ft-line">Culture, code &amp; commerce — designed in Koforidua, shipped worldwide.</p>
+            <div class="ft-status">
+                <span class="ft-dot" aria-hidden="true"></span>
+                <span>Available for new projects</span>
+                <span class="ft-sep" aria-hidden="true">·</span>
+                <span id="ft-clock">00:00 GMT</span>
+            </div>
+        </div>
+
         <div class="footer-top">
-            <div class="footer-brand-block">
+            <div class="footer-brand-block ft-reveal">
                 <span class="footer-brand">David Kwame Amo</span>
                 <p class="footer-tagline">Designer · Brand Architect · Builder</p>
                 <p class="footer-location">Koforidua, Ghana</p>
             </div>
             <nav class="footer-nav" aria-label="Footer navigation">
-                <div class="footer-nav-col">
+                <div class="footer-nav-col ft-reveal">
                     <span class="footer-nav-label">Navigate</span>
                     <a href="#work" class="footer-nav-link">Work</a>
                     <a href="#gallery" class="footer-nav-link">In the Field</a>
@@ -468,7 +504,7 @@
                     <a href="blog.html" class="footer-nav-link">Blog</a>
                     <a href="#inquire" class="footer-nav-link">Inquire</a>
                 </div>
-                <div class="footer-nav-col">
+                <div class="footer-nav-col ft-reveal">
                     <span class="footer-nav-label">Connect</span>
                     <a href="https://instagram.com/KwameHasVision" target="_blank" rel="noopener" class="footer-nav-link">Instagram</a>
                     <a href="https://twitter.com/KwameHasVision" target="_blank" rel="noopener" class="footer-nav-link">X / Twitter</a>
@@ -478,9 +514,13 @@
                 </div>
             </nav>
         </div>
-        <div class="footer-bottom">
+
+        <div class="footer-bottom ft-reveal">
             <span class="footer-stamp">© <span id="footer-year"></span> · Koforidua, Ghana</span>
-            <a href="#inquire" class="footer-cta">Start a project →</a>
+            <div class="ft-bottom-right">
+                <a href="#inquire" class="footer-cta">Start a project →</a>
+                <button type="button" class="ft-top-btn" id="ft-top" aria-label="Back to top">↑ Top</button>
+            </div>
         </div>
     </div>
 </footer>
@@ -494,6 +534,9 @@
 <script defer src="/js/now-playing.js"></script>
 <script defer src="/js/index.js"></script>
 <script defer src="/js/gallery.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
+<script defer src="/js/footer.js"></script>
 <script defer src="/js/sw-updater.js"></script>
 </body>
 </html>
