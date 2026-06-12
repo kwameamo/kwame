@@ -842,13 +842,8 @@
         </div>
 
         <div class="field">
-            <label for="g-caption">Caption <span class="lbl-opt">— optional</span></label>
+            <label for="g-caption">Caption <span class="lbl-opt">— optional, applies to all</span></label>
             <input type="text" id="g-caption" maxlength="140" placeholder="e.g. Studio shoot · Accra" autocomplete="off">
-        </div>
-
-        <div class="field">
-            <label for="g-link">Link <span class="lbl-opt">— optional</span></label>
-            <input type="text" id="g-link" placeholder="https://… (opens when tapped)" autocomplete="off" inputmode="url">
         </div>
 
         <button type="submit" class="btn-primary" id="g-submit" disabled>Upload Image</button>
@@ -1291,7 +1286,6 @@
     var gPreviews = document.getElementById('g-previews');
     var gAddMore  = document.getElementById('g-addmore');
     var gCaption  = document.getElementById('g-caption');
-    var gLink     = document.getElementById('g-link');
     var gSubmit   = document.getElementById('g-submit');
     var gStatus   = document.getElementById('g-status');
     var gList     = document.getElementById('gallery-list');
@@ -1417,11 +1411,6 @@
         e.preventDefault();
         if (pending.length === 0) { gShowStatus('error', 'Choose at least one image first.'); return; }
 
-        var link = gLink.value.trim();
-        if (link && !/^https?:\/\//i.test(link)) {
-            gShowStatus('error', 'Link must start with http:// or https://');
-            return;
-        }
         var caption = gCaption.value.trim();
 
         gSubmit.disabled = true;
@@ -1444,7 +1433,6 @@
                     body: JSON.stringify({
                         password: savedPw,
                         caption:  caption,
-                        link:     link,
                         image:    p.dataUrl
                     })
                 });
@@ -1464,7 +1452,6 @@
         if (failed === 0) {
             gShowStatus('success', '✓ ' + done + ' image' + (done === 1 ? '' : 's') + ' added. Live in ~30 seconds.');
             gCaption.value = '';
-            gLink.value = '';
         } else {
             gShowStatus('error', done + ' uploaded, ' + failed + ' failed — the failed ones are still queued, try again.');
         }
@@ -1512,7 +1499,7 @@
             t.textContent = item.caption || 'Untitled';
             var m = document.createElement('span');
             m.className = 'post-row-meta';
-            m.textContent = '#' + item.id + (item.link ? ' · linked' : '');
+            m.textContent = '#' + item.id;
             info.appendChild(t);
             info.appendChild(m);
 
@@ -1572,7 +1559,6 @@
     }
 
     gCaption.addEventListener('input', gHideStatus);
-    gLink.addEventListener('input', gHideStatus);
 
 }());
 </script>

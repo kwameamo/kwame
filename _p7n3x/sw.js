@@ -1,4 +1,4 @@
-const CACHE = 'admin-v3';
+const CACHE = 'admin-v4';
 
 const PRECACHE = [
   '/_p7n3x/',

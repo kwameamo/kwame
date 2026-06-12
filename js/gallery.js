@@ -21,7 +21,6 @@
     var lb        = document.getElementById('cap-lightbox');
     var lbImg     = document.getElementById('cap-lb-img');
     var lbCaption = document.getElementById('cap-lb-caption');
-    var lbLink    = document.getElementById('cap-lb-link');
     var lbClose   = document.getElementById('cap-lb-close');
 
     var reduceMotion = window.matchMedia &&
@@ -50,39 +49,27 @@
         el.setAttribute('role', 'group');
         el.setAttribute('aria-label', item.caption || ('Image ' + (index + 1)));
 
-        var wrap = document.createElement('div');
-        wrap.className = 'cap-img';
+        var frame = document.createElement('div');
+        frame.className = 'cap-frame';
         var img = document.createElement('img');
         img.src = imgUrl(item);
         img.alt = item.caption || 'Studio image';
         img.loading = index < 3 ? 'eager' : 'lazy';
         img.draggable = false;
-        wrap.appendChild(img);
-        el.appendChild(wrap);
+        frame.appendChild(img);
+        el.appendChild(frame);
 
-        var expand = document.createElement('span');
-        expand.className = 'cap-expand';
-        expand.setAttribute('aria-hidden', 'true');
-        expand.textContent = '⤢';
-        el.appendChild(expand);
-
-        if (item.caption) {
-            var cap = document.createElement('span');
-            cap.className = 'cap-caption';
-            cap.textContent = item.caption;
-            el.appendChild(cap);
-        }
-
-        el.addEventListener('click', function () {
-            if (justSwiped) return;
-            if (index === active) openLightbox(item);
-            else setActive(index);
-        });
+        // Caption sits under the image, inside the card. Fixed row so every
+        // card is the same height in the stack (empty captions reserve space).
+        var cap = document.createElement('div');
+        cap.className = 'cap-caption';
+        cap.textContent = item.caption || '';
+        el.appendChild(cap);
 
         return el;
     }
 
-    /* ── Positioning ── */
+    /* ── Positioning — ghost neighbours, no blur ── */
     function positionCards() {
         var n = items.length;
         cards.forEach(function (el, i) {
@@ -92,18 +79,18 @@
             var ad = Math.abs(d);
             var sign = d < 0 ? -1 : 1;
 
-            var x = 0, y = 0, rot = 0, scale = 1, op = 1, blur = 0, z = 5;
+            var x = 0, y = 0, rot = 0, scale = 1, op = 1, z = 5;
 
             if (ad === 0) {
                 z = 5;
             } else if (ad === 1) {
-                x = sign * 26; y = -34 * sign; rot = sign * 5;
-                scale = 0.9; op = 0.6; blur = 1.5; z = 3;
+                x = sign * 30; y = -22 * sign; rot = sign * 4;
+                scale = 0.93; op = 0.2; z = 3;
             } else if (ad === 2) {
-                x = sign * 40; y = -58 * sign; rot = sign * 8;
-                scale = 0.8; op = 0.28; blur = 3; z = 2;
+                x = sign * 52; y = -40 * sign; rot = sign * 7;
+                scale = 0.86; op = 0.1; z = 2;
             } else {
-                scale = 0.75; op = 0; z = 1;
+                scale = 0.82; op = 0; z = 1;
             }
 
             el.style.setProperty('--x', x + 'px');
@@ -111,7 +98,6 @@
             el.style.setProperty('--rot', rot + 'deg');
             el.style.setProperty('--scale', scale);
             el.style.setProperty('--op', op);
-            el.style.setProperty('--blur', blur ? blur + 'px' : '0');
             el.style.setProperty('--z', z);
             el.setAttribute('data-active', ad === 0 ? 'true' : 'false');
         });
@@ -186,36 +172,45 @@
             return;
         }
         if (!items.length) return;
-        // Only when the gallery is roughly in view
         var r = slider.getBoundingClientRect();
         if (r.bottom < 0 || r.top > window.innerHeight) return;
         if (e.key === 'ArrowLeft')  prev();
         if (e.key === 'ArrowRight') next();
     });
 
-    /* ── Swipe / drag ── */
-    var downX = 0, downY = 0, swiping = false, justSwiped = false;
+    /* ── Tap to open / swipe to navigate ──
+       Driven straight off pointer events so a tap reliably opens the
+       lightbox and a horizontal drag flips cards. */
+    var downX = 0, downY = 0, downT = 0, tracking = false;
 
     stage.addEventListener('pointerdown', function (e) {
-        swiping = true; justSwiped = false;
-        downX = e.clientX; downY = e.clientY;
+        tracking = true;
+        downX = e.clientX; downY = e.clientY; downT = Date.now();
     });
-    window.addEventListener('pointerup', function (e) {
-        if (!swiping) return;
-        swiping = false;
+
+    stage.addEventListener('pointerup', function (e) {
+        if (!tracking) return;
+        tracking = false;
         var dx = e.clientX - downX;
         var dy = e.clientY - downY;
+        var dt = Date.now() - downT;
+
         if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
-            justSwiped = true;
             if (dx < 0) next(); else prev();
-            // Clear the flag after the click that follows pointerup is swallowed
-            setTimeout(function () { justSwiped = false; }, 0);
+            return;
+        }
+        // A tap (small movement, quick) on the deck opens the current image.
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 500 && items.length) {
+            openLightbox(items[active]);
         }
     });
+
+    stage.addEventListener('pointercancel', function () { tracking = false; });
 
     /* ── Autoplay ── */
     var autoTimer = null;
     var AUTO_MS = 5000;
+    var hovering = false;
 
     function startAuto() {
         if (reduceMotion || items.length <= 1 || autoTimer) return;
@@ -228,22 +223,15 @@
         startAuto();
     }
 
-    var hovering = false;
     slider.addEventListener('mouseenter', function () { hovering = true; });
     slider.addEventListener('mouseleave', function () { hovering = false; });
 
     /* ── Lightbox ── */
     function openLightbox(item) {
-        if (!lb) return;
+        if (!lb || !item) return;
         lbImg.src = imgUrl(item);
         lbImg.alt = item.caption || 'Studio image';
         lbCaption.textContent = item.caption || '';
-        if (item.link && /^https?:\/\//i.test(item.link)) {
-            lbLink.href = item.link;
-            lbLink.hidden = false;
-        } else {
-            lbLink.hidden = true;
-        }
         lb.hidden = false;
         lb.setAttribute('aria-hidden', 'false');
         requestAnimationFrame(function () {
@@ -258,7 +246,7 @@
     }
     if (lbClose) lbClose.addEventListener('click', closeLightbox);
     if (lb) lb.addEventListener('click', function (e) {
-        if (e.target === lb || e.target.classList.contains('cap-lb-inner')) closeLightbox();
+        if (e.target !== lbImg) closeLightbox();
     });
 
     /* ── Load ── */
