@@ -348,21 +348,55 @@
 
 
 /* ═══════════════════════════════
-   NOW PLAYING — 4:5 portrait card,
-   cover art full-bleed, info on a scrim
+   NOW PLAYING — 5:4 landscape card,
+   info column left, 1:1 cover art right
 ═══════════════════════════════ */
 .np-card {
-    position: relative;
     width: 100%;
-    max-width: 240px;
-    aspect-ratio: 4 / 5;
+    max-width: 320px;
+    aspect-ratio: 5 / 4;
+    padding: 14px;
     border: 1px solid var(--g2);
-    background: var(--g1);
-    overflow: hidden;
+    background: var(--white);
+    display: flex;
+    gap: 14px;
     transition: border-color 0.3s;
 }
 
 .np-card.playing { border-color: var(--black); }
+
+/* ── Left: info column ── */
+.np-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.np-tag {
+    font-family: 'Syne Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--g3);
+}
+
+.np-tag-live { display: none; }
+.np-card.playing .np-tag-idle { display: none; }
+.np-card.playing .np-tag-live { display: inline; color: var(--black); }
+
+/* ── Right: 1:1 art square ── */
+.np-art {
+    position: relative;
+    width: 50%;
+    aspect-ratio: 1;
+    align-self: center;
+    flex-shrink: 0;
+    border: 1px solid var(--g2);
+    background: var(--g1);
+    overflow: hidden;
+}
 
 .np-cover {
     position: absolute;
@@ -374,41 +408,24 @@
 }
 
 .np-card.has-art .np-cover { display: block; }
-.np-card.has-art .np-icon { display: none; }
+.np-card.has-art .np-disc { display: none; }
 
-.np-icon {
+/* Ghost vinyl fills the art square until cover art arrives */
+.np-disc {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 22px;
-    height: 22px;
-    margin: -11px 0 0 -11px;
-    fill: var(--g3);
+    inset: 12%;
+    width: 76%;
+    height: 76%;
+    color: var(--g3);
+    animation: npdisc 36s linear infinite;
 }
 
-/* Idle: icon sits center, label sits under it */
-.np-card:not(.playing) .np-icon { margin-top: -22px; }
-
-.np-overlay {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 14px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-/* Scrim only when the art is behind the text */
-.np-card.has-art .np-overlay {
-    padding-top: 56px;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.78));
+@keyframes npdisc {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
 .np-idle-text {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 34%;
     font-family: 'Syne Mono', monospace;
     font-size: 11px;
     color: var(--g3);
@@ -416,15 +433,25 @@
 
 .np-card.playing .np-idle-text { display: none; }
 
-.np-track-info { display: none; flex: 1; min-width: 0; }
+.np-cursor { animation: npcursor 1.1s steps(1) infinite; }
+
+@keyframes npcursor {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+}
+
+.np-track-info { display: none; min-width: 0; }
 .np-card.playing .np-track-info { display: block; }
 
 .np-track {
     font-size: 13px;
     font-weight: 600;
-    white-space: nowrap;
+    line-height: 1.3;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .np-track a { color: inherit; text-decoration: none; }
@@ -452,23 +479,26 @@
 
 .np-time-sep { color: var(--g3); }
 
-/* Over art: flip the overlay text to white */
-.np-card.has-art .np-track { color: var(--white); }
-.np-card.has-art .np-artist,
-.np-card.has-art .np-time { color: rgba(255, 255, 255, 0.75); }
-.np-card.has-art .np-time-sep { color: rgba(255, 255, 255, 0.4); }
-
 .np-eq {
     display: flex;
     align-items: flex-end;
     gap: 2px;
     height: 16px;
     flex-shrink: 0;
-    opacity: 0;
+    opacity: 0.4;
     transition: opacity 0.3s;
 }
 
 .np-card.playing .np-eq { opacity: 1; }
+
+/* Idle: bars rest flat in gray, one gives an occasional faint blip */
+.np-card:not(.playing) .np-eq span { background: var(--g3); }
+.np-card:not(.playing) .np-eq span:nth-child(2) { animation: npblip 5s ease-in-out infinite; }
+
+@keyframes npblip {
+    0%, 88%, 100% { transform: scaleY(0.1875); }
+    94%           { transform: scaleY(0.5); }
+}
 
 .np-eq span {
     display: block;
@@ -481,8 +511,6 @@
     will-change: transform;
 }
 
-.np-card.has-art .np-eq span { background: var(--white); }
-
 .np-card.playing .np-eq span:nth-child(1) { animation: npeq 0.9s ease-in-out infinite; }
 .np-card.playing .np-eq span:nth-child(2) { animation: npeq 0.7s ease-in-out 0.15s infinite; }
 .np-card.playing .np-eq span:nth-child(3) { animation: npeq 1.1s ease-in-out 0.05s infinite; }
@@ -491,6 +519,11 @@
 @keyframes npeq {
     0%, 100% { transform: scaleY(0.1875); }
     50%       { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .np-disc, .np-cursor,
+    .np-card:not(.playing) .np-eq span:nth-child(2) { animation: none; }
 }
 
 

@@ -102,12 +102,9 @@
             <a href="#inquire" class="avail-cta">Start a project →</a>
         </div>
         <div class="np-card" id="np-card">
-            <img id="np-cover" class="np-cover" alt="" aria-hidden="true">
-            <svg class="np-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-            </svg>
-            <div class="np-overlay">
-                <span class="np-idle-text">not playing</span>
+            <div class="np-body">
+                <span class="np-tag">audio / <span class="np-tag-idle">standby</span><span class="np-tag-live">on air</span></span>
+                <span class="np-idle-text">not playing<span class="np-cursor">_</span></span>
                 <div class="np-track-info">
                     <div class="np-track"><a id="np-link" target="_blank" rel="noopener"></a></div>
                     <div class="np-artist" id="np-artist"></div>
@@ -116,6 +113,15 @@
                 <div class="np-eq" aria-hidden="true">
                     <span></span><span></span><span></span><span></span>
                 </div>
+            </div>
+            <div class="np-art">
+                <img id="np-cover" class="np-cover" alt="" aria-hidden="true">
+                <svg class="np-disc" viewBox="0 0 120 120" fill="none" stroke="currentColor" aria-hidden="true">
+                    <circle cx="60" cy="60" r="56" stroke-width="1" stroke-dasharray="2 6"/>
+                    <circle cx="60" cy="60" r="40" stroke-width="1" opacity="0.55"/>
+                    <circle cx="60" cy="60" r="26" stroke-width="1" opacity="0.3"/>
+                    <circle cx="60" cy="60" r="3.5" fill="currentColor" stroke="none"/>
+                </svg>
             </div>
         </div>
     </div>
