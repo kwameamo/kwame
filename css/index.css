@@ -348,31 +348,21 @@
 
 
 /* ═══════════════════════════════
-   NOW PLAYING — no header, with cover art
+   NOW PLAYING — 4:5 portrait card,
+   cover art full-bleed, info on a scrim
 ═══════════════════════════════ */
 .np-card {
+    position: relative;
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 4 / 5;
     border: 1px solid var(--g2);
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    background: var(--g1);
+    overflow: hidden;
     transition: border-color 0.3s;
 }
 
 .np-card.playing { border-color: var(--black); }
-
-.np-art-wrap {
-    width: 44px;
-    height: 55px; /* 4:5, matches the gallery cards */
-    flex-shrink: 0;
-    background: var(--g1);
-    border: 1px solid var(--g2);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .np-cover {
     position: absolute;
@@ -381,25 +371,44 @@
     height: 100%;
     object-fit: cover;
     display: none;
-    transition: opacity 0.3s;
 }
 
 .np-card.has-art .np-cover { display: block; }
 .np-card.has-art .np-icon { display: none; }
 
 .np-icon {
-    width: 16px;
-    height: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
     fill: var(--g3);
-    flex-shrink: 0;
 }
 
-.np-details {
-    flex: 1;
-    min-width: 0;
+/* Idle: icon sits center, label sits under it */
+.np-card:not(.playing) .np-icon { margin-top: -22px; }
+
+.np-overlay {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 14px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Scrim only when the art is behind the text */
+.np-card.has-art .np-overlay {
+    padding-top: 56px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.78));
 }
 
 .np-idle-text {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 34%;
     font-family: 'Syne Mono', monospace;
     font-size: 11px;
     color: var(--g3);
@@ -407,11 +416,11 @@
 
 .np-card.playing .np-idle-text { display: none; }
 
-.np-track-info { display: none; }
+.np-track-info { display: none; flex: 1; min-width: 0; }
 .np-card.playing .np-track-info { display: block; }
 
 .np-track {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -424,7 +433,7 @@
     font-family: 'Syne Mono', monospace;
     font-size: 10px;
     color: var(--g3);
-    margin-top: 2px;
+    margin-top: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -438,10 +447,16 @@
     font-size: 9px;
     letter-spacing: 0.04em;
     color: var(--g3);
-    margin-top: 3px;
+    margin-top: 4px;
 }
 
-.np-time-sep { color: var(--g2); }
+.np-time-sep { color: var(--g3); }
+
+/* Over art: flip the overlay text to white */
+.np-card.has-art .np-track { color: var(--white); }
+.np-card.has-art .np-artist,
+.np-card.has-art .np-time { color: rgba(255, 255, 255, 0.75); }
+.np-card.has-art .np-time-sep { color: rgba(255, 255, 255, 0.4); }
 
 .np-eq {
     display: flex;
@@ -465,6 +480,8 @@
     transform-origin: center bottom;
     will-change: transform;
 }
+
+.np-card.has-art .np-eq span { background: var(--white); }
 
 .np-card.playing .np-eq span:nth-child(1) { animation: npeq 0.9s ease-in-out infinite; }
 .np-card.playing .np-eq span:nth-child(2) { animation: npeq 0.7s ease-in-out 0.15s infinite; }
