@@ -23,8 +23,8 @@
             var last = track.image[track.image.length - 1];
             if (last && last['#text']) return last['#text'];
         }
-        // Other common field names
-        return track.cover || track.artwork || track.album_art || track.coverArt || null;
+        // Other common field names (npc-api uses artwork_url)
+        return track.artwork_url || track.cover || track.artwork || track.album_art || track.coverArt || null;
     }
 
     function setPlaying(track) {
