@@ -165,90 +165,155 @@
             min-height: 18px;
         }
 
-        /* ── Post form ── */
+        /* ── App shell ── */
 
-        /* ── Menu ── */
-
-        #menu {
+        #app {
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100dvh;
-            padding: 40px 24px;
-            padding-bottom: calc(40px + env(safe-area-inset-bottom));
-            gap: 12px;
             opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.35s ease, transform 0.35s ease;
+            transition: opacity 0.35s ease;
+        }
+        #app.visible { opacity: 1; }
+
+        .app-bar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(13, 13, 13, 0.88);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
         }
 
-        #menu.visible { opacity: 1; transform: translateY(0); }
-
-        .menu-btn {
-            width: 100%;
-            max-width: 300px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 15px;
-            font-weight: 600;
-            padding: 18px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            -webkit-tap-highlight-color: transparent;
-            transition: border-color 0.15s, background 0.15s;
-        }
-        .menu-btn:active { background: #222; border-color: #444; }
-
-        .menu-btn-icon  { font-size: 20px; line-height: 1; }
-        .menu-btn-label { flex: 1; text-align: left; }
-        .menu-btn-count {
-            font-size: 12px;
-            color: var(--muted);
-            font-family: 'Syne Mono', monospace;
-        }
-
-        /* ── Post form + List view shared ── */
-
-        #post-wrap,
-        #list-wrap,
-        #gallery-wrap {
+        .app-bar-inner {
             max-width: 600px;
             margin: 0 auto;
-            padding: 28px 20px 48px;
-            padding-bottom: calc(48px + env(safe-area-inset-bottom));
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.35s ease, transform 0.35s ease;
-        }
-
-        #post-wrap.visible,
-        #list-wrap.visible,
-        #gallery-wrap.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        header {
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 36px;
         }
 
-        .logo {
+        .app-title {
             font-size: 12px;
             font-weight: 600;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--muted);
-            text-decoration: none;
-            -webkit-tap-highlight-color: transparent;
+            color: var(--text);
         }
+
+        .app-chip {
+            font-family: 'Syne Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 3px 10px;
+        }
+
+        .app-main { flex: 1; }
+
+        /* ── Views ── */
+
+        .view {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 28px 20px 48px;
+            padding-bottom: calc(110px + env(safe-area-inset-bottom)); /* room for tab bar */
+            animation: view-in 0.3s ease;
+        }
+
+        @keyframes view-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-hd { margin-bottom: 28px; }
+
+        .view-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .view-sub {
+            margin-top: 4px;
+            font-family: 'Syne Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.03em;
+            color: var(--muted);
+        }
+
+        /* ── Tab bar ── */
+
+        .tabbar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            background: rgba(13, 13, 13, 0.88);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
+            padding: 8px 16px;
+            padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        }
+
+        .tab {
+            flex: 1;
+            max-width: 130px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 8px 6px;
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s, background 0.15s;
+            min-height: 54px;
+        }
+
+        .tab[aria-current="page"] {
+            color: var(--text);
+            background: var(--surface);
+        }
+
+        .tab:active { background: #1e1e1e; }
+
+        .tab-icon { font-size: 17px; line-height: 1; }
+
+        .tab-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .tab-count {
+            position: absolute;
+            top: 4px;
+            right: 14px;
+            font-family: 'Syne Mono', monospace;
+            font-size: 9px;
+            color: var(--muted);
+            background: #222;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 1px 6px;
+            min-width: 18px;
+            text-align: center;
+        }
+        .tab-count:empty { display: none; }
 
         h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
 
@@ -738,31 +803,24 @@
     <p class="lock-error" id="lock-error" role="alert"></p>
 </div>
 
-<!-- ── Menu ── -->
-<div id="menu" hidden>
-    <p class="lock-label">David Kwame Amo</p>
-    <button type="button" class="menu-btn" id="menu-add">
-        <span class="menu-btn-icon">+</span>
-        <span class="menu-btn-label">Add Post</span>
-    </button>
-    <button type="button" class="menu-btn" id="menu-list">
-        <span class="menu-btn-icon">≡</span>
-        <span class="menu-btn-label">Posts</span>
-        <span class="menu-btn-count" id="menu-count"></span>
-    </button>
-    <button type="button" class="menu-btn" id="menu-gallery">
-        <span class="menu-btn-icon">✦</span>
-        <span class="menu-btn-label">Gallery</span>
-        <span class="menu-btn-count" id="menu-gallery-count"></span>
-    </button>
-</div>
+<!-- ── App shell ── -->
+<div id="app" hidden>
 
-<!-- ── Post form ── -->
-<div id="post-wrap" hidden>
-    <header>
-        <button type="button" class="logo" id="back-from-form">← Menu</button>
-        <h1>New Post</h1>
-    </header>
+<header class="app-bar">
+    <div class="app-bar-inner">
+        <span class="app-title">David Kwame Amo</span>
+        <span class="app-chip">Admin</span>
+    </div>
+</header>
+
+<main class="app-main">
+
+<!-- ── Write view ── -->
+<section id="post-wrap" class="view" hidden>
+    <div class="view-hd">
+        <h1 class="view-title">New Post</h1>
+        <p class="view-sub">Write and publish to the blog.</p>
+    </div>
 
     <form id="form" novalidate>
 
@@ -813,16 +871,14 @@
         <button type="button" class="btn-ghost" id="another-btn">Write another post</button>
 
     </form>
+</section>
 
-
-</div>
-
-<!-- ── Posts list ── -->
-<div id="list-wrap" hidden>
-    <header>
-        <button type="button" class="logo" id="back-from-list">← Menu</button>
-        <h1>Posts</h1>
-    </header>
+<!-- ── Posts view ── -->
+<section id="list-wrap" class="view" hidden>
+    <div class="view-hd">
+        <h1 class="view-title">Posts</h1>
+        <p class="view-sub">Everything published on the blog.</p>
+    </div>
     <div class="posts-wrap">
         <div class="posts-header">
             <span class="posts-heading" id="posts-heading">All Posts</span>
@@ -830,14 +886,14 @@
         </div>
         <ul class="posts-list" id="posts-list"></ul>
     </div>
-</div>
+</section>
 
 <!-- ── Gallery view ── -->
-<div id="gallery-wrap" hidden>
-    <header>
-        <button type="button" class="logo" id="back-from-gallery">← Menu</button>
-        <h1>Gallery</h1>
-    </header>
+<section id="gallery-wrap" class="view" hidden>
+    <div class="view-hd">
+        <h1 class="view-title">Gallery</h1>
+        <p class="view-sub">Images shown in the homepage slider.</p>
+    </div>
 
     <form id="gallery-form" novalidate>
         <div class="field">
@@ -866,7 +922,29 @@
         </div>
         <ul class="posts-list" id="gallery-list"></ul>
     </div>
-</div>
+</section>
+
+</main>
+
+<!-- ── Tab bar ── -->
+<nav class="tabbar" aria-label="Sections">
+    <button type="button" class="tab" id="tab-post" data-view="post-wrap" aria-current="page">
+        <span class="tab-icon">✎</span>
+        <span class="tab-label">Write</span>
+    </button>
+    <button type="button" class="tab" id="tab-posts" data-view="list-wrap">
+        <span class="tab-icon">≡</span>
+        <span class="tab-label">Posts</span>
+        <span class="tab-count" id="menu-count"></span>
+    </button>
+    <button type="button" class="tab" id="tab-gallery" data-view="gallery-wrap">
+        <span class="tab-icon">✦</span>
+        <span class="tab-label">Gallery</span>
+        <span class="tab-count" id="menu-gallery-count"></span>
+    </button>
+</nav>
+
+</div><!-- /app -->
 
 <script>
 (function () {
@@ -875,35 +953,31 @@
     var lockEl    = document.getElementById('lock');
     var lockInput = document.getElementById('lock-input');
     var lockError = document.getElementById('lock-error');
-    var menuEl    = document.getElementById('menu');
-    var postWrap  = document.getElementById('post-wrap');
-    var listWrap  = document.getElementById('list-wrap');
+    var appEl     = document.getElementById('app');
     var savedPw   = '';
 
-    function showView(viewEl, onShown) {
-        menuEl.classList.remove('visible');
-        setTimeout(function () {
-            menuEl.hidden = true;
-            viewEl.hidden = false;
-            requestAnimationFrame(function () {
-                requestAnimationFrame(function () {
-                    viewEl.classList.add('visible');
-                    if (onShown) onShown();
-                });
-            });
-        }, 200);
+    /* ── Tabs ── */
+    var tabs  = Array.prototype.slice.call(document.querySelectorAll('.tabbar .tab'));
+    var views = {};
+    tabs.forEach(function (tab) {
+        views[tab.dataset.view] = document.getElementById(tab.dataset.view);
+    });
+
+    function switchTab(viewId) {
+        tabs.forEach(function (tab) {
+            var current = tab.dataset.view === viewId;
+            if (current) tab.setAttribute('aria-current', 'page');
+            else tab.removeAttribute('aria-current');
+        });
+        Object.keys(views).forEach(function (id) {
+            views[id].hidden = id !== viewId;
+        });
+        window.scrollTo(0, 0);
     }
 
-    function backToMenu(viewEl) {
-        viewEl.classList.remove('visible');
-        setTimeout(function () {
-            viewEl.hidden = true;
-            menuEl.hidden = false;
-            requestAnimationFrame(function () {
-                requestAnimationFrame(function () { menuEl.classList.add('visible'); });
-            });
-        }, 200);
-    }
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () { switchTab(tab.dataset.view); });
+    });
 
     lockInput.focus();
 
@@ -945,10 +1019,11 @@
             lockEl.classList.add('exit');
             setTimeout(function () {
                 lockEl.hidden = true;
-                menuEl.hidden = false;
+                appEl.hidden = false;
+                switchTab('post-wrap');
                 requestAnimationFrame(function () {
                     requestAnimationFrame(function () {
-                        menuEl.classList.add('visible');
+                        appEl.classList.add('visible');
                         syncPosts();
                         syncGallery();
                     });
@@ -1167,22 +1242,6 @@
 
     document.getElementById('posts-reload').addEventListener('click', syncPosts);
 
-    // Menu buttons
-    document.getElementById('menu-add').addEventListener('click', function () {
-        showView(postWrap, function () { document.getElementById('title').focus(); });
-    });
-    document.getElementById('menu-list').addEventListener('click', function () {
-        showView(listWrap);
-    });
-
-    // Back buttons
-    document.getElementById('back-from-form').addEventListener('click', function () {
-        backToMenu(postWrap);
-    });
-    document.getElementById('back-from-list').addEventListener('click', function () {
-        backToMenu(listWrap);
-    });
-
     function toHtml(raw) {
         return raw.trim().split(/\n{2,}/).map(function (block) {
             var t = block.trim();
@@ -1288,7 +1347,6 @@
     });
 
     /* ── Gallery ── */
-    var galleryWrap = document.getElementById('gallery-wrap');
     var gDrop     = document.getElementById('g-drop');
     var gFile     = document.getElementById('g-file');
     var gEmpty    = document.getElementById('g-drop-empty');
@@ -1312,13 +1370,6 @@
         gStatus.textContent = '';
     }
 
-    // Menu + back wiring
-    document.getElementById('menu-gallery').addEventListener('click', function () {
-        showView(galleryWrap);
-    });
-    document.getElementById('back-from-gallery').addEventListener('click', function () {
-        backToMenu(galleryWrap);
-    });
     document.getElementById('g-reload').addEventListener('click', syncGallery);
 
     // Open the file picker

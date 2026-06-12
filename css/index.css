@@ -800,26 +800,23 @@
 
 .cap[data-active="true"]:hover .cap-frame img { transform: scale(1.04); }
 
-/* Caption — under the image, inside the card. Fixed row keeps every card
-   the same height in the stack; only the front card's caption is shown. */
-.cap-caption {
-    height: 34px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 8px 0;
+/* Caption — sits below the deck, outside the cards, so long captions
+   wrap and are never clipped by the gallery container. */
+.cap-active-caption {
+    margin: 26px auto 0;
+    max-width: 520px;
+    padding: 0 24px;
     font-family: 'Syne Mono', monospace;
     font-size: 11px;
     letter-spacing: 0.04em;
+    line-height: 1.6;
     color: var(--g4);
     text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    min-height: 18px;
+    transition: opacity 0.3s ease;
 }
 
-.cap[data-active="false"] .cap-caption { visibility: hidden; }
+.cap-active-caption.fading { opacity: 0; }
 
 /* Navigation arrows */
 .cap-nav {
@@ -931,9 +928,14 @@
 .cap-slider[data-state="empty"] { min-height: 0; display: block; padding: 0; }
 .cap-slider[data-state="empty"] .cap-nav,
 .cap-slider[data-state="empty"] .cap-stage { display: none; }
-.cap-slider[data-state="empty"] + .cap-dots { display: none; }
+.cap-slider[data-state="empty"] ~ .cap-dots,
+.cap-slider[data-state="empty"] ~ .cap-active-caption { display: none; }
 
 /* ── Lightbox ── */
+/* display:flex would override the hidden attribute, leaving an invisible
+   full-screen overlay that swallows every click — keep this rule first. */
+.cap-lightbox[hidden] { display: none; }
+
 .cap-lightbox {
     position: fixed;
     inset: 0;

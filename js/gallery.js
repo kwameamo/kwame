@@ -13,6 +13,7 @@
     var prevBtn = document.getElementById('cap-prev');
     var nextBtn = document.getElementById('cap-next');
     var dotsWrap = document.getElementById('cap-dots');
+    var captionEl = document.getElementById('cap-active-caption');
     var empty   = document.getElementById('cap-empty');
     var countEl = document.getElementById('gallery-count');
     if (!slider || !stage) return;
@@ -59,14 +60,21 @@
         frame.appendChild(img);
         el.appendChild(frame);
 
-        // Caption sits under the image, inside the card. Fixed row so every
-        // card is the same height in the stack (empty captions reserve space).
-        var cap = document.createElement('div');
-        cap.className = 'cap-caption';
-        cap.textContent = item.caption || '';
-        el.appendChild(cap);
-
         return el;
+    }
+
+    /* Caption lives below the deck so long text wraps fully. */
+    var captionTimer = null;
+    function updateCaption() {
+        if (!captionEl) return;
+        var text = (items[active] && items[active].caption) || '';
+        if (captionEl.textContent === text) return;
+        captionEl.classList.add('fading');
+        clearTimeout(captionTimer);
+        captionTimer = setTimeout(function () {
+            captionEl.textContent = text;
+            captionEl.classList.remove('fading');
+        }, 180);
     }
 
     /* ── Positioning — ghost neighbours, no blur ── */
@@ -103,6 +111,7 @@
         });
         updateDots();
         updateArrows();
+        updateCaption();
     }
 
     function setActive(i) {
