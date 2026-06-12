@@ -2,8 +2,10 @@
    GALLERY — stacked-deck carousel
    Pulls images uploaded from /_p7n3x and shows
    them as a stacked card slider with ‹ › arrows,
-   swipe, dots, and a tap-to-open lightbox.
-   Managed entirely from the admin — no code edits.
+   drag-follow swipe, dots, and a lightbox with
+   its own prev/next. Cards are positioned by
+   continuous pose interpolation so dragging
+   tracks the finger 1:1 and settles smoothly.
 ───────────────────────────────────────── */
 (function () {
     'use strict';
@@ -23,6 +25,8 @@
     var lbImg     = document.getElementById('cap-lb-img');
     var lbCaption = document.getElementById('cap-lb-caption');
     var lbClose   = document.getElementById('cap-lb-close');
+    var lbPrev    = document.getElementById('cap-lb-prev');
+    var lbNext    = document.getElementById('cap-lb-next');
 
     var reduceMotion = window.matchMedia &&
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -77,38 +81,52 @@
         }, 180);
     }
 
-    /* ── Positioning — ghost neighbours, no blur ── */
-    function positionCards() {
+    /* ── Pose interpolation ──
+       Keyframe poses at integer stack depths; fractional depths lerp
+       between them, which lets the deck follow a drag continuously. */
+    var POSES = [
+        { x: 0,  y: 0,  rot: 0, scale: 1,    op: 1,    blur: 0   },
+        { x: 30, y: 22, rot: 4, scale: 0.93, op: 0.22, blur: 1.5 },
+        { x: 52, y: 40, rot: 7, scale: 0.86, op: 0.1,  blur: 3   },
+        { x: 62, y: 48, rot: 9, scale: 0.82, op: 0,    blur: 4   }
+    ];
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function applyPose(el, d) {
+        var sign = d < 0 ? -1 : 1;
+        var ad = Math.min(Math.abs(d), POSES.length - 1);
+        var i = Math.min(Math.floor(ad), POSES.length - 2);
+        var t = ad - i;
+        var a = POSES[i], b = POSES[i + 1];
+
+        el.style.setProperty('--x', (sign * lerp(a.x, b.x, t)).toFixed(2) + 'px');
+        el.style.setProperty('--y', (-sign * lerp(a.y, b.y, t)).toFixed(2) + 'px');
+        el.style.setProperty('--rot', (sign * lerp(a.rot, b.rot, t)).toFixed(2) + 'deg');
+        el.style.setProperty('--scale', lerp(a.scale, b.scale, t).toFixed(4));
+        el.style.setProperty('--op', lerp(a.op, b.op, t).toFixed(3));
+        el.style.setProperty('--blur', lerp(a.blur, b.blur, t).toFixed(2) + 'px');
+        // Stacking: closer to front = higher. Scaled to keep integers distinct.
+        el.style.setProperty('--z', String(Math.round((POSES.length - ad) * 10)));
+        el.setAttribute('data-active', ad < 0.5 ? 'true' : 'false');
+    }
+
+    /* Render the deck at a continuous position (active + offset).
+       offset 0 = settled; offset ±0..1 = mid-drag toward next/prev. */
+    function renderAt(offset) {
         var n = items.length;
         cards.forEach(function (el, i) {
-            var d = i - active;
-            if (d > n / 2)  d -= n;
-            if (d < -n / 2) d += n;
-            var ad = Math.abs(d);
-            var sign = d < 0 ? -1 : 1;
-
-            var x = 0, y = 0, rot = 0, scale = 1, op = 1, z = 5;
-
-            if (ad === 0) {
-                z = 5;
-            } else if (ad === 1) {
-                x = sign * 30; y = -22 * sign; rot = sign * 4;
-                scale = 0.93; op = 0.2; z = 3;
-            } else if (ad === 2) {
-                x = sign * 52; y = -40 * sign; rot = sign * 7;
-                scale = 0.86; op = 0.1; z = 2;
-            } else {
-                scale = 0.82; op = 0; z = 1;
+            var d = i - active - offset;
+            if (n > 1) {
+                while (d > n / 2)  d -= n;
+                while (d < -n / 2) d += n;
             }
-
-            el.style.setProperty('--x', x + 'px');
-            el.style.setProperty('--y', y + 'px');
-            el.style.setProperty('--rot', rot + 'deg');
-            el.style.setProperty('--scale', scale);
-            el.style.setProperty('--op', op);
-            el.style.setProperty('--z', z);
-            el.setAttribute('data-active', ad === 0 ? 'true' : 'false');
+            applyPose(el, d);
         });
+    }
+
+    function positionCards() {
+        renderAt(0);
         updateDots();
         updateArrows();
         updateCaption();
@@ -177,7 +195,9 @@
 
     document.addEventListener('keydown', function (e) {
         if (lb && !lb.hidden) {
-            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'Escape')     closeLightbox();
+            if (e.key === 'ArrowLeft')  lbStep(-1);
+            if (e.key === 'ArrowRight') lbStep(1);
             return;
         }
         if (!items.length) return;
@@ -187,34 +207,68 @@
         if (e.key === 'ArrowRight') next();
     });
 
-    /* ── Tap to open / swipe to navigate ──
-       Driven straight off pointer events so a tap reliably opens the
-       lightbox and a horizontal drag flips cards. */
-    var downX = 0, downY = 0, downT = 0, tracking = false;
+    /* ── Drag-follow swipe / tap ──
+       The deck tracks the pointer 1:1 during a horizontal drag
+       (transitions off), then settles with a spring transition. */
+    var DRAG_WIDTH = 280;     // px of drag for a full card flip
+    var drag = null;          // { x0, y0, t0, horizontal }
+
+    function setDragging(on) {
+        stage.classList.toggle('dragging', on);
+    }
 
     stage.addEventListener('pointerdown', function (e) {
-        tracking = true;
-        downX = e.clientX; downY = e.clientY; downT = Date.now();
+        if (!items.length) return;
+        drag = { x0: e.clientX, y0: e.clientY, t0: Date.now(), horizontal: false };
+        try { stage.setPointerCapture(e.pointerId); } catch (_) {}
     });
 
-    stage.addEventListener('pointerup', function (e) {
-        if (!tracking) return;
-        tracking = false;
-        var dx = e.clientX - downX;
-        var dy = e.clientY - downY;
-        var dt = Date.now() - downT;
+    stage.addEventListener('pointermove', function (e) {
+        if (!drag) return;
+        var dx = e.clientX - drag.x0;
+        var dy = e.clientY - drag.y0;
+        if (!drag.horizontal) {
+            if (Math.abs(dx) < 8) return;                 // dead zone
+            if (Math.abs(dy) > Math.abs(dx)) { drag = null; return; } // vertical scroll wins
+            drag.horizontal = true;
+            setDragging(true);
+            if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+        }
+        var offset = -dx / DRAG_WIDTH;
+        // Soft resistance past one card
+        if (offset > 1)  offset = 1  + (offset - 1) * 0.3;
+        if (offset < -1) offset = -1 + (offset + 1) * 0.3;
+        renderAt(offset);
+    });
 
-        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
-            if (dx < 0) next(); else prev();
+    function endDrag(e) {
+        if (!drag) return;
+        var d = drag; drag = null;
+        var dx = e.clientX - d.x0;
+        var dy = e.clientY - d.y0;
+        var dt = Math.max(Date.now() - d.t0, 1);
+
+        if (d.horizontal) {
+            setDragging(false);
+            var offset = -dx / DRAG_WIDTH;
+            var velocity = dx / dt; // px per ms
+            if (offset > 0.25 || velocity < -0.45)      setActive(active + 1);
+            else if (offset < -0.25 || velocity > 0.45) setActive(active - 1);
+            else { renderAt(0); restartAuto(); }
             return;
         }
-        // A tap (small movement, quick) on the deck opens the current image.
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 500 && items.length) {
-            openLightbox(items[active]);
-        }
-    });
 
-    stage.addEventListener('pointercancel', function () { tracking = false; });
+        // Tap: quick, no real movement → open the active image.
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 500) {
+            openLightbox(active);
+        }
+    }
+
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', function () {
+        if (drag && drag.horizontal) { setDragging(false); renderAt(0); restartAuto(); }
+        drag = null;
+    });
 
     /* ── Autoplay ── */
     var autoTimer = null;
@@ -224,7 +278,9 @@
     function startAuto() {
         if (reduceMotion || items.length <= 1 || autoTimer) return;
         autoTimer = setInterval(function () {
-            if (!document.hidden && (!lb || lb.hidden) && !hovering) setActive(active + 1);
+            if (!document.hidden && (!lb || lb.hidden) && !hovering && !drag) {
+                setActive(active + 1);
+            }
         }, AUTO_MS);
     }
     function restartAuto() {
@@ -235,27 +291,55 @@
     slider.addEventListener('mouseenter', function () { hovering = true; });
     slider.addEventListener('mouseleave', function () { hovering = false; });
 
-    /* ── Lightbox ── */
-    function openLightbox(item) {
-        if (!lb || !item) return;
+    /* ── Lightbox (with its own prev/next) ── */
+    var lbIndex = 0;
+    var lbFadeTimer = null;
+
+    function lbShow(index) {
+        lbIndex = ((index % items.length) + items.length) % items.length;
+        var item = items[lbIndex];
         lbImg.src = imgUrl(item);
         lbImg.alt = item.caption || 'Studio image';
         lbCaption.textContent = item.caption || '';
+        var single = items.length <= 1;
+        if (lbPrev) lbPrev.hidden = single;
+        if (lbNext) lbNext.hidden = single;
+    }
+
+    function lbStep(dir) {
+        if (!items.length || !lb || lb.hidden) return;
+        // Quick cross-fade while the new image loads
+        lbImg.classList.add('switching');
+        clearTimeout(lbFadeTimer);
+        lbFadeTimer = setTimeout(function () {
+            lbShow(lbIndex + dir);
+            setActive(lbIndex); // keep the deck in sync behind the lightbox
+            lbImg.classList.remove('switching');
+        }, 140);
+    }
+
+    function openLightbox(index) {
+        if (!lb || !items.length) return;
+        lbShow(index);
         lb.hidden = false;
         lb.setAttribute('aria-hidden', 'false');
         requestAnimationFrame(function () {
             requestAnimationFrame(function () { lb.classList.add('show'); });
         });
     }
+
     function closeLightbox() {
         if (!lb) return;
         lb.classList.remove('show');
         lb.setAttribute('aria-hidden', 'true');
         setTimeout(function () { lb.hidden = true; lbImg.src = ''; }, 280);
     }
+
     if (lbClose) lbClose.addEventListener('click', closeLightbox);
+    if (lbPrev)  lbPrev.addEventListener('click', function () { lbStep(-1); });
+    if (lbNext)  lbNext.addEventListener('click', function () { lbStep(1); });
     if (lb) lb.addEventListener('click', function (e) {
-        if (e.target !== lbImg) closeLightbox();
+        if (e.target === lb || e.target.classList.contains('cap-lb-inner')) closeLightbox();
     });
 
     /* ── Load ── */

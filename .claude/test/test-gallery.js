@@ -69,8 +69,8 @@ async function activeIndex(page) {
       const r = img.getBoundingClientRect();
       return r.width > 50 && r.height > 50;
     });
-    // Close via backdrop
-    await page.mouse.click(20, 450);
+    // Close via backdrop (bottom-left, clear of the lightbox nav buttons)
+    await page.mouse.click(60, 780);
     await page.waitForTimeout(500);
     results.lightboxCloses = await page.evaluate(() => document.getElementById('cap-lightbox').hidden);
   }
@@ -100,15 +100,63 @@ async function activeIndex(page) {
     };
   });
 
-  // ── Swipe ──
+  // ── Drag-follow swipe ──
   const before = await activeIndex(page);
   const stageBox = await page.locator('#cap-stage').boundingBox();
   await page.mouse.move(stageBox.x + stageBox.width / 2 + 80, stageBox.y + 100);
   await page.mouse.down();
-  await page.mouse.move(stageBox.x + stageBox.width / 2 - 120, stageBox.y + 100, { steps: 8 });
+  await page.mouse.move(stageBox.x + stageBox.width / 2 - 40, stageBox.y + 100, { steps: 6 });
+  // Mid-drag: deck should be tracking (dragging class on, cards mid-pose)
+  results.dragFollow = await page.evaluate(() => {
+    const stage = document.getElementById('cap-stage');
+    const front = stage.querySelector('.cap');
+    return stage.classList.contains('dragging');
+  });
+  await page.mouse.move(stageBox.x + stageBox.width / 2 - 120, stageBox.y + 100, { steps: 6 });
   await page.mouse.up();
-  await page.waitForTimeout(700);
+  await page.waitForTimeout(800);
   results.swipeWorks = (await activeIndex(page)) !== before;
+
+  // Small drag should snap back, not flip
+  const snapBefore = await activeIndex(page);
+  await page.mouse.move(stageBox.x + stageBox.width / 2, stageBox.y + 100);
+  await page.mouse.down();
+  await page.mouse.move(stageBox.x + stageBox.width / 2 - 30, stageBox.y + 100, { steps: 4 });
+  await page.waitForTimeout(350); // slow release so velocity is low
+  await page.mouse.up();
+  await page.waitForTimeout(800);
+  results.snapBackWorks = (await activeIndex(page)) === snapBefore;
+
+  // ── Ghost blur on backdrop cards ──
+  results.ghostBlur = await page.evaluate(() => {
+    const caps = [...document.querySelectorAll('#cap-stage .cap')];
+    const back = caps.find(c => c.getAttribute('data-active') === 'false' &&
+      parseFloat(getComputedStyle(c).opacity) > 0.05);
+    if (!back) return { found: false };
+    const f = getComputedStyle(back).filter;
+    return { found: true, filter: f, blurred: /blur\((?!0px)/.test(f) };
+  });
+
+  // ── Lightbox prev/next ──
+  const lbFront = page.locator('#cap-stage .cap[data-active="true"]');
+  await lbFront.click({ position: { x: 100, y: 100 } });
+  await page.waitForTimeout(500);
+  const srcA = await page.getAttribute('#cap-lb-img', 'src');
+  await page.click('#cap-lb-next');
+  await page.waitForTimeout(500);
+  const srcB = await page.getAttribute('#cap-lb-img', 'src');
+  results.lbNextWorks = srcA !== srcB;
+  await page.click('#cap-lb-prev');
+  await page.waitForTimeout(500);
+  results.lbPrevWorks = (await page.getAttribute('#cap-lb-img', 'src')) === srcA;
+  // Deck synced behind lightbox + keyboard nav inside lightbox
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(500);
+  results.lbKeyboardWorks = (await page.getAttribute('#cap-lb-img', 'src')) === srcB;
+  results.deckSynced = (await activeIndex(page)) !== -1;
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(500);
+  results.lbEscCloses = await page.evaluate(() => document.getElementById('cap-lightbox').hidden);
 
   // ── Dots ──
   results.dots = await page.locator('#cap-dots .cap-dot').count();

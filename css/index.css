@@ -764,19 +764,26 @@
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
     user-select: none;
-    /* JS sets --x / --y / --rot / --scale per card position */
+    /* JS sets --x / --y / --rot / --scale / --blur per card position */
     transform:
         translate(-50%, -50%)
         translate(var(--x, 0), var(--y, 0))
         rotate(var(--rot, 0deg))
         scale(var(--scale, 1));
     opacity: var(--op, 1);
+    filter: blur(var(--blur, 0));
     z-index: var(--z, 1);
+    /* Gentle spring: slight overshoot on settle */
     transition:
-        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
+        transform 0.65s cubic-bezier(0.34, 1.25, 0.4, 1),
+        opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform, opacity, filter;
 }
+
+/* While dragging, cards track the pointer 1:1 — no easing lag */
+.cap-stage.dragging .cap { transition: none; }
+.cap-stage.dragging { cursor: grabbing; }
 
 /* Only the front card is interactive */
 .cap[data-active="false"] { pointer-events: none; }
@@ -971,6 +978,41 @@
     border-radius: 8px;
     object-fit: contain;
     background: #1a1a1a;
+    transition: opacity 0.14s ease;
+}
+
+.cap-lb-img.switching { opacity: 0; }
+
+/* Lightbox prev/next */
+.cap-lb-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+}
+
+.cap-lb-nav:hover { background: rgba(255, 255, 255, 0.18); }
+.cap-lb-prev { left: 16px; }
+.cap-lb-next { right: 16px; }
+
+@media (max-width: 480px) {
+    .cap-lb-nav { width: 38px; height: 38px; font-size: 19px; }
+    .cap-lb-prev { left: 8px; }
+    .cap-lb-next { right: 8px; }
 }
 
 .cap-lb-caption {
@@ -1004,7 +1046,7 @@
 .cap-lb-close:hover { background: rgba(255, 255, 255, 0.18); }
 
 @media (prefers-reduced-motion: reduce) {
-    .cap, .cap-img img, .cap-lightbox, .cap-lb-inner { transition: none; }
+    .cap, .cap-frame img, .cap-lightbox, .cap-lb-inner, .cap-lb-img { transition: none; }
 }
 
 
