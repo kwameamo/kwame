@@ -643,59 +643,72 @@
         }
 
         .g-previews {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 8px;
         }
 
         .g-pv {
-            position: relative;
-            aspect-ratio: 4 / 5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .g-pv-thumb {
+            flex-shrink: 0;
+            width: 48px;
+            height: 60px; /* 4:5 */
             border-radius: 8px;
-            overflow: hidden;
+            object-fit: cover;
             background: #222;
         }
 
-        .g-pv img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+        .g-pv-cap {
+            flex: 1;
+            min-width: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 16px; /* 16px prevents iOS zoom */
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color 0.15s;
         }
-
-        .g-pv.busy::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(13, 13, 13, 0.55);
-        }
+        .g-pv-cap:focus { border-color: #444; }
 
         .g-pv-x {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            z-index: 2;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(0, 0, 0, 0.6);
-            color: #fff;
-            font-size: 15px;
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            font-size: 17px;
             line-height: 1;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s, border-color 0.15s;
         }
 
-        .g-pv-x:active { background: var(--red); }
+        .g-pv-x:active { color: var(--red); border-color: var(--red); }
 
         .g-addmore { display: none; }
         .g-addmore[hidden] { display: none; }
         .g-addmore.show { display: block; }
+
+        .g-cap-hint {
+            margin-top: 10px;
+            font-family: 'Syne Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.02em;
+        }
 
         /* List thumbnails reuse .post-row */
         .g-thumb {
@@ -839,11 +852,7 @@
                 <span class="g-previews" id="g-previews" hidden></span>
             </div>
             <button type="button" class="btn-ghost g-addmore" id="g-addmore" hidden>+ Add more photos</button>
-        </div>
-
-        <div class="field">
-            <label for="g-caption">Caption <span class="lbl-opt">— optional, applies to all</span></label>
-            <input type="text" id="g-caption" maxlength="140" placeholder="e.g. Studio shoot · Accra" autocomplete="off">
+            <p class="g-cap-hint" id="g-cap-hint" hidden>Add an optional caption to each image below.</p>
         </div>
 
         <button type="submit" class="btn-primary" id="g-submit" disabled>Upload Image</button>
@@ -1285,12 +1294,12 @@
     var gEmpty    = document.getElementById('g-drop-empty');
     var gPreviews = document.getElementById('g-previews');
     var gAddMore  = document.getElementById('g-addmore');
-    var gCaption  = document.getElementById('g-caption');
+    var gCapHint  = document.getElementById('g-cap-hint');
     var gSubmit   = document.getElementById('g-submit');
     var gStatus   = document.getElementById('g-status');
     var gList     = document.getElementById('gallery-list');
 
-    var pending = [];            // [{ uid, dataUrl }] queued for upload
+    var pending = [];            // [{ uid, dataUrl, caption }] queued for upload
     var uidSeq = 0;
     var galleryItems = [];
 
@@ -1332,7 +1341,7 @@
         files.forEach(function (file) {
             if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { skipped++; return; }
             downscale(file, 1600, 0.82).then(function (dataUrl) {
-                pending.push({ uid: ++uidSeq, dataUrl: dataUrl });
+                pending.push({ uid: ++uidSeq, dataUrl: dataUrl, caption: '' });
                 renderPending();
             }).catch(function () { /* skip unreadable file */ });
         });
@@ -1343,13 +1352,25 @@
         while (gPreviews.firstChild) gPreviews.removeChild(gPreviews.firstChild);
 
         pending.forEach(function (p) {
-            var cell = document.createElement('span');
-            cell.className = 'g-pv';
+            var row = document.createElement('div');
+            row.className = 'g-pv';
 
             var img = document.createElement('img');
+            img.className = 'g-pv-thumb';
             img.src = p.dataUrl;
             img.alt = '';
-            cell.appendChild(img);
+            row.appendChild(img);
+
+            var cap = document.createElement('input');
+            cap.type = 'text';
+            cap.className = 'g-pv-cap';
+            cap.maxLength = 140;
+            cap.placeholder = 'Caption (optional)';
+            cap.value = p.caption;
+            cap.setAttribute('aria-label', 'Caption for this image');
+            // Update the model only — no re-render, so typing keeps focus.
+            cap.addEventListener('input', function () { p.caption = cap.value; });
+            row.appendChild(cap);
 
             var x = document.createElement('button');
             x.type = 'button';
@@ -1361,9 +1382,9 @@
                 pending = pending.filter(function (q) { return q.uid !== p.uid; });
                 renderPending();
             });
-            cell.appendChild(x);
+            row.appendChild(x);
 
-            gPreviews.appendChild(cell);
+            gPreviews.appendChild(row);
         });
 
         var has = pending.length > 0;
@@ -1372,6 +1393,7 @@
         gDrop.classList.toggle('has-img', has);
         gAddMore.hidden = !has;
         gAddMore.classList.toggle('show', has);
+        if (gCapHint) gCapHint.hidden = !has;
         gSubmit.disabled = !has;
         gSubmit.textContent = has && pending.length > 1
             ? 'Upload ' + pending.length + ' Images'
@@ -1411,8 +1433,6 @@
         e.preventDefault();
         if (pending.length === 0) { gShowStatus('error', 'Choose at least one image first.'); return; }
 
-        var caption = gCaption.value.trim();
-
         gSubmit.disabled = true;
         gAddMore.disabled = true;
         gHideStatus();
@@ -1432,7 +1452,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         password: savedPw,
-                        caption:  caption,
+                        caption:  (p.caption || '').trim(),
                         image:    p.dataUrl
                     })
                 });
@@ -1451,7 +1471,6 @@
 
         if (failed === 0) {
             gShowStatus('success', '✓ ' + done + ' image' + (done === 1 ? '' : 's') + ' added. Live in ~30 seconds.');
-            gCaption.value = '';
         } else {
             gShowStatus('error', done + ' uploaded, ' + failed + ' failed — the failed ones are still queued, try again.');
         }
@@ -1558,7 +1577,6 @@
         }
     }
 
-    gCaption.addEventListener('input', gHideStatus);
 
 }());
 </script>
