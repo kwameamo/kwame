@@ -1486,54 +1486,32 @@
 /* ═══════════════════════════════
    FOOTER
 ═══════════════════════════════ */
-.site-footer { border-top: 1px solid var(--g2); }
-
-/* ── Ticker strip ── */
-.ft-ticker {
-    overflow: hidden;
-    border-bottom: 1px solid var(--g2);
-    padding: 12px 0;
+.site-footer {
+    border-top: 1px solid var(--g2);
+    position: relative;
+    overflow: hidden; /* clips the orb */
 }
 
-.ft-ticker-track {
-    display: flex;
-    width: max-content;
-    animation: ft-marquee 30s linear infinite;
-}
-
-.ft-ticker:hover .ft-ticker-track { animation-play-state: paused; }
-
-.ft-ticker-group {
-    display: flex;
-    align-items: center;
-    gap: 2.5rem;
-    padding-right: 2.5rem;
-    white-space: nowrap;
-}
-
-.ft-ticker-group span {
-    font-family: 'Syne Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--g3);
-}
-
-.ft-tick-star {
-    font-size: 9px;
-    animation: ft-spin 9s linear infinite;
-}
-
-@keyframes ft-marquee {
-    to { transform: translateX(-50%); }
-}
-
-@keyframes ft-spin {
-    to { transform: rotate(360deg); }
+/* ── Inversion orb ──
+   mix-blend-mode: difference over white flips everything inside the
+   circle: page goes black, text goes white. Pure inversion, no color. */
+.ft-orb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: #fff;
+    mix-blend-mode: difference;
+    pointer-events: none;
+    z-index: 5;
+    transform: translate(-50%, -50%) scale(0);
+    will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .ft-ticker-track, .ft-tick-star { animation: none; }
+    .ft-orb { display: none; }
 }
 
 /* ── Statement ── */
@@ -1545,14 +1523,6 @@
     border-bottom: 1px solid var(--g2);
 }
 
-.ft-kicker {
-    font-family: 'Syne Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--g3);
-}
-
 .ft-line {
     font-weight: 800;
     font-size: clamp(22px, 2.6vw, 34px);
@@ -1560,15 +1530,6 @@
     line-height: 1.15;
     max-width: 640px;
 }
-
-/* Word-mask spans injected by footer.js */
-.ft-w {
-    display: inline-block;
-    overflow: hidden;
-    vertical-align: bottom;
-}
-
-.ft-w-in { display: inline-block; }
 
 .ft-status {
     display: flex;
@@ -1861,7 +1822,6 @@
     .footer-inner { padding: 36px 24px 28px; }
     .footer-top { flex-direction: column; gap: 2rem; }
     .footer-nav { gap: 2rem; }
-    .ft-ticker { padding: 10px 0; }
     .ft-statement { padding-bottom: 2rem; gap: 12px; }
     .ft-line { font-size: 22px; }
     .footer-bottom { flex-direction: column-reverse; align-items: flex-start; gap: 1.25rem; }

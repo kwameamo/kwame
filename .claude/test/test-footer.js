@@ -14,68 +14,81 @@ const { chromium } = require('playwright');
   results.gsapLoaded = await page.evaluate(() =>
     typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined');
 
-  // Scroll to footer to fire ScrollTrigger reveals
+  // No marquee, no footer label
+  results.noTicker = await page.evaluate(() => !document.querySelector('.ft-ticker'));
+  results.noKicker = await page.evaluate(() => !document.querySelector('.ft-kicker'));
+
+  // Clock with seconds
+  await page.waitForTimeout(1100);
+  const clockA = await page.textContent('#ft-clock');
+  results.clockFormat = /^\d{2}:\d{2}:\d{2} GMT$/.test(clockA);
+  await page.waitForTimeout(2100);
+  results.clockTicksSeconds = (await page.textContent('#ft-clock')) !== clockA;
+
+  // Scroll to footer → statement decodes back to the original text
+  const original = 'Culture, code & commerce — designed in Koforidua, shipped worldwide.';
   await page.locator('#footer').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1600);
+  await page.waitForSelector('#ft-line[data-fx-done="1"]', { timeout: 6000 })
+    .catch(() => {});
+  results.decodeDone = await page.evaluate(() =>
+    document.getElementById('ft-line').dataset.fxDone === '1');
+  results.decodeTextRestored = (await page.textContent('#ft-line')) === original;
 
-  // Ticker animating
-  results.ticker = await page.evaluate(() => {
-    const track = document.querySelector('.ft-ticker-track');
-    const s = getComputedStyle(track);
-    return { animating: s.animationName === 'ft-marquee' && s.animationPlayState === 'running' };
+  // Reveals settled
+  await page.waitForTimeout(900);
+  results.revealsSettled = await page.evaluate(() =>
+    [...document.querySelectorAll('.ft-reveal')].every(el =>
+      parseFloat(getComputedStyle(el).opacity) > 0.95));
+
+  // Orb: difference blend, scales up on entry, follows the cursor
+  results.orbBlend = await page.evaluate(() =>
+    getComputedStyle(document.getElementById('ft-orb')).mixBlendMode === 'difference');
+  const fr = await page.locator('#footer').boundingBox();
+  await page.mouse.move(fr.x + 300, fr.y + 200);
+  await page.waitForTimeout(600);
+  const orbT1 = await page.evaluate(() => document.getElementById('ft-orb').style.transform);
+  await page.mouse.move(fr.x + 800, fr.y + 300, { steps: 5 });
+  await page.waitForTimeout(700);
+  const orbT2 = await page.evaluate(() => document.getElementById('ft-orb').style.transform);
+  results.orbFollows = !!orbT1 && !!orbT2 && orbT1 !== orbT2;
+  results.orbVisible = await page.evaluate(() => {
+    const m = document.getElementById('ft-orb').style.transform.match(/scale\(([\d.]+)\)/);
+    return m ? parseFloat(m[1]) > 0.5 : false;
   });
 
-  // Statement words split + revealed
-  results.statement = await page.evaluate(() => {
-    const line = document.getElementById('ft-line');
-    const words = line.querySelectorAll('.ft-w-in');
-    const first = words[0] && getComputedStyle(words[0]);
-    return {
-      wordCount: words.length,
-      revealed: words.length > 0 &&
-        Math.abs(new DOMMatrix(first.transform === 'none' ? undefined : first.transform).m42) < 1,
-      fullText: line.textContent.includes('worldwide'),
-    };
-  });
+  // Link hover decode restores its text
+  const linkText = await page.textContent('.footer-nav-link');
+  await page.hover('.footer-nav-link');
+  await page.waitForTimeout(700);
+  results.linkDecodeRestored = (await page.textContent('.footer-nav-link')) === linkText;
 
-  // Reveals finished at full opacity / no offset
-  results.revealsSettled = await page.evaluate(() => {
-    return [...document.querySelectorAll('.ft-reveal')].every(el => {
-      const s = getComputedStyle(el);
-      return parseFloat(s.opacity) > 0.95;
-    });
-  });
-
-  // Clock shows a real time
-  results.clock = await page.textContent('#ft-clock');
-
-  // Magnetic CTA: hover should move it
+  // Magnetic CTA
   const cta = page.locator('.footer-cta');
   const box = await cta.boundingBox();
   await page.mouse.move(box.x + box.width - 4, box.y + 2);
   await page.waitForTimeout(400);
   results.magnetic = await page.evaluate(() => {
-    const el = document.querySelector('.footer-cta');
-    const t = getComputedStyle(el).transform;
-    if (t === 'none') return { moved: false };
+    const t = getComputedStyle(document.querySelector('.footer-cta')).transform;
+    if (t === 'none') return false;
     const m = new DOMMatrix(t);
-    return { moved: Math.abs(m.m41) > 0.5 || Math.abs(m.m42) > 0.5 };
+    return Math.abs(m.m41) > 0.5 || Math.abs(m.m42) > 0.5;
   });
-  await page.mouse.move(box.x - 200, box.y - 200);
-  await page.waitForTimeout(900);
 
   // Back to top
   await page.click('#ft-top');
   await page.waitForTimeout(3000);
   results.backToTop = await page.evaluate(() => window.scrollY < 50);
 
-  // Screenshots
+  // Screenshots (orb mid-footer for the desktop shot)
   await page.locator('#footer').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(800);
+  const fr2 = await page.locator('#footer').boundingBox();
+  await page.mouse.move(fr2.x + 420, fr2.y + 170);
+  await page.waitForTimeout(900);
   await page.locator('#footer').screenshot({ path: '.claude/test/footer-desktop.png' });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.locator('#footer').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(1500);
   await page.locator('#footer').screenshot({ path: '.claude/test/footer-mobile.png' });
 
   console.log(JSON.stringify(results, null, 2));
