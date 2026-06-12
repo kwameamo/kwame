@@ -210,6 +210,42 @@
     </div>
 </section>
 
+<!-- GALLERY — capsule slider (managed from /_p7n3x) -->
+<section class="gallery-band" id="gallery" aria-label="Selected moments from the studio">
+    <div class="gallery-hd">
+        <span class="s-num">✦</span>
+        <h2 class="s-title">In the Field</h2>
+        <span class="s-count" id="gallery-count" aria-live="polite"></span>
+    </div>
+    <div class="cap-slider" id="cap-slider" data-state="loading">
+        <button type="button" class="cap-nav cap-prev" id="cap-prev" aria-label="Previous image">‹</button>
+        <div class="cap-stage" id="cap-stage" role="group" aria-roledescription="carousel" aria-label="Studio gallery">
+            <!-- Skeleton card shown until items load -->
+            <div class="cap cap-skeleton" aria-hidden="true"></div>
+        </div>
+        <button type="button" class="cap-nav cap-next" id="cap-next" aria-label="Next image">›</button>
+        <!-- Empty state -->
+        <div class="cap-empty" id="cap-empty" hidden>
+            <span class="cap-empty-mark">✦</span>
+            <p class="cap-empty-title">Nothing here yet</p>
+            <p class="cap-empty-sub">Selected moments from the studio will show up here soon.</p>
+        </div>
+    </div>
+    <div class="cap-dots" id="cap-dots" aria-hidden="true"></div>
+</section>
+
+<!-- Gallery lightbox -->
+<div class="cap-lightbox" id="cap-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button type="button" class="cap-lb-close" id="cap-lb-close" aria-label="Close">×</button>
+    <div class="cap-lb-inner">
+        <img class="cap-lb-img" id="cap-lb-img" alt="">
+        <div class="cap-lb-meta" id="cap-lb-meta">
+            <span class="cap-lb-caption" id="cap-lb-caption"></span>
+            <a class="cap-lb-link" id="cap-lb-link" target="_blank" rel="noopener" hidden>View →</a>
+        </div>
+    </div>
+</div>
+
 <!-- SERVICES -->
 <section class="section" id="services">
     <div class="section-hd">
@@ -454,6 +490,7 @@
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script defer src="/js/now-playing.js"></script>
 <script defer src="/js/index.js"></script>
+<script defer src="/js/gallery.js"></script>
 <script defer src="/js/sw-updater.js"></script>
 </body>
 </html>

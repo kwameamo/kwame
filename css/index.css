@@ -710,6 +710,346 @@
 
 
 /* ═══════════════════════════════
+   GALLERY — capsule slider
+═══════════════════════════════ */
+.gallery-band {
+    border-bottom: 1px solid var(--g2);
+    padding-bottom: 44px;
+    overflow: hidden;
+}
+
+.gallery-hd {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 40px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 1.25rem;
+}
+
+.gallery-hd .s-num { font-size: 11px; color: var(--g3); }
+.gallery-hd .s-count { margin-left: auto; }
+
+/* Stacked-deck carousel */
+.cap-slider {
+    position: relative;
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    min-height: 420px;
+}
+
+/* The stage holds the stacked cards, centered */
+.cap-stage {
+    position: relative;
+    flex: 1 1 auto;
+    max-width: 360px;
+    height: 420px;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: pan-y;
+}
+
+/* Individual card — 4:5 ratio */
+.cap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    max-width: 80vw;
+    aspect-ratio: 4 / 5;
+    border-radius: 26px;
+    overflow: hidden;
+    background: var(--g1);
+    text-decoration: none;
+    color: var(--white);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    /* JS sets --x / --y / --rot / --scale per card position */
+    transform:
+        translate(-50%, -50%)
+        translate(var(--x, 0), var(--y, 0))
+        rotate(var(--rot, 0deg))
+        scale(var(--scale, 1));
+    opacity: var(--op, 1);
+    filter: blur(var(--blur, 0));
+    z-index: var(--z, 1);
+    box-shadow: 0 18px 50px -20px rgba(0, 0, 0, 0.45);
+    transition:
+        transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 0.5s ease,
+        filter 0.5s ease;
+    will-change: transform, opacity, filter;
+}
+
+/* Only the front card is interactive */
+.cap[data-active="false"] { pointer-events: none; }
+
+.cap-img { position: absolute; inset: 0; }
+
+.cap-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+    pointer-events: none;
+}
+
+.cap[data-active="true"]:hover .cap-img img { transform: scale(1.04); }
+
+/* Caption scrim (front card only) */
+.cap-caption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 36px 20px 18px;
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    line-height: 1.45;
+    color: var(--white);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.72));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cap[data-active="true"] .cap-caption { opacity: 1; }
+
+/* "Tap to view" hint on the front card */
+.cap-expand {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: var(--white);
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.cap[data-active="true"] .cap-expand { opacity: 1; }
+
+/* Navigation arrows */
+.cap-nav {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--g2);
+    background: var(--white);
+    color: var(--black);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cap-nav:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+.cap-nav:disabled { opacity: 0; pointer-events: none; }
+
+/* Dots */
+.cap-dots {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 28px;
+}
+
+.cap-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--g2);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cap-dot.active { background: var(--black); transform: scale(1.3); }
+
+/* Skeleton card (pre-load) */
+.cap-skeleton {
+    cursor: default;
+    transform: translate(-50%, -50%);
+    background:
+        repeating-linear-gradient(
+            -45deg,
+            transparent, transparent 6px,
+            rgba(0, 0, 0, 0.04) 6px, rgba(0, 0, 0, 0.04) 12px
+        ),
+        var(--g1);
+}
+
+.cap-skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.55) 50%,
+        transparent 70%
+    );
+    transform: translateX(-120%);
+    animation: wi-shimmer 2.4s ease-in-out infinite;
+}
+
+/* Empty state */
+.cap-empty {
+    max-width: 1280px;
+    margin: 8px 40px 0;
+    padding: 48px 40px;
+    text-align: center;
+    border: 1px dashed var(--g2);
+}
+
+.cap-empty-mark {
+    display: block;
+    font-size: 18px;
+    color: var(--g3);
+    margin-bottom: 14px;
+}
+
+.cap-empty-title {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+}
+
+.cap-empty-sub {
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--g3);
+}
+
+/* When empty, the dashed panel replaces the stage */
+.cap-slider[data-state="empty"] { min-height: 0; display: block; padding: 0; }
+.cap-slider[data-state="empty"] .cap-nav,
+.cap-slider[data-state="empty"] .cap-stage { display: none; }
+.cap-slider[data-state="empty"] + .cap-dots { display: none; }
+
+/* ── Lightbox ── */
+.cap-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(10, 10, 10, 0.94);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+}
+
+.cap-lightbox.show { opacity: 1; }
+
+.cap-lb-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: min(92vw, 720px);
+    transform: scale(0.96);
+    transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.cap-lightbox.show .cap-lb-inner { transform: scale(1); }
+
+.cap-lb-img {
+    max-width: 100%;
+    max-height: 78vh;
+    border-radius: 16px;
+    object-fit: contain;
+    background: #1a1a1a;
+    box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.8);
+}
+
+.cap-lb-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cap-lb-caption {
+    font-family: 'Syne Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    text-align: center;
+}
+
+.cap-lb-link {
+    font-family: 'Syne Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--black);
+    background: var(--white);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 999px;
+    transition: opacity 0.2s;
+}
+
+.cap-lb-link:hover { opacity: 0.8; }
+
+.cap-lb-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--white);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
+}
+
+.cap-lb-close:hover { background: rgba(255, 255, 255, 0.18); }
+
+@media (prefers-reduced-motion: reduce) {
+    .cap, .cap-img img, .cap-lightbox, .cap-lb-inner { transition: none; }
+}
+
+
+/* ═══════════════════════════════
    SERVICES
 ═══════════════════════════════ */
 .services-grid {
@@ -1378,6 +1718,14 @@
     .form-row { grid-template-columns: 1fr; }
 
     .brands-inner { padding: 28px 24px; }
+
+    .gallery-hd { padding: 32px 24px 0; }
+    .gallery-band { padding-bottom: 36px; }
+    .cap-slider { margin-top: 28px; min-height: 380px; gap: 4px; padding: 0 8px; }
+    .cap-stage { height: 380px; }
+    .cap { width: 260px; border-radius: 22px; }
+    .cap-empty { margin-left: 24px; margin-right: 24px; padding: 40px 24px; }
+
     .footer-inner { padding: 40px 24px 28px; }
     .footer-top { flex-direction: column; gap: 2rem; }
     .footer-nav { gap: 2rem; }
@@ -1392,4 +1740,9 @@
     .hero-title-block { padding: 32px 0; }
     .brands-list { gap: 1.5rem; }
     .brand-link img { height: 24px; }
+
+    .cap-slider { min-height: 340px; }
+    .cap-stage { height: 340px; }
+    .cap { width: 230px; }
+    .cap-nav { width: 38px; height: 38px; font-size: 18px; }
 }

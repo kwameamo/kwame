@@ -595,6 +595,68 @@
             -webkit-tap-highlight-color: transparent;
             min-height: 32px;
         }
+
+        /* ── Gallery uploader ── */
+
+        .lbl-opt {
+            text-transform: none;
+            letter-spacing: 0;
+            color: #444;
+            font-weight: 400;
+        }
+
+        .g-drop {
+            display: block;
+            width: 100%;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            cursor: pointer;
+            overflow: hidden;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            transition: border-color 0.15s;
+        }
+        .g-drop:active   { border-color: #444; }
+        .g-drop.has-img  { border-style: solid; }
+
+        .g-drop-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 160px;
+            padding: 28px 16px;
+        }
+
+        .g-drop-icon { font-size: 28px; line-height: 1; color: var(--muted); }
+        .g-drop-text { font-size: 14px; font-weight: 600; }
+        .g-drop-hint {
+            font-family: 'Syne Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .g-preview {
+            display: block;
+            width: 100%;
+            max-height: 320px;
+            object-fit: cover;
+        }
+
+        /* List thumbnails reuse .post-row */
+        .g-thumb {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #222;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 <body>
@@ -624,6 +686,11 @@
         <span class="menu-btn-icon">≡</span>
         <span class="menu-btn-label">Posts</span>
         <span class="menu-btn-count" id="menu-count"></span>
+    </button>
+    <button type="button" class="menu-btn" id="menu-gallery">
+        <span class="menu-btn-icon">✦</span>
+        <span class="menu-btn-label">Gallery</span>
+        <span class="menu-btn-count" id="menu-gallery-count"></span>
     </button>
 </div>
 
@@ -699,6 +766,50 @@
             <button type="button" class="posts-reload" id="posts-reload" title="Refresh">↻</button>
         </div>
         <ul class="posts-list" id="posts-list"></ul>
+    </div>
+</div>
+
+<!-- ── Gallery view ── -->
+<div id="gallery-wrap" hidden>
+    <header>
+        <button type="button" class="logo" id="back-from-gallery">← Menu</button>
+        <h1>Gallery</h1>
+    </header>
+
+    <form id="gallery-form" novalidate>
+        <div class="field">
+            <label>Image</label>
+            <button type="button" class="g-drop" id="g-drop">
+                <input type="file" id="g-file" accept="image/jpeg,image/png,image/webp" hidden>
+                <span class="g-drop-empty" id="g-drop-empty">
+                    <span class="g-drop-icon">+</span>
+                    <span class="g-drop-text">Tap to choose a photo</span>
+                    <span class="g-drop-hint">JPG, PNG or WebP · resized automatically</span>
+                </span>
+                <img class="g-preview" id="g-preview" alt="" hidden>
+            </button>
+        </div>
+
+        <div class="field">
+            <label for="g-caption">Caption <span class="lbl-opt">— optional</span></label>
+            <input type="text" id="g-caption" maxlength="140" placeholder="e.g. Studio shoot · Accra" autocomplete="off">
+        </div>
+
+        <div class="field">
+            <label for="g-link">Link <span class="lbl-opt">— optional</span></label>
+            <input type="text" id="g-link" placeholder="https://… (opens when tapped)" autocomplete="off" inputmode="url">
+        </div>
+
+        <button type="submit" class="btn-primary" id="g-submit" disabled>Upload Image</button>
+        <div class="status" id="g-status" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="posts-wrap">
+        <div class="posts-header">
+            <span class="posts-heading">Uploaded</span>
+            <button type="button" class="posts-reload" id="g-reload" title="Refresh">↻</button>
+        </div>
+        <ul class="posts-list" id="gallery-list"></ul>
     </div>
 </div>
 
@@ -784,6 +895,7 @@
                     requestAnimationFrame(function () {
                         menuEl.classList.add('visible');
                         syncPosts();
+                        syncGallery();
                     });
                 });
             }, 300);
@@ -1119,6 +1231,247 @@
     document.getElementById('form').querySelectorAll('input, textarea').forEach(function (el) {
         el.addEventListener('input', function () { el.classList.remove('error'); });
     });
+
+    /* ── Gallery ── */
+    var galleryWrap = document.getElementById('gallery-wrap');
+    var gDrop    = document.getElementById('g-drop');
+    var gFile    = document.getElementById('g-file');
+    var gEmpty   = document.getElementById('g-drop-empty');
+    var gPreview = document.getElementById('g-preview');
+    var gCaption = document.getElementById('g-caption');
+    var gLink    = document.getElementById('g-link');
+    var gSubmit  = document.getElementById('g-submit');
+    var gStatus  = document.getElementById('g-status');
+    var gList    = document.getElementById('gallery-list');
+
+    var pendingImage = null;     // base64 data URL ready to upload
+    var galleryItems = [];
+
+    function gShowStatus(cls, msg) {
+        gStatus.className = 'status ' + cls;
+        gStatus.textContent = msg;
+    }
+    function gHideStatus() {
+        gStatus.className = 'status';
+        gStatus.textContent = '';
+    }
+
+    // Menu + back wiring
+    document.getElementById('menu-gallery').addEventListener('click', function () {
+        showView(galleryWrap);
+    });
+    document.getElementById('back-from-gallery').addEventListener('click', function () {
+        backToMenu(galleryWrap);
+    });
+    document.getElementById('g-reload').addEventListener('click', syncGallery);
+
+    // File picker
+    gDrop.addEventListener('click', function (e) {
+        if (e.target === gFile) return;
+        gFile.click();
+    });
+
+    gFile.addEventListener('change', function () {
+        var file = gFile.files && gFile.files[0];
+        if (!file) return;
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) {
+            gShowStatus('error', 'Please choose a JPG, PNG or WebP image.');
+            return;
+        }
+        gHideStatus();
+        downscale(file, 1600, 0.82).then(function (dataUrl) {
+            pendingImage = dataUrl;
+            gPreview.src = dataUrl;
+            gPreview.hidden = false;
+            gEmpty.hidden = true;
+            gDrop.classList.add('has-img');
+            gSubmit.disabled = false;
+        }).catch(function (err) {
+            gShowStatus('error', err.message || 'Could not read that image.');
+        });
+    });
+
+    // Shrink image client-side before upload — keeps payloads small + fast.
+    function downscale(file, maxDim, quality) {
+        return new Promise(function (resolve, reject) {
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function () {
+                URL.revokeObjectURL(url);
+                var w = img.naturalWidth, h = img.naturalHeight;
+                var scale = Math.min(1, maxDim / Math.max(w, h));
+                var cw = Math.max(1, Math.round(w * scale));
+                var ch = Math.max(1, Math.round(h * scale));
+                var canvas = document.createElement('canvas');
+                canvas.width = cw; canvas.height = ch;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, cw, ch);
+                try {
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                } catch (err) {
+                    reject(new Error('Could not process image.'));
+                }
+            };
+            img.onerror = function () {
+                URL.revokeObjectURL(url);
+                reject(new Error('Could not read that image.'));
+            };
+            img.src = url;
+        });
+    }
+
+    function resetGalleryForm() {
+        pendingImage = null;
+        gFile.value = '';
+        gPreview.src = '';
+        gPreview.hidden = true;
+        gEmpty.hidden = false;
+        gDrop.classList.remove('has-img');
+        gCaption.value = '';
+        gLink.value = '';
+        gSubmit.disabled = true;
+    }
+
+    document.getElementById('gallery-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        if (!pendingImage) { gShowStatus('error', 'Choose an image first.'); return; }
+
+        var link = gLink.value.trim();
+        if (link && !/^https?:\/\//i.test(link)) {
+            gShowStatus('error', 'Link must start with http:// or https://');
+            return;
+        }
+
+        gSubmit.disabled = true;
+        gSubmit.textContent = 'Uploading…';
+        gHideStatus();
+
+        try {
+            var res = await fetch('/.netlify/functions/save-gallery', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    password: savedPw,
+                    caption:  gCaption.value.trim(),
+                    link:     link,
+                    image:    pendingImage
+                })
+            });
+            var data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
+
+            gShowStatus('success', '✓ Image added. Live in ~30 seconds.');
+            resetGalleryForm();
+            syncGallery();
+        } catch (err) {
+            gShowStatus('error', err.message);
+        } finally {
+            gSubmit.textContent = 'Upload Image';
+            gSubmit.disabled = !pendingImage;
+        }
+    });
+
+    async function syncGallery() {
+        try {
+            var res = await fetch('/.netlify/functions/get-gallery');
+            if (res.ok) {
+                var data = await res.json();
+                if (Array.isArray(data)) galleryItems = data;
+            }
+        } catch (_) {}
+        var count = galleryItems.length;
+        document.getElementById('menu-gallery-count').textContent = count > 0 ? count : '';
+        renderGalleryList();
+    }
+
+    function renderGalleryList() {
+        while (gList.firstChild) gList.removeChild(gList.firstChild);
+
+        if (galleryItems.length === 0) {
+            var empty = document.createElement('li');
+            empty.style.cssText = 'padding:14px 0;color:var(--muted);font-size:13px;text-align:center;';
+            empty.textContent = 'No images yet.';
+            gList.appendChild(empty);
+            return;
+        }
+
+        galleryItems.forEach(function (item) {
+            var li = document.createElement('li');
+            li.className = 'post-row';
+
+            var thumb = document.createElement('img');
+            thumb.className = 'g-thumb';
+            thumb.src = '/.netlify/functions/get-gallery-image?id=' + encodeURIComponent(item.id);
+            thumb.alt = '';
+
+            var info = document.createElement('div');
+            info.className = 'post-row-info';
+            var t = document.createElement('span');
+            t.className = 'post-row-title';
+            t.textContent = item.caption || 'Untitled';
+            var m = document.createElement('span');
+            m.className = 'post-row-meta';
+            m.textContent = '#' + item.id + (item.link ? ' · linked' : '');
+            info.appendChild(t);
+            info.appendChild(m);
+
+            var confirmStrip = document.createElement('div');
+            confirmStrip.className = 'post-row-confirm';
+            var label = document.createElement('span');
+            label.className = 'post-row-confirm-label';
+            label.textContent = 'Delete this image?';
+            var yes = document.createElement('button');
+            yes.type = 'button';
+            yes.className = 'btn-del-yes';
+            yes.textContent = 'Delete';
+            yes.addEventListener('click', function () { deleteGalleryItem(item.id, li); });
+            var no = document.createElement('button');
+            no.type = 'button';
+            no.className = 'btn-del-no';
+            no.textContent = 'Cancel';
+            no.addEventListener('click', function () { li.classList.remove('confirming'); });
+            confirmStrip.appendChild(label);
+            confirmStrip.appendChild(yes);
+            confirmStrip.appendChild(no);
+
+            var del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'post-row-del';
+            del.setAttribute('aria-label', 'Delete image');
+            del.textContent = '×';
+            del.addEventListener('click', function () { li.classList.add('confirming'); });
+
+            li.appendChild(thumb);
+            li.appendChild(info);
+            li.appendChild(confirmStrip);
+            li.appendChild(del);
+            gList.appendChild(li);
+        });
+    }
+
+    async function deleteGalleryItem(id, rowEl) {
+        rowEl.classList.add('removing');
+        try {
+            var res = await fetch('/.netlify/functions/delete-gallery', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, password: savedPw })
+            });
+            var data = await res.json();
+            if (!res.ok || !data.ok) throw new Error(data.error || 'Delete failed.');
+
+            galleryItems = galleryItems.filter(function (it) { return it.id !== id; });
+            document.getElementById('menu-gallery-count').textContent =
+                galleryItems.length > 0 ? galleryItems.length : '';
+            setTimeout(function () { rowEl.remove(); }, 250);
+        } catch (err) {
+            rowEl.classList.remove('removing', 'confirming');
+            gShowStatus('error', 'Delete failed: ' + err.message);
+        }
+    }
+
+    gCaption.addEventListener('input', gHideStatus);
+    gLink.addEventListener('input', gHideStatus);
 
 }());
 </script>
