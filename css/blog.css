@@ -162,3 +162,11 @@ a { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
     .blog-card { transition: none; }
 }
+
+@media (max-width: 640px) {
+    .nav-back { display: inline-block; padding: 10px 0; }
+    .blog-card:active { background: var(--g1); }
+    .blog-title { font-size: 16px; }
+    .modal-body { font-size: 16px; }
+    .modal-close { min-height: 40px; }
+}
