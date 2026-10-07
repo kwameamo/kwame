@@ -57,7 +57,7 @@
         </div>
         <div class="cs-meta-item">
             <div class="cs-meta-label">Stack</div>
-            <div class="cs-meta-value">Astro · Three.js · YAML · Netlify · Google Workspace</div>
+            <div class="cs-meta-value">Astro · Three.js · YAML</div>
         </div>
         <div class="cs-meta-item">
             <div class="cs-meta-label">Live</div>
@@ -154,20 +154,8 @@
         <div class="cs-section-label">Architecture</div>
         <div class="cs-section-body">
             <p>The site shipped as a fully responsive static build, then migrated to <strong>Astro</strong> in a planned Phase 1.</p>
-            <p>The Astro port introduced YAML content files — <strong>site.yaml</strong>, <strong>gallery.yaml</strong>, <strong>experiences.yaml</strong> — so all editable copy and imagery lives in plain-text, version-controlled files. 13 reusable components mirror the original page structure. A <strong>netlify.toml</strong> config tuned for the chosen hosting environment. A clean handoff archive ready for Phase 2.</p>
+            <p>The Astro port introduced YAML content files — <strong>site.yaml</strong>, <strong>gallery.yaml</strong>, <strong>experiences.yaml</strong> — so all editable copy and imagery lives in plain-text, version-controlled files. 13 reusable components mirror the original page structure. A clean handoff archive ready for Phase 2.</p>
             <p><strong>Phase 2</strong> (in progress) layers a GitHub Contents API client and authentication on top, evolving the site into a config-driven admin panel — a white-label CurioLabs product being designed for reuse across future clients.</p>
-        </div>
-    </div>
-
-    <!-- Infrastructure -->
-    <div class="cs-section">
-        <div class="cs-section-label">Infrastructure</div>
-        <div class="cs-section-body">
-            <p>The launch stack was chosen deliberately, not by default. Every decision was documented for the client.</p>
-            <p><strong>Hosting:</strong> Netlify Starter — confirmed to support custom domains without requiring Pro.</p>
-            <p><strong>Domain:</strong> Namecheap.</p>
-            <p><strong>Email:</strong> Google Workspace Business Starter — chosen specifically for native IMAP Gmail on mobile, after ruling out Cloudflare Email Routing (incompatible with Netlify-managed DNS) and "Send mail as" workarounds.</p>
-            <p><strong>Analytics:</strong> GA4 + Google Search Console.</p>
         </div>
     </div>
 
@@ -175,7 +163,7 @@
     <div class="cs-section">
         <div class="cs-section-label">Documentation</div>
         <div class="cs-section-body">
-            <p>A pricing PDF was delivered under the CurioLabs brand covering the website build, domain, hosting, and Google Workspace billing options — annual and monthly — with correct GHS / USD / EUR exchange handling.</p>
+            <p>A pricing PDF was delivered under the CurioLabs brand covering the website build and its billing options — annual and monthly — with correct GHS / USD / EUR exchange handling.</p>
             <p>A small but meaningful detail: the resort's name contains the <strong>Ɛ</strong> character (extended Latin). I generated the PDF in ReportLab using Liberation Sans, which renders Ɛ correctly — Helvetica does not. The pricing document was kept as a clean line-item list rather than a styled comparison table, matching how Mr. Hansen reads pricing in practice.</p>
         </div>
     </div>

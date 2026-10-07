@@ -58,7 +58,7 @@
         </div>
         <div class="cs-meta-item">
             <div class="cs-meta-label">Stack</div>
-            <div class="cs-meta-value">Python · CustomTkinter · fontTools · PyInstaller · Inno Setup · macOS .app/.dmg · GitHub Actions · Netlify · Paystack</div>
+            <div class="cs-meta-value">Python · CustomTkinter · fontTools</div>
         </div>
         <div class="cs-meta-item">
             <div class="cs-meta-label">Live</div>
@@ -144,7 +144,7 @@
         <div class="cs-section-label">Free To Use, Pay If It Helps</div>
         <div class="cs-section-body">
             <p>Font tools tend to be either free and abandoned or paid and locked. I wanted neither, so FontDrop is <strong>free to use and every feature keeps working</strong>. After a 40-day trial, installing shows a polite reminder with a Continue button. If it saves you time, a one-time <strong>$25</strong> license removes the reminder. Nothing renews and nothing is ever locked.</p>
-            <p>Licenses are signed keys checked on the PC itself, so there is no account and no internet needed to activate. Payments run through Paystack, and keys are issued by a small set of Netlify functions with an admin view for hand-issuing or revoking a license. I was honest in the code about what offline licensing can do: it stops casual sharing and gives honest buyers a clear path. It isn't hardened against someone determined, and I didn't try to make it so.</p>
+            <p>Licenses are signed keys checked on the PC itself, so there is no account and no internet needed to activate. Keys are issued by a small backend with an admin view for hand-issuing or revoking a license. I was honest in the code about what offline licensing can do: it stops casual sharing and gives honest buyers a clear path. It isn't hardened against someone determined, and I didn't try to make it so.</p>
         </div>
     </div>
 
@@ -152,7 +152,7 @@
         <div class="cs-section-label">Engineering</div>
         <div class="cs-section-body">
             <p><strong>Updates that can't wedge themselves.</strong> FontDrop checks a public releases repository once a day, shows the release notes, then downloads the update, verifies it against the published SHA-256 and swaps it in after the app closes. An early version could flash a “Failed to load Python DLL” error after an update. The fix was to start the new copy completely independent of the old one.</p>
-            <p><strong>Private source, public downloads.</strong> A tagged release triggers a GitHub Actions build that produces the .exe, its checksum and the installer, and publishes them to a separate public repo with the changelog as release notes. The source stays private.</p>
+            <p><strong>Private source, public downloads.</strong> A tagged release automatically builds the .exe, its checksum and the installer, and publishes them to a separate public repo with the changelog as release notes. The source stays private.</p>
             <p><strong>Performance that you can feel.</strong> Searching waits for a pause in typing instead of rebuilding the list on every key. Dragging the sidebar and preview dividers no longer stutters. Dialogs and banners animate on fixed time curves rather than being resized frame by frame.</p>
             <p><strong>Privacy as a default.</strong> Fonts and folders never leave the PC. The only network traffic is the update check and, if the user opts in, anonymous usage counts with a random id and never a font name, file name, folder or email. The website counts visits without cookies and respects Do Not Track.</p>
         </div>
