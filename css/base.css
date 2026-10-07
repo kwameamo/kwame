@@ -4,9 +4,11 @@
     --black: #000000;
     --g1: #f4f4f4;
     --g2: #e4e4e4;
-    --g3: #aaaaaa;
+    --g3: #757575;
     --g4: #555555;
     --nav-h: 56px;
+    --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 /* ── Reset ── */
@@ -19,7 +21,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-    font-family: 'Syne', sans-serif;
+    font-family: var(--sans);
     background: var(--white);
     color: var(--black);
     line-height: 1.5;

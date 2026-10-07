@@ -31,7 +31,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <link rel="stylesheet" href="/css/base.css">
@@ -39,199 +39,132 @@
 </head>
 <body>
 
-<!-- NAV -->
+<a href="#main" class="skip">Skip to content</a>
+
 <nav class="site-nav" id="site-nav">
-    <div class="nav-inner">
-        <a href="#" class="nav-brand">David Kwame Amo</a>
-        <ul class="nav-links">
-            <li><a href="#work">Work</a></li>
-            <li><a href="#gallery">In the Field</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="blog.html">Blog</a></li>
-        </ul>
-        <a href="#inquire" class="nav-cta">Commission Work →</a>
-        <button type="button" class="nav-hamburger" id="nav-hamburger" aria-label="Open navigation" aria-expanded="false">
-            <span></span><span></span><span></span>
-        </button>
-    </div>
+    <a href="#" class="nav-brand">David Kwame Amo</a>
+    <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#gallery">Field</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="#inquire">Contact</a></li>
+    </ul>
 </nav>
 
-<!-- Mobile nav overlay -->
-<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
-    <div class="mobile-nav-inner">
-        <a href="#work"     class="mobile-nav-link">Work</a>
-        <a href="#gallery"  class="mobile-nav-link">In the Field</a>
-        <a href="#services" class="mobile-nav-link">Services</a>
-        <a href="#about"    class="mobile-nav-link">About</a>
-        <a href="blog.html" class="mobile-nav-link">Blog</a>
-        <a href="#inquire"  class="mobile-nav-cta">Commission Work →</a>
-    </div>
-</div>
+<main id="main" class="page">
 
-<!-- HERO -->
-<section class="hero">
-    <div class="hero-left">
-        <span class="hero-index">01 / Introduction</span>
-        <div class="hero-title-block">
-            <p class="hero-discipline">Designer · Brand Architect · Builder</p>
-            <h1 class="hero-name">David<br>Kwame<br>Amo</h1>
-            <p class="hero-tagline">Operating at the intersection of culture, code, and commerce. Based in Ghana, working globally.</p>
-        </div>
-        <div class="hero-footer">
-            <span class="hero-location">Koforidua, Ghana</span>
-            <span class="hero-time"><span id="hero-year">2026</span> · <span id="hero-clock">00:00</span> GMT</span>
-            <span class="hero-scroll">↓</span>
-        </div>
+<!-- PROFILE -->
+<header class="hero" id="profile">
+    <p class="kicker">✦ Profile</p>
+    <h1 class="hero-name">David Kwame Amo</h1>
+    <p class="hero-role">Designer · Brand Architect · Builder</p>
+    <p class="hero-lede">I work at the intersection of culture, code, and commerce — branding, garments, and software. Based in Koforidua, Ghana, working globally.</p>
+    <p class="hero-meta"><span id="hero-clock">00:00:00</span> GMT · Koforidua, Ghana</p>
+
+    <!-- data-status: "available" | "limited" | "busy" -->
+    <div class="avail-card" data-status="available">
+        <span class="avail-dot" aria-hidden="true"></span>
+        <span class="avail-label" id="avail-label">Available for work</span>
+        <span class="avail-sep" aria-hidden="true">·</span>
+        <span class="avail-response">replies within 48 hrs</span>
+        <a href="#inquire" class="avail-cta">Start a project →</a>
     </div>
-    <div class="hero-right">
-        <!-- data-status: "available" | "limited" | "busy" -->
-        <div class="avail-card" data-status="available">
-            <div class="avail-top">
-                <span class="avail-dot" aria-hidden="true"></span>
-                <span class="avail-label" id="avail-label">Available for work</span>
-            </div>
-            <div class="avail-rule"></div>
-            <div class="avail-services">
-                <span>Branding</span>
-                <span>Web Dev</span>
-                <span>Garments</span>
-            </div>
-            <div class="avail-rule"></div>
-            <p class="avail-response">Responds within 48 hrs</p>
-            <a href="#inquire" class="avail-cta">Start a project →</a>
-        </div>
-        <div class="np-card" id="np-card">
-            <div class="np-body">
-                <span class="np-tag">audio / <span class="np-tag-idle">standby</span><span class="np-tag-live">on air</span></span>
-                <span class="np-idle-text">not playing<span class="np-cursor">_</span></span>
-                <div class="np-track-info">
-                    <div class="np-track"><a id="np-link" target="_blank" rel="noopener"></a></div>
-                    <div class="np-artist" id="np-artist"></div>
-                    <div class="np-time" aria-label="Track progress"><span id="np-progress">0:00</span><span class="np-time-sep">/</span><span id="np-duration">0:00</span></div>
-                </div>
-                <div class="np-eq" aria-hidden="true">
-                    <span></span><span></span><span></span><span></span>
-                </div>
-            </div>
-            <div class="np-art">
-                <img id="np-cover" class="np-cover" alt="" aria-hidden="true">
-                <svg class="np-disc" viewBox="0 0 120 120" fill="none" stroke="currentColor" aria-hidden="true">
-                    <circle cx="60" cy="60" r="56" stroke-width="1" stroke-dasharray="2 6"/>
-                    <circle cx="60" cy="60" r="40" stroke-width="1" opacity="0.55"/>
-                    <circle cx="60" cy="60" r="26" stroke-width="1" opacity="0.3"/>
-                    <circle cx="60" cy="60" r="3.5" fill="currentColor" stroke="none"/>
-                </svg>
-            </div>
-        </div>
-    </div>
-</section>
+    <span hidden id="hero-year"></span>
+
+</header>
 
 <!-- WORK -->
 <section class="section" id="work">
-    <div class="section-hd">
-        <span class="s-num">02</span>
-        <h2 class="s-title">Selected Work</h2>
-        <span class="s-count">6 projects</span>
-    </div>
-    <div class="work-grid">
-
-        <a href="/work/ghana-duty.html" class="wi wi-b1">
-            <div class="wi-img"><img src="/photos/ghana-duty-cover.jpg" alt="Ghana Duty Calculator"></div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Web App</span><span class="wi-tag">React</span><span class="wi-tag">API</span></div>
-                <h3 class="wi-name">Ghana Duty Calculator</h3>
-                <p class="wi-desc">The only Ghana vehicle duty calculator that matches what GRA actually charges — a private rates API tracks daily customs exchange rates and serves a line-by-line breakdown across 1,500+ vehicles.</p>
-                <span class="wi-link">View case study →</span>
-            </div>
-        </a><!--  -->
-
-        <a href="/work/chopright.html" class="wi wi-b2">
-            <div class="wi-img"><img src="/photos/chopright-cover.jpg" alt="ChopRight"></div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Brand Identity</span></div>
-                <h3 class="wi-name">ChopRight</h3>
-                <p class="wi-desc">Brand identity for ChopRight — logo, visual language, and brand guidelines for a food and dining brand built to stand out in a crowded market.</p>
-                <span class="wi-link">View case study →</span>
-            </div>
-        </a>
-
-        <a href="/work/kwaeemu-resort.html" class="wi wi-web">
-            <div class="wi-img"><img src="/photos/kwaeemu-cover.png" alt="Kwaeemu Resort"></div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Web Design</span><span class="wi-tag">Development</span></div>
-                <h3 class="wi-name">Kwaeemu Resort</h3>
-                <p class="wi-desc">Full web design and development for Kwaeemu Resort — a premium hospitality site designed to convert visitors into guests through elevated visual presentation and seamless UX.</p>
-                <span class="wi-link">View case study →</span>
-            </div>
-        </a>
-
-        <a href="/work/chic-curls.html" class="wi wi-web">
-            <div class="wi-img"><img src="/photos/chic-curls-cover.jpg" alt="Chic Curls — luxury lash extensions, Accra"></div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Web Design</span><span class="wi-tag">Development</span><span class="wi-tag">UX</span></div>
-                <h3 class="wi-name">Chic Curls</h3>
-                <p class="wi-desc">Link-in-bio landing page with a custom booking system for a luxury lash extensions studio in Accra — a mobile-first, WhatsApp-integrated solution built for the Ghanaian market.</p>
-                <span class="wi-link">View case study →</span>
-            </div>
-        </a>
-
-        <a href="/work/gyamera-aesthetics.html" class="wi wi-web">
-            <div class="wi-img"><img src="/photos/gyamera-aesthetics-cover.jpg" alt="Gyamera Aesthetics — rebrand and platform upgrade, Accra"></div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Web Design</span><span class="wi-tag">Development</span><span class="wi-tag">Branding</span><span class="wi-tag">PWA</span></div>
-                <h3 class="wi-name">Gyamera Aesthetics</h3>
-                <p class="wi-desc">Full rebrand and platform upgrade — new nude-tone identity, Google Sheets slot-blocking backend, PWA layer, and a trust-building content expansion for a growing lash studio in Accra.</p>
-                <span class="wi-link">View case study →</span>
-            </div>
-        </a>
-
-        <!-- data-coming-soon: remove attr + add img src + swap to <a> when project launches -->
-        <div class="wi wi-c1" data-coming-soon tabindex="0" role="button" aria-label="Bene Est Akrofi Foundation — coming soon">
-            <div class="wi-img">
-                <img src="/photos/akrofi-bene-est.jpg" alt="Bene Est Akrofi Foundation — Logo Design and Branding">
-                <span class="wi-cs-badge"><span class="wi-cs-dot"></span>In Progress</span>
-            </div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Logo Design</span><span class="wi-tag">Branding</span></div>
-                <h3 class="wi-name">Bene Est Akrofi Foundation</h3>
-                <p class="wi-desc">Logo design and brand identity for the Bene Est Akrofi Foundation — a visual identity built to communicate purpose, credibility, and institutional trust.</p>
-                <span class="wi-link wi-link-soon">Coming soon</span>
-            </div>
-        </div>
-
-        <!-- data-coming-soon: remove attr + add img src + swap to <a> when project launches -->
-        <div class="wi wi-c2" data-coming-soon tabindex="0" role="button" aria-label="Bene Est Akrofi — coming soon">
-            <div class="wi-img">
-                <img src="/photos/akrofi-bene-est.jpg" alt="Bene Est Akrofi — Web Development">
-                <span class="wi-cs-badge"><span class="wi-cs-dot"></span>In Progress</span>
-            </div>
-            <div class="wi-meta">
-                <div class="wi-tags"><span class="wi-tag">Web Development</span></div>
-                <h3 class="wi-name">Bene Est Akrofi</h3>
-                <p class="wi-desc">Web development for Bene Est Akrofi — a clean, functional, and professional web presence for the organization and its foundation arm.</p>
-                <span class="wi-link wi-link-soon">Coming soon</span>
-            </div>
-        </div>
-
+    <h2 class="s-title"><span class="s-mark">✦</span> Projects</h2>
+    <p class="s-rule" aria-hidden="true"></p>
+    <div class="wk-all">
+    <h3 class="wk-group">Design</h3>
+    <ul class="wk-list">
+        <li><a class="wk" href="/work/chopright.html">
+            <img class="wk-img" src="/photos/chopright-cover.jpg" alt="ChopRight" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">ChopRight <span class="wk-arrow">↗</span></span>
+                <span class="wk-tags">Brand Identity</span>
+                <span class="wk-desc">Brand identity for ChopRight — logo, visual language, and brand guidelines for a food and dining brand built to stand out in a crowded market.</span>
+            </span>
+        </a></li>
+        <li><div class="wk wk-disabled" data-coming-soon tabindex="0" role="button" aria-label="Bene Est Akrofi Foundation — coming soon">
+            <img class="wk-img" src="/photos/akrofi-bene-est.jpg" alt="Bene Est Akrofi Foundation — Logo Design and Branding" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">Bene Est Akrofi Foundation <span class="wk-soon">in progress</span></span>
+                <span class="wk-tags">Logo Design · Branding</span>
+                <span class="wk-desc">Logo design and brand identity for the Bene Est Akrofi Foundation — a visual identity built to communicate purpose, credibility, and institutional trust.</span>
+            </span>
+        </div></li>
+    </ul>
+    <h3 class="wk-group">Software</h3>
+    <ul class="wk-list">
+        <li><a class="wk" href="/work/ghana-duty.html">
+            <img class="wk-img" src="/photos/ghana-duty-cover.jpg" alt="Ghana Duty Calculator" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">Ghana Duty Calculator <span class="wk-arrow">↗</span></span>
+                <span class="wk-tags">Web App · React · API</span>
+                <span class="wk-desc">The only Ghana vehicle duty calculator that matches what GRA actually charges — a private rates API tracks daily customs exchange rates and serves a line-by-line breakdown across 1,500+ vehicles.</span>
+            </span>
+        </a></li>
+        <li><a class="wk" href="/work/fontdrop.html">
+            <img class="wk-img" src="/photos/fontdrop-icon.png" alt="FontDrop" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">FontDrop <span class="wk-arrow">↗</span></span>
+                <span class="wk-tags">Desktop App · Python · Windows · macOS</span>
+                <span class="wk-desc">An app for Windows and macOS that installs every font from a folder of zips, skips the ones you already have and repairs the broken entries behind “already installed” errors. Free to use, $25 if it helps.</span>
+            </span>
+        </a></li>
+    </ul>
+    <h3 class="wk-group">Web</h3>
+    <ul class="wk-list">
+        <li><a class="wk" href="/work/kwaeemu-resort.html">
+            <img class="wk-img" src="/photos/kwaeemu-cover.png" alt="Kwaeemu Resort" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">Kwaeemu Resort <span class="wk-arrow">↗</span></span>
+                <span class="wk-tags">Web Design · Development</span>
+                <span class="wk-desc">Full web design and development for Kwaeemu Resort — a premium hospitality site designed to convert visitors into guests through elevated visual presentation and seamless UX.</span>
+            </span>
+        </a></li>
+        <li><a class="wk" href="/work/chic-curls.html">
+            <img class="wk-img" src="/photos/chic-curls-cover.jpg" alt="Chic Curls — luxury lash extensions, Accra" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">Chic Curls <span class="wk-arrow">↗</span></span>
+                <span class="wk-tags">Web Design · Development · UX</span>
+                <span class="wk-desc">Link-in-bio landing page with a custom booking system for a luxury lash extensions studio in Accra — a mobile-first, WhatsApp-integrated solution built for the Ghanaian market.</span>
+            </span>
+        </a></li>
+        <li><a class="wk" href="/work/gyamera-aesthetics.html">
+            <img class="wk-img" src="/photos/gyamera-aesthetics-cover.jpg" alt="Gyamera Aesthetics — rebrand and platform upgrade, Accra" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">Gyamera Aesthetics <span class="wk-arrow">↗</span></span>
+                <span class="wk-tags">Web Design · Development · Branding · PWA</span>
+                <span class="wk-desc">Full rebrand and platform upgrade — new nude-tone identity, Google Sheets slot-blocking backend, PWA layer, and a trust-building content expansion for a growing lash studio in Accra.</span>
+            </span>
+        </a></li>
+        <li><div class="wk wk-disabled" data-coming-soon tabindex="0" role="button" aria-label="Bene Est Akrofi — coming soon">
+            <img class="wk-img" src="/photos/akrofi-bene-est.jpg" alt="Bene Est Akrofi — Web Development" loading="lazy">
+            <span class="wk-body">
+                <span class="wk-name">Bene Est Akrofi <span class="wk-soon">in progress</span></span>
+                <span class="wk-tags">Web Development</span>
+                <span class="wk-desc">Web development for Bene Est Akrofi — a clean, functional, and professional web presence for the organization and its foundation arm.</span>
+            </span>
+        </div></li>
+    </ul>
     </div>
 </section>
 
 <!-- GALLERY — capsule slider (managed from /_p7n3x) -->
 <section class="gallery-band" id="gallery" aria-label="Selected moments from the studio">
-    <div class="gallery-hd">
-        <span class="s-num">✦</span>
-        <h2 class="s-title">In the Field</h2>
-        <span class="s-count" id="gallery-count" aria-live="polite"></span>
-    </div>
+    <h2 class="s-title"><span class="s-mark">✧</span> In the Field <span class="s-count" id="gallery-count" aria-live="polite"></span></h2>
+    <p class="s-rule" aria-hidden="true"></p>
     <div class="cap-slider" id="cap-slider" data-state="loading">
         <button type="button" class="cap-nav cap-prev" id="cap-prev" aria-label="Previous image">‹</button>
         <div class="cap-stage" id="cap-stage" role="group" aria-roledescription="carousel" aria-label="Studio gallery">
-            <!-- Skeleton card shown until items load -->
             <div class="cap cap-skeleton" aria-hidden="true"></div>
         </div>
         <button type="button" class="cap-nav cap-next" id="cap-next" aria-label="Next image">›</button>
-        <!-- Empty state -->
         <div class="cap-empty" id="cap-empty" hidden>
             <span class="cap-empty-mark">✦</span>
             <p class="cap-empty-title">Nothing here yet</p>
@@ -242,7 +175,6 @@
     <div class="cap-dots" id="cap-dots" aria-hidden="true"></div>
 </section>
 
-<!-- Gallery lightbox -->
 <div class="cap-lightbox" id="cap-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
     <button type="button" class="cap-lb-close" id="cap-lb-close" aria-label="Close">×</button>
     <button type="button" class="cap-lb-nav cap-lb-prev" id="cap-lb-prev" aria-label="Previous image">‹</button>
@@ -253,125 +185,36 @@
     <button type="button" class="cap-lb-nav cap-lb-next" id="cap-lb-next" aria-label="Next image">›</button>
 </div>
 
-<!-- SERVICES -->
-<section class="section" id="services">
-    <div class="section-hd">
-        <span class="s-num">03</span>
-        <h2 class="s-title">Services</h2>
-        <div class="currency-wrap">
-            <div class="currency-toggle">
-                <button type="button" class="cur-btn" data-currency="usd">$ USD</button>
-                <button type="button" class="cur-btn active" data-currency="ghs">₵ GHS</button>
-            </div>
-            <span class="cur-rate" id="cur-rate">fetching rate…</span>
-        </div>
-    </div>
-    <div class="services-scroll-wrap">
-    <div class="services-grid">
-        <div class="svc">
-            <p class="svc-idx">01 / Branding</p>
-            <h3 class="svc-name">Brand<br>Identity</h3>
-            <p class="svc-price">Starting at <span class="price-val" data-usd="800">$800</span></p>
-            <ul class="svc-list">
-                <li>Logo design + mark system</li>
-                <li>Visual identity guidelines</li>
-                <li>Color + typography system</li>
-                <li>Brand voice & positioning</li>
-                <li>Stationery & print collateral</li>
-                <li>Social media kit</li>
-            </ul>
-            <a href="#inquire" class="svc-cta">Start a project →</a>
-        </div>
-        <div class="svc">
-            <p class="svc-idx">02 / Clothing</p>
-            <h3 class="svc-name">Garment<br>Design</h3>
-            <p class="svc-price">Starting at <span class="price-val" data-usd="400">$400</span></p>
-            <ul class="svc-list">
-                <li>Graphic & print design</li>
-                <li>Tech pack preparation</li>
-                <li>Cut-and-sew design</li>
-                <li>Merchandise collections</li>
-                <li>Print-ready production files</li>
-                <li>Creative direction for shoots</li>
-            </ul>
-            <a href="#inquire" class="svc-cta">Start a project →</a>
-        </div>
-        <div class="svc">
-            <p class="svc-idx">03 / Digital</p>
-            <h3 class="svc-name">Web Design<br>+ Dev</h3>
-            <p class="svc-price">Starting at <span class="price-val" data-usd="1200">$1,200</span></p>
-            <ul class="svc-list">
-                <li>UI/UX design</li>
-                <li>Full front-end development</li>
-                <li>Responsive, deployed sites</li>
-                <li>Web app & tool development</li>
-                <li>CMS integration</li>
-                <li>Ongoing maintenance</li>
-            </ul>
-            <a href="#inquire" class="svc-cta">Start a project →</a>
-        </div>
-    </div>
-    </div><!-- end services-scroll-wrap -->
-    <div class="services-dots" id="services-dots" aria-hidden="true">
-        <span class="svc-dot"></span>
-        <span class="svc-dot"></span>
-        <span class="svc-dot"></span>
+<!-- BRANDS -->
+<section class="section" id="brands">
+    <h2 class="s-title"><span class="s-mark">✽</span> My Brands</h2>
+    <p class="s-rule" aria-hidden="true"></p>
+    <div class="brands-list">
+        <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener" class="brand-link" title="CurioGraphicsYard"><img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard"></a>
+        <a href="https://vision97.vision" target="_blank" rel="noopener" class="brand-link" title="Vision'97"><img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97"></a>
+        <a href="https://curiolabs.dev" target="_blank" rel="noopener" class="brand-link" title="CurioLabs"><img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs"></a>
     </div>
 </section>
 
-<!-- BRANDS -->
-<div class="brands-strip">
-    <div class="brands-inner">
-        <span class="brands-lbl">My Brands</span>
-        <div class="brands-list">
-            <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener" class="brand-link" title="CurioGraphicsYard">
-                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%201.svg" alt="CurioGraphicsYard">
-            </a>
-            <a href="https://vision97.vision" target="_blank" rel="noopener" class="brand-link" title="Vision'97">
-                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/Asset%205.svg" alt="Vision'97">
-            </a>
-            <a href="https://curiolabs.dev" target="_blank" rel="noopener" class="brand-link" title="CurioLabs">
-                <img src="https://raw.githubusercontent.com/kwameamo/kwame/main/brands/3.svg" alt="CurioLabs">
-            </a>
-        </div>
-    </div>
-</div>
-
 <!-- ABOUT -->
 <section class="section" id="about">
-    <div class="section-hd">
-        <span class="s-num">04</span>
-        <h2 class="s-title">About</h2>
-    </div>
-    <div class="about-grid">
-        <div class="about-text">
-            <div class="about-bio">
-                <p>Designer and builder operating at the intersection of culture, code, and commerce. Founder of <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>, a brand rooted in clarity of purpose. Lead designer at <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, creating identities and garments. Building practical digital tools at <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a> that solve real operational problems.</p>
-                <p>Collaborated with <a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a>, <a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a>, <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, and <a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a> on merchandise and visual identity. Full creative direction for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>.</p>
-                <p><a href="blog.html">Read the blog →</a> for thinking on design, tools, culture, and the work behind the work.</p>
-            </div>
-        </div>
-        <div class="about-img-col">
-            <div class="about-photo">
-                <img src="photos/me.PNG" alt="David Kwame Amo">
-            </div>
-        </div>
+    <h2 class="s-title"><span class="s-mark">⟁</span> About</h2>
+    <p class="s-rule" aria-hidden="true"></p>
+    <div class="about-photo"><img src="photos/me.PNG" alt="David Kwame Amo"></div>
+    <div class="about-bio">
+        <p>Designer and builder operating at the intersection of culture, code, and commerce. Founder of <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>, a brand rooted in clarity of purpose. Lead designer at <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, creating identities and garments. Building practical digital tools at <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a> that solve real operational problems.</p>
+        <p>Collaborated with <a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a>, <a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a>, <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, and <a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a> on merchandise and visual identity. Full creative direction for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>.</p>
+        <p><a href="blog.html">Read the blog →</a> for thinking on design, tools, culture, and the work behind the work.</p>
     </div>
 </section>
 
 <!-- INQUIRE -->
 <section class="section" id="inquire">
-    <div class="section-hd">
-        <span class="s-num">05</span>
-        <h2 class="s-title">Inquire</h2>
-    </div>
-    <div class="inquire-grid">
-        <div class="inquire-left">
-            <h2 class="inquire-hl">Let's build something worth remembering.</h2>
-            <p class="inquire-sub">Tell me what you're working on. I'll get back to you within 48 hours with thoughts and next steps.</p>
-        </div>
-        <div class="inquire-right">
-            <form id="inquire-form" action="https://api.web3forms.com/submit" method="POST">
+    <h2 class="s-title"><span class="s-mark">✦</span> Contact</h2>
+    <p class="s-rule" aria-hidden="true"></p>
+    <p class="inquire-hl">Let's build something worth remembering.</p>
+    <p class="inquire-sub">Tell me what you're working on. I'll get back to you within 48 hours with thoughts and next steps.</p>
+    <form id="inquire-form" action="https://api.web3forms.com/submit" method="POST">
                 <input type="hidden" name="access_key" value="2b75ecd3-2979-4b92-a1ed-93b3a432a536">
                 <input type="hidden" name="redirect" value="https://kwame.vision/#inquire">
                 <!-- Combined name for web3forms — populated by JS on submit -->
@@ -441,93 +284,32 @@
                 </div>
                 <button type="submit" class="f-submit" id="f-submit-btn">Send Inquiry →</button>
             </form>
-
-            <div class="f-success" id="f-success">
-                <p class="f-success-title">Message received.</p>
-                <p class="f-success-sub">I'll be in touch within 48 hours.</p>
-            </div>
-            <div class="f-error" id="f-error">
-                <p class="f-error-title">Something went wrong.</p>
-                <p class="f-error-sub">Email me directly at <a href="mailto:kwameallday@gmail.com">kwameallday@gmail.com</a></p>
-            </div>
-        </div>
+    <div class="f-success" id="f-success">
+        <p class="f-success-title">Message received.</p>
+        <p class="f-success-sub">I'll be in touch within 48 hours.</p>
+    </div>
+    <div class="f-error" id="f-error">
+        <p class="f-error-title">Something went wrong.</p>
+        <p class="f-error-sub">Email me directly at <a href="mailto:kwameallday@gmail.com">kwameallday@gmail.com</a></p>
     </div>
 </section>
 
-<!-- FOOTER -->
+</main>
+
 <footer class="site-footer" id="footer">
-
-    <!-- Inversion orb — follows the cursor, inverts whatever it crosses -->
-    <div class="ft-orb" id="ft-orb" aria-hidden="true"></div>
-
-    <!-- Live orb coordinates -->
-    <span class="ft-hud" id="ft-hud" aria-hidden="true"></span>
-
-    <div class="footer-inner">
-
-        <!-- Statement -->
-        <div class="ft-statement ft-reveal">
-            <svg class="ft-sig" viewBox="0 0 24 24" aria-hidden="true">
-                <path id="ft-sig-path" d="M12 2.5 L14.4 9.6 L21.5 12 L14.4 14.4 L12 21.5 L9.6 14.4 L2.5 12 L9.6 9.6 Z"/>
-            </svg>
-            <p class="ft-line" id="ft-line">Culture, code &amp; commerce — designed in Koforidua, shipped worldwide.</p>
-            <div class="ft-status">
-                <span class="ft-dot" aria-hidden="true"></span>
-                <span>Available for new projects</span>
-                <span class="ft-sep" aria-hidden="true">·</span>
-                <span id="ft-clock">00:00:00 GMT</span>
-            </div>
-        </div>
-
-        <div class="footer-top">
-            <div class="footer-brand-block ft-reveal">
-                <span class="footer-brand">David Kwame Amo</span>
-                <p class="footer-tagline">Designer · Brand Architect · Builder</p>
-                <p class="footer-location">Koforidua, Ghana</p>
-            </div>
-            <nav class="footer-nav" aria-label="Footer navigation">
-                <div class="footer-nav-col ft-reveal">
-                    <span class="footer-nav-label">Navigate</span>
-                    <a href="#work" class="footer-nav-link">Work</a>
-                    <a href="#gallery" class="footer-nav-link">In the Field</a>
-                    <a href="#services" class="footer-nav-link">Services</a>
-                    <a href="#about" class="footer-nav-link">About</a>
-                    <a href="blog.html" class="footer-nav-link">Blog</a>
-                    <a href="#inquire" class="footer-nav-link">Inquire</a>
-                </div>
-                <div class="footer-nav-col ft-reveal">
-                    <span class="footer-nav-label">Connect</span>
-                    <a href="https://instagram.com/KwameHasVision" target="_blank" rel="noopener" class="footer-nav-link">Instagram</a>
-                    <a href="https://twitter.com/KwameHasVision" target="_blank" rel="noopener" class="footer-nav-link">X / Twitter</a>
-                    <a href="https://www.behance.net/kwameamo" target="_blank" rel="noopener" class="footer-nav-link">Behance</a>
-                    <a href="https://linkedin.com/in/kwameamo" target="_blank" rel="noopener" class="footer-nav-link">LinkedIn</a>
-                    <a href="https://pinterest.com/KwameHasVision" target="_blank" rel="noopener" class="footer-nav-link">Pinterest</a>
-                </div>
-            </nav>
-        </div>
-
-        <div class="footer-bottom ft-reveal">
-            <span class="footer-stamp">© <span id="footer-year"></span> · Koforidua, Ghana</span>
-            <div class="ft-bottom-right">
-                <a href="#inquire" class="footer-cta">Start a project →</a>
-                <button type="button" class="ft-top-btn" id="ft-top" aria-label="Back to top">↑ Top</button>
-            </div>
-        </div>
-    </div>
+    <nav class="footer-links" aria-label="Elsewhere">
+        <a href="https://instagram.com/KwameHasVision" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://twitter.com/KwameHasVision" target="_blank" rel="noopener">X</a>
+        <a href="https://www.behance.net/kwameamo" target="_blank" rel="noopener">Behance</a>
+        <a href="https://linkedin.com/in/kwameamo" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://pinterest.com/KwameHasVision" target="_blank" rel="noopener">Pinterest</a>
+    </nav>
+    <p class="footer-stamp">© <span id="footer-year"></span> David Kwame Amo · <a href="#">Back to top ↑</a></p>
 </footer>
 
-<!-- Mobile sticky CTA -->
-<div class="mobile-cta-bar" id="mobile-cta">
-    <a href="#inquire">Commission Work →</a>
-</div>
-
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-<script defer src="/js/now-playing.js"></script>
 <script defer src="/js/index.js"></script>
 <script defer src="/js/gallery.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
-<script defer src="/js/footer.js"></script>
 <script defer src="/js/sw-updater.js"></script>
 </body>
 </html>

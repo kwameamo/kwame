@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FontDrop — David Kwame Amo</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="/photos/favicon.png">
+    <meta name="description" content="An app for Windows and macOS that installs every font from a folder of zip files, skips the ones you already have, and repairs the broken entries behind “already installed” errors.">
+    <meta property="og:title" content="FontDrop — David Kwame Amo">
+    <meta property="og:description" content="An app for Windows and macOS that installs every font from a folder of zip files, skips the ones you already have, and repairs the broken entries behind “already installed” errors.">
+    <meta property="og:url" content="https://kwame.vision/work/fontdrop.html">
+    <meta property="og:image" content="https://kwame.vision/photos/me.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="FontDrop — David Kwame Amo">
+    <meta name="twitter:description" content="An app for Windows and macOS that installs every font from a folder of zip files, skips the ones you already have, and repairs the broken entries behind “already installed” errors.">
+    <meta name="twitter:image" content="https://kwame.vision/photos/me.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/case-study.css">
+    <style>.cs-section-body code { font-family: var(--mono); font-size: 13px; color: var(--black); background: var(--g1); padding: 1px 5px; border-radius: 4px; }</style>
+</head>
+<body>
+
+<nav class="cs-nav" id="cs-nav">
+    <div class="cs-nav-inner">
+        <a href="/index.html#work" class="cs-back">← Projects</a>
+        <span class="cs-nav-label">Desktop App</span>
+        <a href="/index.html#inquire" class="cs-nav-cta">Hire me →</a>
+    </div>
+</nav>
+
+<section class="cs-hero">
+    <div class="cs-hero-inner">
+        <p class="cs-cat">Desktop App · Python · Windows · macOS · Product</p>
+        <h1 class="cs-title">FontDrop</h1>
+        <p class="cs-tagline">Drop in a folder of zips. FontDrop opens every one, skips the fonts you already have and installs the rest.</p>
+    </div>
+</section>
+
+<div class="cs-cover">
+    <img src="/photos/fontdrop-app-scan.webp" alt="FontDrop scanning five zip files and listing which fonts are ready to install">
+</div>
+
+<div class="cs-meta">
+    <div class="cs-meta-inner">
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Client</div>
+            <div class="cs-meta-value">CurioLabs Technologies (self-initiated)</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Year</div>
+            <div class="cs-meta-value">2026 → present</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Stack</div>
+            <div class="cs-meta-value">Python · CustomTkinter · fontTools · PyInstaller · Inno Setup · macOS .app/.dmg · GitHub Actions · Netlify · Paystack</div>
+        </div>
+        <div class="cs-meta-item">
+            <div class="cs-meta-label">Live</div>
+            <div class="cs-meta-value"><a href="https://fontdrop.curiolabs.dev" target="_blank" rel="noopener">fontdrop.curiolabs.dev</a></div>
+        </div>
+    </div>
+</div>
+
+<div class="cs-content">
+
+    <div class="cs-section">
+        <div class="cs-section-label">Overview</div>
+        <div class="cs-section-body">
+            <p>Every designer ends up with a downloads folder full of font zips: client packs, foundry downloads, zips inside zips. Windows can't install from a zip at all, so the manual route is unzip, select, right-click, install, and repeat for every pack.</p>
+            <p>FontDrop is a Windows and macOS app that does that in one go. Choose a folder, or drop folders, zips or font files on the window. It reads every font's real name and version, compares it with what is already on the PC, and shows what is new before anything is installed.</p>
+            <p>It is a CurioLabs product, built and shipped end to end: the app, the installer, the update pipeline, the license system, the website and the demo video.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">The Problem</div>
+        <div class="cs-section-body">
+            <p>None of the individual annoyances are new. They are the same complaints people have had about Windows' own font installer for years, and each one costs a few minutes that add up.</p>
+            <p><strong>No zip support.</strong> Windows won't install from a zip, and Mac zips carry <code>__MACOSX</code> junk that gets in the way.</p>
+            <p><strong>“This font is already installed”, when it isn't.</strong> The cause is a registry entry whose font file is gone. The font looks installed to Windows and is missing everywhere else.</p>
+            <p><strong>One prompt per font.</strong> A newer version of a font asks “replace?” once for every weight.</p>
+            <p><strong>Fonts some apps can't see.</strong> Fonts installed “for me” don't show up in Inkscape, DaVinci Resolve or Java apps, which only read fonts installed for everyone.</p>
+            <p><strong>Duplicates.</strong> Two copies of the same font confuse every app's font menu.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Know What's New Before It Installs</div>
+        <div class="cs-section-body">
+            <p>The core decision was to separate looking from doing. FontDrop scans first and installs only when asked. Each font is matched by the name and version stored inside the file, not by its file name, and marked as <strong>Ready to install</strong>, <strong>Already installed</strong>, a <strong>Newer version</strong> of one you have, or a <strong>Duplicate</strong>.</p>
+            <p>Rows can be unticked, searched and sorted, and the scan can be exported as a CSV. Nothing touches Windows until Install is clicked, and the last install can be undone.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <div class="cs-img-cell"><img src="/photos/fontdrop-app-duplicates.webp" alt="FontDrop's Duplicates view listing three Outfit weights found in two different zips"></div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">See It Before You Install It</div>
+        <div class="cs-section-body">
+            <p>Selecting a row opens a live preview with your own text and size, and the full alphabet underneath. It is a quick way to check that the font in the zip is the one the client meant to send. The preview draws in the background, so the size slider stays responsive even on heavy display fonts.</p>
+            <p>The window is built to look at home on Windows 11: sidebar, toolbar, sheets and banners in a macOS-inspired layout, with light and dark modes that follow Windows and can be pinned in Settings.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row two">
+        <div class="cs-img-cell"><img src="/photos/fontdrop-crop-preview-light.webp" alt="FontDrop font preview in light mode" style="object-fit: contain"></div>
+        <div class="cs-img-cell"><img src="/photos/fontdrop-crop-preview-dark.webp" alt="FontDrop font preview in dark mode" style="object-fit: contain"></div>
+    </div>
+
+    <div class="cs-img-row two">
+        <div class="cs-img-cell"><img src="/photos/fontdrop-crop-scan-light.webp" alt="FontDrop scan results in light mode" style="object-fit: contain"></div>
+        <div class="cs-img-cell"><img src="/photos/fontdrop-crop-scan-dark.webp" alt="FontDrop scan results in dark mode" style="object-fit: contain"></div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Font Health</div>
+        <div class="cs-section-body">
+            <p>Installing new fonts is half the job. The other half is cleaning up what is already there. Font Health checks the PC for four things: duplicate fonts, broken font entries, fonts that some apps can't see, and font files Windows can't read. Each one gets a one-click fix.</p>
+            <p>The rule that shaped it: <strong>fonts that came with Windows are never touched.</strong> Duplicates are removed from the PC, and duplicate files in a scanned folder go to the Recycle Bin, not into thin air.</p>
+            <p>The “already installed” error is handled the same way. FontDrop treats a font with a dead registry entry as missing, and repairs the entry while installing.</p>
+        </div>
+    </div>
+
+    <div class="cs-img-row full">
+        <div class="cs-img-cell"><img src="/photos/fontdrop-app-health.webp" alt="FontDrop's Font Health view showing 1,558 installed fonts and one extra duplicate copy"></div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">For Studios And IT</div>
+        <div class="cs-section-body">
+            <p>The same engine runs without a window. <code>FontDrop.exe --install --path "D:\Fonts" --scope machine --quiet</code> installs everything new, exits with 0 on success and 1 if any font failed, and can be run across a studio full of PCs. An optional Explorer entry adds “Install fonts with FontDrop” to the right-click menu for any folder or zip.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Free To Use, Pay If It Helps</div>
+        <div class="cs-section-body">
+            <p>Font tools tend to be either free and abandoned or paid and locked. I wanted neither, so FontDrop is <strong>free to use and every feature keeps working</strong>. After a 40-day trial, installing shows a polite reminder with a Continue button. If it saves you time, a one-time <strong>$25</strong> license removes the reminder. Nothing renews and nothing is ever locked.</p>
+            <p>Licenses are signed keys checked on the PC itself, so there is no account and no internet needed to activate. Payments run through Paystack, and keys are issued by a small set of Netlify functions with an admin view for hand-issuing or revoking a license. I was honest in the code about what offline licensing can do: it stops casual sharing and gives honest buyers a clear path. It isn't hardened against someone determined, and I didn't try to make it so.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Engineering</div>
+        <div class="cs-section-body">
+            <p><strong>Updates that can't wedge themselves.</strong> FontDrop checks a public releases repository once a day, shows the release notes, then downloads the update, verifies it against the published SHA-256 and swaps it in after the app closes. An early version could flash a “Failed to load Python DLL” error after an update. The fix was to start the new copy completely independent of the old one.</p>
+            <p><strong>Private source, public downloads.</strong> A tagged release triggers a GitHub Actions build that produces the .exe, its checksum and the installer, and publishes them to a separate public repo with the changelog as release notes. The source stays private.</p>
+            <p><strong>Performance that you can feel.</strong> Searching waits for a pause in typing instead of rebuilding the list on every key. Dragging the sidebar and preview dividers no longer stutters. Dialogs and banners animate on fixed time curves rather than being resized frame by frame.</p>
+            <p><strong>Privacy as a default.</strong> Fonts and folders never leave the PC. The only network traffic is the update check and, if the user opts in, anonymous usage counts with a random id and never a font name, file name, folder or email. The website counts visits without cookies and respects Do Not Track.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">Beyond The App</div>
+        <div class="cs-section-body">
+            <p>A tool like this lives or dies on whether people find it and trust it, so the product includes the pieces around the app: a website with docs, a changelog and guides for the exact searches people make (<em>install fonts from a zip</em>, <em>font already installed error</em>, <em>install fonts for all users</em>, <em>bulk install fonts</em>), a privacy policy, terms, and a looping demo video made in Remotion.</p>
+        </div>
+    </div>
+
+    <div class="cs-section">
+        <div class="cs-section-label">On macOS</div>
+        <div class="cs-section-body">
+            <p>FontDrop also runs on macOS 11 and later, on Apple silicon and Intel. It does everything the Windows version does: nested zips, skipping fonts you already have, replacing older versions, finding duplicates, previews and undo.</p>
+            <p>It follows Mac conventions rather than copying Windows: a proper menu bar, ⌘ shortcuts, Settings in the FontDrop menu, and folders and zips dropped on the Dock icon or opened with Open With in Finder. “Just Me” installs to your Fonts folder. “Everyone” installs for every account and asks for an administrator password once for the whole install. Fonts that came with macOS are never replaced, removed or installed twice, and updates download the new app, check its checksum and swap it in, as on Windows.</p>
+        </div>
+    </div>
+
+</div>
+
+<section class="cs-next">
+    <a href="/work/kwaeemu-resort.html" class="cs-next-link">
+        <div>
+            <span class="cs-next-label">Next Project</span>
+            <span class="cs-next-name">Kwaeemu Resort</span>
+        </div>
+        <span class="cs-next-arrow">→</span>
+    </a>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <a href="/index.html" class="footer-brand">David Kwame Amo</a>
+        <span class="footer-stamp">© <span id="footer-year">2026</span> · Koforidua, Ghana</span>
+    </div>
+</footer>
+
+<script defer src="/js/case-study.js"></script>
+<script defer src="/js/sw-updater.js"></script>
+</body>
+</html>

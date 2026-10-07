@@ -151,7 +151,7 @@
     function buildDots() {
         if (!dotsWrap) return;
         while (dotsWrap.firstChild) dotsWrap.removeChild(dotsWrap.firstChild);
-        if (items.length <= 1) { dotsWrap.hidden = true; return; }
+        if (items.length <= 1 || items.length > 12) { dotsWrap.hidden = true; return; }
         dotsWrap.hidden = false;
         items.forEach(function (_, i) {
             var b = document.createElement('button');

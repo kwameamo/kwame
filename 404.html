@@ -7,195 +7,39 @@
   <link rel="icon" type="image/png" href="/photos/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body { height: 100%; }
-
     body {
-      background: #0a0a0a;
-      color: #f0f0f0;
-      font-family: 'Syne', sans-serif;
+      background: #fff;
+      color: #000;
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 2rem;
-      overflow: hidden;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 24px;
     }
-
-    /* Grain overlay */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-          rgba(255,255,255,0.012) 2px,
-          rgba(255,255,255,0.012) 4px
-        );
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .scene {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 700px;
-      text-align: center;
-    }
-
-    /* ── Big 404 ── */
-    .num {
-      position: relative;
-      display: block;
-      font-family: 'Syne Mono', monospace;
-      font-size: clamp(6rem, 28vw, 16rem);
-      line-height: 0.85;
-      letter-spacing: -0.04em;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(240,240,240,0.18);
-      user-select: none;
-      animation: base-flicker 8s ease-in-out infinite;
-    }
-
-    /* Glitch layers */
-    .num::before,
-    .num::after {
-      content: '404';
-      position: absolute;
-      inset: 0;
-      font-family: 'Syne Mono', monospace;
-      font-size: inherit;
-      letter-spacing: inherit;
-      line-height: inherit;
-      color: transparent;
-      opacity: 0;
-    }
-
-    .num::before {
-      -webkit-text-stroke: 1px #ff5c5c;
-      clip-path: polygon(0 15%, 100% 15%, 100% 45%, 0 45%);
-      animation: glitch-r 8s ease-in-out infinite;
-    }
-
-    .num::after {
-      -webkit-text-stroke: 1px #4cde8f;
-      clip-path: polygon(0 55%, 100% 55%, 100% 80%, 0 80%);
-      animation: glitch-g 8s ease-in-out infinite;
-    }
-
-    @keyframes base-flicker {
-      0%, 88%, 100% { -webkit-text-stroke-color: rgba(240,240,240,0.18); }
-      90%  { -webkit-text-stroke-color: rgba(240,240,240,0.45); }
-      91%  { -webkit-text-stroke-color: rgba(240,240,240,0.1);  }
-      92%  { -webkit-text-stroke-color: rgba(240,240,240,0.38); }
-      93%  { -webkit-text-stroke-color: rgba(240,240,240,0.18); }
-    }
-
-    @keyframes glitch-r {
-      0%, 88%, 96%, 100% { transform: none; opacity: 0; }
-      89% { transform: translate(-4px, 0); opacity: 0.7; }
-      91% { transform: translate( 4px, 0); opacity: 0.5; }
-      93% { transform: translate(-2px, 0); opacity: 0.6; }
-      95% { transform: none; opacity: 0; }
-    }
-
-    @keyframes glitch-g {
-      0%, 88%, 96%, 100% { transform: none; opacity: 0; }
-      90% { transform: translate( 4px, 0); opacity: 0.6; }
-      92% { transform: translate(-4px, 0); opacity: 0.4; }
-      94% { transform: translate( 2px, 0); opacity: 0.5; }
-      95% { transform: none; opacity: 0; }
-    }
-
-    /* ── Rule ── */
-    .rule {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-top: 2.5rem;
-    }
-
-    .rule::before,
-    .rule::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #222;
-    }
-
-    .rule-label {
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.6rem;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: #333;
-      white-space: nowrap;
-    }
-
-    /* ── Copy ── */
-    .copy {
-      margin-top: 2rem;
-      font-size: 0.95rem;
-      color: #555;
-      line-height: 1.7;
-    }
-
-    .copy strong {
-      color: #888;
-      font-weight: 400;
-    }
-
-    /* ── CTA ── */
-    .cta {
-      display: inline-block;
-      margin-top: 2.5rem;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #f0f0f0;
-      text-decoration: none;
-      padding: 0.65rem 1.6rem;
-      border: 1px solid #222;
-      transition: border-color 0.25s, color 0.25s;
-    }
-
-    .cta:hover {
-      border-color: rgba(240,240,240,0.5);
-    }
-
-    /* ── Footer ── */
-    .site-mark {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-family: 'Syne Mono', monospace;
-      font-size: 0.55rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: #1c1c1c;
-      z-index: 1;
-    }
+    .num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #757575; }
+    .num::before { content: 'º6 '; }
+    .scene { display: grid; gap: 16px; }
+    h1 { font-size: clamp(30px, 6vw, 40px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+    .copy { font-size: 17px; color: #555; max-width: 40ch; }
+    .copy strong { font-weight: 400; color: #000; }
+    .cta { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #000; text-underline-offset: 4px; width: max-content; }
+    .site-mark { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #757575; margin-top: 48px; }
+    ::selection { background: #000; color: #fff; }
   </style>
 </head>
 <body>
 
 <div class="scene">
-  <span class="num">404</span>
+  <span class="num">404 / page not found</span>
+  <h1>Nothing here.</h1>
 
-  <div class="rule">
-    <span class="rule-label">Page not found</span>
-  </div>
 
   <p class="copy">
     This page doesn't exist.<br>

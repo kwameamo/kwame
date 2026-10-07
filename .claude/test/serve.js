@@ -51,8 +51,23 @@ const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json' };
 
-http.createServer((req, res) => {
+const LIVE = 'https://kwame.vision';
+
+http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
+  // Read-only passthrough to the live gallery so local previews show real images.
+  // Falls through to the mocks below if the live site is unreachable.
+  if (req.method === 'GET' && !process.env.MOCK_GALLERY &&
+      (url.pathname === '/.netlify/functions/get-gallery' || url.pathname === '/.netlify/functions/get-gallery-image')) {
+    try {
+      const r = await fetch(LIVE + url.pathname + url.search);
+      if (r.ok) {
+        res.writeHead(200, { 'Content-Type': r.headers.get('content-type') || 'application/octet-stream' });
+        res.end(Buffer.from(await r.arrayBuffer()));
+        return;
+      }
+    } catch (_) { /* use mocks */ }
+  }
   // Mocked functions
   if (url.pathname === '/.netlify/functions/get-gallery') {
     const empty = url.searchParams.get('empty');
