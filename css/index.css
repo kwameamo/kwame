@@ -740,3 +740,8 @@ a.wk:hover .wk-arrow { color: var(--black); transform: translate(2px, -2px); }
     .avail-dot { animation: none; }
     * { scroll-behavior: auto !important; }
 }
+
+/* Mobile and touch screens: everything in colour */
+@media (max-width: 640px), (hover: none) {
+    .wk-img, .about-photo img { filter: none; }
+}
