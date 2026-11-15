@@ -322,13 +322,14 @@ a.wk:hover .wk-arrow { color: var(--black); transform: translate(2px, -2px); }
 
 .hs-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
 }
 
 .hs-tile {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     overflow: hidden;
     border-radius: 26px;
     background: var(--hs-tile);
@@ -342,9 +343,15 @@ a.hs-tile:hover, .hs-tile--feature:hover { box-shadow: 0 18px 50px -24px rgba(0,
 a.hs-tile.is-in:hover { transform: scale(1.015); }
 a.hs-tile.is-in:active { transform: scale(0.985); }
 
+/* Safari sizes a plate from its logo file unless the track and the logo are pinned */
 .hs-plate {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     place-items: center;
+    min-width: 0;
+    box-sizing: border-box;
+    width: calc(100% - 16px);
+    align-self: center;
     aspect-ratio: 16 / 10;
     margin: 8px 8px 0;
     padding: 18px;
@@ -354,9 +361,9 @@ a.hs-tile.is-in:active { transform: scale(0.985); }
 
 .hs-logo {
     display: block;
-    width: auto;
-    max-width: 100%;
-    max-height: 46px;
+    width: 100%;
+    height: 46px;
+    min-width: 0;
     object-fit: contain;
     transition: transform 0.6s var(--hs-ease);
 }
@@ -422,7 +429,7 @@ a.hs-tile:hover .hs-more span, a.hs-more:hover span { transform: translateX(3px)
 .hs-tile--feature {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: 1.15fr 1fr;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     align-items: stretch;
     background:
         radial-gradient(90% 120% at 0% 0%, rgba(227, 38, 43, 0.10), transparent 55%),
@@ -432,7 +439,7 @@ a.hs-tile:hover .hs-more span, a.hs-more:hover span { transform: translateX(3px)
 }
 
 .hs-tile--feature .hs-plate { aspect-ratio: auto; min-height: 220px; margin: 8px; padding: 28px; }
-.hs-tile--feature .hs-logo { max-height: 74px; }
+.hs-tile--feature .hs-logo { height: 74px; }
 .hs-tile--feature .hs-body { justify-content: center; padding: 24px 26px 26px 14px; }
 .hs-tile--feature .hs-name { font-size: 32px; }
 .hs-tile--feature .hs-desc { font-size: 16px; max-width: 30ch; }
@@ -442,10 +449,11 @@ a.hs-tile:hover .hs-more span, a.hs-more:hover span { transform: translateX(3px)
 a.hs-more:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 640px) {
-    .hs-grid { grid-template-columns: 1fr 1fr; }
-    .hs-tile--feature { grid-template-columns: 1fr; }
+    .hs-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .hs-tile--feature { grid-template-columns: minmax(0, 1fr); }
     .hs-tile--feature .hs-plate { min-height: 150px; padding: 24px; }
-    .hs-tile--feature .hs-logo { max-height: 56px; }
+    .hs-tile--feature .hs-logo { height: 56px; }
+    .hs-logo { height: 40px; }
     .hs-tile--feature .hs-body { padding: 14px 20px 22px; }
     .hs-tile--feature .hs-name { font-size: 28px; }
     .hs-tile:last-child { grid-column: 1 / -1; }
