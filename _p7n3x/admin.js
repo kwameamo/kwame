@@ -611,6 +611,15 @@
 
     function tileUrl(p) { return IMG + encodeURIComponent(p.id) + (p.thumb ? '&size=thumb&v=' + encodeURIComponent(p.thumb) : ''); }
     function fullUrl(p) { return IMG + encodeURIComponent(p.id); }
+    function shotTime(it) {
+        var stamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(it.takenStamp || '') ? it.takenStamp : null;
+        if (!stamp && /^\d{4}-\d{2}-\d{2}$/.test(it.takenAt || '')) {
+            var up = /T(\d{2}:\d{2}:\d{2})/.exec(it.createdAt || '');
+            stamp = it.takenAt + 'T' + (up ? up[1] : '12:00:00');
+        }
+        var t = stamp ? new Date(stamp).getTime() : new Date(it.createdAt || 0).getTime();
+        return isNaN(t) ? 0 : t;
+    }
     function dayOf(p) { return /^\d{4}-\d{2}-\d{2}$/.test(p.takenAt || '') ? p.takenAt : String(p.createdAt || '').slice(0, 10); }
 
     function syncPhotos() {
@@ -619,8 +628,7 @@
             .catch(function () { return []; })
             .then(function (list) {
                 photos = (Array.isArray(list) ? list : []).slice().sort(function (a, b) {
-                    var da = dayOf(a), db = dayOf(b);
-                    return da < db ? -1 : da > db ? 1 : (a.id || 0) - (b.id || 0);
+                    return (shotTime(a) - shotTime(b)) || ((a.id || 0) - (b.id || 0));
                 });
                 renderPhotos();
             });
@@ -747,14 +755,20 @@
                     var ifd0 = readIfd(u32(4), [0x0132, 0x8769]);
                     var exif = ifd0[0x8769] ? readIfd(ifd0[0x8769], [0x9003, 0x9004]) : {};
                     var raw = exif[0x9003] || exif[0x9004] || ifd0[0x0132];
-                    var m = /^(\d{4}):(\d{2}):(\d{2})/.exec(raw || '');
-                    return m && m[1] !== '0000' ? m[1] + '-' + m[2] + '-' + m[3] : null;
+                    var m = /^(\d{4}):(\d{2}):(\d{2})(?:[ T](\d{2}):(\d{2}):(\d{2}))?/.exec(raw || '');
+                    if (!m || m[1] === '0000') return null;
+                    return m[1] + '-' + m[2] + '-' + m[3] + 'T' + (m[4] ? m[4] + ':' + m[5] + ':' + m[6] : '12:00:00');
                 }
                 if ((marker & 0xFF00) !== 0xFF00) break;
                 off += 2 + size;
             }
             return null;
         }).catch(function () { return null; });
+    }
+
+    function localStamp(d) {
+        function p(n) { return n < 10 ? '0' + n : String(n); }
+        return N.iso(d) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
     }
 
     /* ── Add photos ── */
@@ -769,9 +783,18 @@
         var skipped = 0;
         files.forEach(function (file) {
             if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { skipped++; return; }
-            var item = { uid: ++uid, file: file, url: URL.createObjectURL(file), caption: '', date: N.iso(new Date(file.lastModified || Date.now())) };
+            // Until the metadata is read, fall back to the file's own date
+            var mod = new Date(file.lastModified || Date.now());
+            var item = { uid: ++uid, file: file, url: URL.createObjectURL(file), caption: '', date: N.iso(mod), stamp: localStamp(mod), fromPhoto: false };
             queue.push(item);
-            exifDate(file).then(function (d) { if (d) { item.date = d; var input = document.querySelector('[data-uid="' + item.uid + '"] input[type=date]'); if (input) input.value = d; } });
+            exifDate(file).then(function (s) {
+                if (!s) return;
+                item.stamp = s;
+                item.date = s.slice(0, 10);
+                item.fromPhoto = true;
+                var input = document.querySelector('[data-uid="' + item.uid + '"] input[type=date]');
+                if (input) input.value = item.date;
+            });
         });
         renderQueue();
         if (!$('sheet-import').classList.contains('is-open')) openSheet('sheet-import');
@@ -804,7 +827,12 @@
             date.type = 'date';
             date.value = item.date;
             date.setAttribute('aria-label', 'Date taken');
-            date.addEventListener('change', function () { if (date.value) item.date = date.value; });
+            date.addEventListener('change', function () {
+                if (!date.value) return;
+                item.date = date.value;
+                // Keep the time of day, so photos from one day stay in the order they were shot
+                item.stamp = date.value + (item.stamp ? item.stamp.slice(10) : 'T12:00:00');
+            });
             f.appendChild(cap);
             f.appendChild(date);
             li.appendChild(f);
@@ -857,7 +885,8 @@
                         h: out.h,
                         caption: item.caption.trim(),
                         place: place,
-                        takenAt: item.date
+                        takenAt: item.date,
+                        takenStamp: item.stamp
                     });
                 }).then(function () { item.state = 'done'; done++; }, function () { item.state = 'failed'; failed++; });
             }).then(renderQueue);

@@ -36,7 +36,7 @@ export default async (req, context) => {
     return json({ error: 'Invalid request body.' }, 400);
   }
 
-  const { password, caption, link, image, place, takenAt, w, h, thumb } = body;
+  const { password, caption, link, image, place, takenAt, takenStamp, w, h, thumb } = body;
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
     await recordFailure(ip);
@@ -99,6 +99,8 @@ export default async (req, context) => {
       // B-Roll metadata: where it was taken, the day it was taken (not uploaded), pixel size.
       place:     (place || '').toString().slice(0, 80).trim(),
       takenAt:   DATE_RE.test(String(takenAt || '')) ? String(takenAt) : undefined,
+      // When it was shot, to the second, from the photo's metadata: orders the roll
+      takenStamp: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(String(takenStamp || '')) ? String(takenStamp) : undefined,
       w:         dim(w),
       h:         dim(h),
       thumb:     hasThumb || undefined,

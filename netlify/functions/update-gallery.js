@@ -57,8 +57,14 @@ export default async (req, context) => {
     if ('link' in body)    item.link    = String(body.link || '').slice(0, 500).trim();
     if ('takenAt' in body) {
       if (body.takenAt && !DATE_RE.test(String(body.takenAt))) return json({ error: 'Date must be YYYY-MM-DD.' }, 400);
-      if (body.takenAt) item.takenAt = String(body.takenAt);
-      else delete item.takenAt;
+      if (body.takenAt) {
+        item.takenAt = String(body.takenAt);
+        // A new day keeps the original time of day, so the order within a day holds
+        if (item.takenStamp) item.takenStamp = item.takenAt + item.takenStamp.slice(10);
+      } else {
+        delete item.takenAt;
+        delete item.takenStamp;
+      }
     }
 
     if (body.thumb) {

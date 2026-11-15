@@ -53,6 +53,16 @@
         .then(function (list) { roll(Array.isArray(list) ? list : []); })
         .catch(function () { roll([]); });
 
+    function shotTime(it) {
+        var stamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(it.takenStamp || '') ? it.takenStamp : null;
+        if (!stamp && /^\d{4}-\d{2}-\d{2}$/.test(it.takenAt || '')) {
+            var up = /T(\d{2}:\d{2}:\d{2})/.exec(it.createdAt || '');
+            stamp = it.takenAt + 'T' + (up ? up[1] : '12:00:00');
+        }
+        var t = stamp ? new Date(stamp).getTime() : new Date(it.createdAt || 0).getTime();
+        return isNaN(t) ? 0 : t;
+    }
+
     function roll(items) {
         if (loading) loading.remove();
 
@@ -79,10 +89,12 @@
                 monthName: MONTHS[+parts[1] - 1],
                 short: MONTHS[+parts[1] - 1].slice(0, 3) + ' ' + (+parts[2]) + ', ' + parts[0],
                 long: MONTHS[+parts[1] - 1] + ' ' + (+parts[2]) + ', ' + parts[0],
-                weekday: DAYS[day.getDay()]
+                weekday: DAYS[day.getDay()],
+                time: shotTime(it)
             };
         });
-        photos.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.id || 0) - (b.id || 0); });
+        // Like the Photos app: oldest at the top, the newest shot at the bottom, where the roll opens
+        photos.sort(function (a, b) { return (a.time - b.time) || ((a.id || 0) - (b.id || 0)); });
         photos.forEach(function (p, i) { p.index = i; });
 
         if (!photos.length) {

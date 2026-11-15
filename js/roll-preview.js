@@ -21,12 +21,21 @@
         if (countEl) countEl.textContent = '';
     }
 
+    function shotTime(it) {
+        var stamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(it.takenStamp || '') ? it.takenStamp : null;
+        if (!stamp && /^\d{4}-\d{2}-\d{2}$/.test(it.takenAt || '')) {
+            var up = /T(\d{2}:\d{2}:\d{2})/.exec(it.createdAt || '');
+            stamp = it.takenAt + 'T' + (up ? up[1] : '12:00:00');
+        }
+        var t = stamp ? new Date(stamp).getTime() : new Date(it.createdAt || 0).getTime();
+        return isNaN(t) ? 0 : t;
+    }
+
     function render(items) {
         // Newest first on the home page: the roll itself runs oldest → newest.
+        // Newest shot first
         var sorted = items.slice().sort(function (a, b) {
-            var da = (a.takenAt || String(a.createdAt || '')).slice(0, 10);
-            var db = (b.takenAt || String(b.createdAt || '')).slice(0, 10);
-            return da < db ? 1 : da > db ? -1 : (b.id || 0) - (a.id || 0);
+            return (shotTime(b) - shotTime(a)) || ((b.id || 0) - (a.id || 0));
         });
         var shown = sorted.slice(0, MAX);
 
