@@ -10,6 +10,13 @@ const json = (body, status = 200, extra = {}) =>
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const MAX_BYTES    = 5 * 1024 * 1024; // 5MB ceiling after client-side downscale
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function dim(v) {
+  const n = parseInt(v, 10);
+  return Number.isFinite(n) && n > 0 && n <= 20000 ? n : undefined;
+}
+
 export default async (req, context) => {
   const ip = context?.ip ?? req.headers.get('x-forwarded-for') ?? 'unknown';
 
@@ -29,7 +36,7 @@ export default async (req, context) => {
     return json({ error: 'Invalid request body.' }, 400);
   }
 
-  const { password, caption, link, image } = body;
+  const { password, caption, link, image, place, takenAt, w, h, thumb } = body;
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
     await recordFailure(ip);
@@ -74,10 +81,27 @@ export default async (req, context) => {
     // Store the binary, with mime in blob metadata so the image route can echo it back.
     await store.set(`img:${nextId}`, buffer, { metadata: { mime } });
 
+    // A small tile (about 400px) for the grid, built in the admin before upload.
+    let hasThumb = 0;
+    const tm = typeof thumb === 'string' ? thumb.match(/^data:(image\/(?:jpeg|webp));base64,(.+)$/) : null;
+    if (tm) {
+      const tbuf = Buffer.from(tm[2], 'base64');
+      if (tbuf.length <= 400 * 1024) {
+        await store.set(`thumb:${nextId}`, tbuf, { metadata: { mime: tm[1] } });
+        hasThumb = 1;
+      }
+    }
+
     const item = {
       id:        nextId,
       caption:   (caption || '').toString().slice(0, 140).trim(),
       link:      (link || '').toString().slice(0, 500).trim(),
+      // B-Roll metadata: where it was taken, the day it was taken (not uploaded), pixel size.
+      place:     (place || '').toString().slice(0, 80).trim(),
+      takenAt:   DATE_RE.test(String(takenAt || '')) ? String(takenAt) : undefined,
+      w:         dim(w),
+      h:         dim(h),
+      thumb:     hasThumb || undefined,
       mime,
       createdAt: new Date().toISOString()
     };

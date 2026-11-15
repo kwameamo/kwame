@@ -178,3 +178,9 @@ a { color: inherit; }
     .cs-next-link { padding-top: 24px; padding-bottom: 24px; }
     .footer-stamp a { display: inline-block; padding: 10px 0; }
 }
+
+/* ── Dark appearance ── */
+.cs-nav-inner .theme-btn { width: 36px; min-height: 44px; color: var(--lg-ink); }
+.cs-nav-end { display: inline-flex; align-items: center; gap: 10px; }
+:root[data-scheme="dark"] .cs-section-label { background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.3) 0 4px, transparent 4px 8px); }
+:root[data-scheme="dark"] .cs-next-link { background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.3) 0 4px, transparent 4px 8px); }

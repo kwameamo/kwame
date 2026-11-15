@@ -1,13 +1,13 @@
 {
-  "name": "Blog Admin",
+  "name": "Admin — kwame.vision",
   "short_name": "Admin",
-  "description": "David Kwame Amo — Blog admin panel",
+  "description": "Notes and B-Roll for kwame.vision",
   "start_url": "/_p7n3x/",
   "scope": "/_p7n3x/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0d0d0d",
-  "theme_color": "#0d0d0d",
+  "background_color": "#f2f2f7",
+  "theme_color": "#f2f2f7",
   "lang": "en",
   "icons": [
     {

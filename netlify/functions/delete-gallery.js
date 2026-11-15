@@ -52,6 +52,7 @@ export default async (req, context) => {
     await store.setJSON('items', filtered);
     // Remove the binary too. Ignore if it's already gone.
     try { await store.delete(`img:${id}`); } catch {}
+    try { await store.delete(`thumb:${id}`); } catch {}
 
     return json({ ok: true });
   } catch (err) {

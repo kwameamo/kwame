@@ -129,6 +129,33 @@
 
 
     /* ─────────────────────────────────────────
+       ABOUT — tiles rise into view once, a beat apart
+    ───────────────────────────────────────── */
+    var reveals = document.querySelectorAll('.ab-reveal');
+    if (reveals.length) {
+        if (!('IntersectionObserver' in window) ||
+            (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+            Array.prototype.forEach.call(reveals, function (el) { el.classList.add('is-in'); });
+        } else {
+            var revealIO = new IntersectionObserver(function (entries) {
+                var delay = 0;
+                entries.forEach(function (entry) {
+                    // Also catch tiles scrolled past too fast to be seen intersecting
+                    if (!entry.isIntersecting && entry.boundingClientRect.bottom > 0) return;
+                    var el = entry.target;
+                    el.style.transitionDelay = delay + 'ms';
+                    delay += 70;
+                    el.classList.add('is-in');
+                    setTimeout(function () { el.style.transitionDelay = ''; }, 1000 + delay);
+                    revealIO.unobserve(el);
+                });
+            }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+            Array.prototype.forEach.call(reveals, function (el) { revealIO.observe(el); });
+        }
+    }
+
+
+    /* ─────────────────────────────────────────
        MOBILE CTA — hide when inquire is visible
     ───────────────────────────────────────── */
     var inquireSection = document.getElementById('inquire');

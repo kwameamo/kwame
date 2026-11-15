@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/theme.js"></script>
     <title>David Kwame Amo — Designer, Brand Architect, Builder</title>
 
     <!-- PWA -->
@@ -37,6 +38,7 @@
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/glass.css">
+    <link rel="preload" href="/.netlify/functions/get-gallery" as="fetch" crossorigin>
 </head>
 <body>
 
@@ -45,10 +47,11 @@
 <nav class="site-nav" id="site-nav">
     <ul class="nav-links">
         <li><a href="#work">Work</a></li>
-        <li><a href="#gallery">Field</a></li>
+        <li><a href="/roll.html">B-Roll</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="blog.html">Blog</a></li>
         <li><a href="#inquire">Contact</a></li>
+        <li><button type="button" class="theme-btn" data-theme-toggle></button></li>
     </ul>
 </nav>
 
@@ -155,35 +158,22 @@
     </div>
 </section>
 
-<!-- GALLERY — capsule slider (managed from /_p7n3x) -->
-<section class="gallery-band" id="gallery" aria-label="Selected moments from the studio">
-    <h2 class="s-title"><span class="s-mark">✧</span> In the Field <span class="s-count" id="gallery-count" aria-live="polite"></span></h2>
+<!-- B-ROLL — camera roll preview (photos managed from /_p7n3x, full roll at /roll.html) -->
+<section class="gallery-band" id="gallery" aria-label="B-Roll — the camera roll around the work">
+    <h2 class="s-title"><span class="s-mark">✧</span> B-Roll <span class="s-count" id="gallery-count" aria-live="polite"></span></h2>
     <p class="s-rule" aria-hidden="true"></p>
-    <div class="cap-slider" id="cap-slider" data-state="loading">
-        <button type="button" class="cap-nav cap-prev" id="cap-prev" aria-label="Previous image">‹</button>
-        <div class="cap-stage" id="cap-stage" role="group" aria-roledescription="carousel" aria-label="Studio gallery">
-            <div class="cap cap-skeleton" aria-hidden="true"></div>
-        </div>
-        <button type="button" class="cap-nav cap-next" id="cap-next" aria-label="Next image">›</button>
-        <div class="cap-empty" id="cap-empty" hidden>
-            <span class="cap-empty-mark">✦</span>
-            <p class="cap-empty-title">Nothing here yet</p>
-            <p class="cap-empty-sub">Selected moments from the studio will show up here soon.</p>
-        </div>
+    <p class="br-lede">The camera roll around the work: studio days, garments in progress, places, people, and whatever is keeping me inspired this week.</p>
+    <div class="br-preview" id="br-preview" aria-label="Latest photos">
+        <span class="br-pv br-pv-skeleton" aria-hidden="true"></span><span class="br-pv br-pv-skeleton" aria-hidden="true"></span><span class="br-pv br-pv-skeleton" aria-hidden="true"></span><span class="br-pv br-pv-skeleton" aria-hidden="true"></span>
+        <span class="br-pv br-pv-skeleton" aria-hidden="true"></span><span class="br-pv br-pv-skeleton" aria-hidden="true"></span><span class="br-pv br-pv-skeleton" aria-hidden="true"></span><span class="br-pv br-pv-skeleton" aria-hidden="true"></span>
     </div>
-    <p class="cap-active-caption" id="cap-active-caption" aria-live="polite"></p>
-    <div class="cap-dots" id="cap-dots" aria-hidden="true"></div>
+    <div class="cap-empty" id="br-preview-empty" hidden>
+        <span class="cap-empty-mark">✦</span>
+        <p class="cap-empty-title">Nothing here yet</p>
+        <p class="cap-empty-sub">The roll fills up as the work happens.</p>
+    </div>
+    <a class="br-open lg" href="/roll.html"><span>Open the roll →</span></a>
 </section>
-
-<div class="cap-lightbox" id="cap-lightbox" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image viewer">
-    <button type="button" class="cap-lb-close" id="cap-lb-close" aria-label="Close">×</button>
-    <button type="button" class="cap-lb-nav cap-lb-prev" id="cap-lb-prev" aria-label="Previous image">‹</button>
-    <div class="cap-lb-inner">
-        <img class="cap-lb-img" id="cap-lb-img" alt="">
-        <span class="cap-lb-caption" id="cap-lb-caption"></span>
-    </div>
-    <button type="button" class="cap-lb-nav cap-lb-next" id="cap-lb-next" aria-label="Next image">›</button>
-</div>
 
 <!-- BRANDS -->
 <section class="section" id="brands">
@@ -196,15 +186,72 @@
     </div>
 </section>
 
-<!-- ABOUT -->
-<section class="section" id="about">
+<!-- ABOUT — product-page style: one big idea, then a grid of tiles -->
+<section class="section ab" id="about">
     <h2 class="s-title"><span class="s-mark">⟁</span> About</h2>
     <p class="s-rule" aria-hidden="true"></p>
-    <div class="about-photo"><img src="photos/me.PNG" alt="David Kwame Amo"></div>
-    <div class="about-bio">
-        <p>Designer and builder operating at the intersection of culture, code, and commerce. Founder of <a href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">Vision'97</a>, a brand rooted in clarity of purpose. Lead designer at <a href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">CurioGraphicsYard</a>, creating identities and garments. Building practical digital tools at <a href="https://curiolabs.dev" target="_blank" rel="noopener">CurioLabs</a> that solve real operational problems.</p>
-        <p>Collaborated with <a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a>, <a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a>, <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>, and <a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a> on merchandise and visual identity. Full creative direction for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>.</p>
-        <p><a href="blog.html">Read the blog →</a> for thinking on design, tools, culture, and the work behind the work.</p>
+
+    <div class="ab-intro ab-reveal">
+        <p class="ab-eyebrow">David Kwame Amo</p>
+        <h3 class="ab-hl">Designer. Builder.<br><span class="ab-hl-soft">Brand architect.</span></h3>
+        <p class="ab-lede">One practice across culture, code and commerce. Identities, garments and software, made in Koforidua for people everywhere.</p>
+    </div>
+
+    <div class="ab-bento">
+        <figure class="ab-tile ab-tile--photo ab-reveal">
+            <img src="photos/me.PNG" alt="David Kwame Amo" loading="lazy" decoding="async">
+            <figcaption>
+                <span class="ab-k">Based in</span>
+                <span class="ab-t">Koforidua, Ghana.</span>
+                <span class="ab-s">Working globally.</span>
+            </figcaption>
+        </figure>
+
+        <a class="ab-tile ab-tile--dark ab-reveal" href="https://instagram.com/vision97.vision/" target="_blank" rel="noopener">
+            <span class="ab-k">Founder</span>
+            <span class="ab-t">Vision'97</span>
+            <span class="ab-s">A brand rooted in clarity of purpose.</span>
+            <span class="ab-more">Follow <span aria-hidden="true">›</span></span>
+        </a>
+
+        <a class="ab-tile ab-reveal" href="https://instagram.com/curiogfxyard/" target="_blank" rel="noopener">
+            <span class="ab-k">Lead designer</span>
+            <span class="ab-t">Curio&shy;Graphics&shy;Yard</span>
+            <span class="ab-s">Identities and garments for brands with something to say.</span>
+            <span class="ab-more">See the work <span aria-hidden="true">›</span></span>
+        </a>
+
+        <a class="ab-tile ab-tile--wide ab-tile--glow ab-reveal" href="https://curiolabs.dev" target="_blank" rel="noopener">
+            <span class="ab-k">Builder</span>
+            <span class="ab-t">CurioLabs</span>
+            <span class="ab-s">Practical digital tools that solve real operational problems.</span>
+            <span class="ab-more">Visit curiolabs.dev <span aria-hidden="true">›</span></span>
+        </a>
+
+        <div class="ab-tile ab-tile--wide ab-reveal">
+            <span class="ab-k">Collaborations</span>
+            <span class="ab-t ab-t--sm">Merch and visual identity with</span>
+            <ul class="ab-chips">
+                <li><a href="https://instagram.com/no.loveinthecity/" target="_blank" rel="noopener">No Love In The City</a></li>
+                <li><a href="https://instagram.com/toujourssurlargent/" target="_blank" rel="noopener">Toujours Sur L'argent</a></li>
+                <li><a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a></li>
+                <li><a href="https://instagram.com/kejetiaboys/" target="_blank" rel="noopener">Kejetia Boys</a></li>
+            </ul>
+            <span class="ab-s">Full creative direction for <a href="https://instagram.com/gyeowuo.corp/" target="_blank" rel="noopener">Gye Owuo Corp</a> and <a href="https://instagram.com/cheriebya_/" target="_blank" rel="noopener">Cherié by A</a>.</span>
+        </div>
+
+        <a class="ab-tile ab-tile--stat ab-reveal" href="#work">
+            <span class="ab-k">Craft</span>
+            <span class="ab-big">3</span>
+            <span class="ab-s">disciplines. Brand, garment and software, under one roof.</span>
+        </a>
+
+        <a class="ab-tile ab-tile--notes ab-reveal" href="blog.html">
+            <span class="ab-k">Notes</span>
+            <span class="ab-t">Notes from the build.</span>
+            <span class="ab-s">On design, tools, culture and the work behind the work.</span>
+            <span class="ab-more">Read the blog <span aria-hidden="true">›</span></span>
+        </a>
     </div>
 </section>
 
@@ -309,7 +356,7 @@
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script defer src="/js/index.js"></script>
-<script defer src="/js/gallery.js"></script>
+<script defer src="/js/roll-preview.js"></script>
 <script defer src="/js/glass.js"></script>
 <script defer src="/js/sw-updater.js"></script>
 </body>

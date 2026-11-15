@@ -1,8 +1,222 @@
+/* ═══════════════════════════════════════════════════════════
+   LIQUID GLASS — the material
+
+   Every pill, button and panel that floats over content shares
+   one material, composited from six layers:
+
+     1. Projection      volumetric shadow under the slab
+                        (box-shadow stack)
+     2. Blur + lift     backdrop blur 2px, saturation and
+                        brightness boosted so the pane reads
+                        translucent rather than frosted
+     3. Edge refraction SVG displacement map (js/glass.js):
+                        content under the rim is bent inward,
+                        strongest at the edge, flat in the
+                        centre; red bends 15% more than blue
+                        so the rim shows a hint of dispersion
+     4. Colouring       a semi-transparent tint whose opacity
+                        js/glass.js raises as the backdrop gets
+                        busier (white 6–22% on light glass,
+                        rgb(20 20 24) 16–38% on dark glass)
+     5. Edge lighting   a specular streak top-left and
+                        bottom-right (::before), plus a softer
+                        inset streak further in (::after)
+     6. Text colouring  labels multiply into light glass and
+                        screen onto dark glass, so type picks
+                        up a trace of whatever is behind it
+
+   js/glass.js samples nine points of the backdrop under each
+   pane; mean luminance below 0.5 flips the pane to dark glass,
+   the spread of those samples sets the tint concentration.
+   Selectors below name the legacy class names used around the
+   site so nothing has to be re-tagged; new UI just uses .lg.
+═══════════════════════════════════════════════════════════ */
+
+.lg,
+.site-nav,
+.cs-nav,
+.modal-close,
+.modal-nav-btn,
+.mf-btn,
+.glass-btn,
+.modal-nav-counter {
+    /* Light glass — tuned concentrations */
+    --lg-tint: 255 255 255;
+    --lg-alpha: 0.14;          /* js/glass.js: 0.06 – 0.22 */
+    --lg-hover: 0;
+    --lg-blur: 8px;            /* CSS-only fallback; 2px once refraction is on */
+    --lg-sat: 180%;
+    --lg-bright: 1.06;
+    --lg-ink: #1a1a1a;
+    --lg-ink-soft: rgba(26, 26, 26, 0.55);
+    --lg-blend: multiply;
+    --lg-rim: 255 255 255;
+    --lg-rim-a: 1;
+    --lg-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.055),
+        0 1px 2px rgba(0, 0, 0, 0.05),
+        0 6px 14px -4px rgba(0, 0, 0, 0.10),
+        0 18px 40px -12px rgba(0, 0, 0, 0.16),
+        0 36px 70px -28px rgba(0, 0, 0, 0.22);
+
+    position: relative;
+    isolation: isolate;
+    border: 0;
+    color: var(--lg-ink);
+    background: rgb(var(--lg-tint) / calc(var(--lg-alpha) + var(--lg-hover)));
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(var(--lg-bright));
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(var(--lg-bright));
+    box-shadow: var(--lg-shadow);
+    transition:
+        background-color 0.35s ease,
+        color 0.35s ease,
+        box-shadow 0.35s ease,
+        transform 0.25s cubic-bezier(0.34, 1.4, 0.5, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Dark glass: the pane is over dark or saturated content */
+[data-lg="dark"].lg,
+[data-lg="dark"].site-nav,
+[data-lg="dark"].cs-nav,
+[data-lg="dark"].modal-close,
+[data-lg="dark"].modal-nav-btn,
+[data-lg="dark"].mf-btn,
+[data-lg="dark"].glass-btn,
+[data-lg="dark"].modal-nav-counter {
+    --lg-tint: 20 20 24;
+    --lg-alpha: 0.27;          /* js/glass.js: 0.16 – 0.38 */
+    --lg-sat: 160%;
+    --lg-bright: 0.8;
+    --lg-ink: #f6f6f8;
+    --lg-ink-soft: rgba(246, 246, 248, 0.6);
+    --lg-blend: screen;
+    --lg-rim: 255 255 255;
+    --lg-rim-a: 0.7;
+    --lg-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.22),
+        0 1px 2px rgba(0, 0, 0, 0.18),
+        0 6px 14px -4px rgba(0, 0, 0, 0.26),
+        0 18px 40px -12px rgba(0, 0, 0, 0.36),
+        0 36px 70px -28px rgba(0, 0, 0, 0.45);
+}
+
+/* 5. Edge lighting — rim streaks top-left and bottom-right */
+.lg::before,
+.site-nav::before,
+.cs-nav::before,
+.modal-close::before,
+.modal-nav-btn::before,
+.mf-btn::before,
+.glass-btn::before,
+.modal-nav-counter::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1.25px;
+    background: linear-gradient(135deg,
+        rgb(var(--lg-rim) / var(--lg-rim-a)) 0%,
+        rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.55)) 14%,
+        rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.10)) 36%,
+        rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.04)) 62%,
+        rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.45)) 86%,
+        rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.9)) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+
+/* 5. Edge lighting — the inset streak further in, for volume */
+.lg::after,
+.site-nav::after,
+.cs-nav::after,
+.modal-close::after,
+.modal-nav-btn::after,
+.mf-btn::after,
+.glass-btn::after,
+.modal-nav-counter::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    box-shadow:
+        inset 1.5px 1.5px 2px -0.5px rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.55)),
+        inset -1.5px -1.5px 2px -0.5px rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.28)),
+        inset 3px 3px 6px -3px rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.35)),
+        inset 0 0 18px -6px rgb(var(--lg-rim) / calc(var(--lg-rim-a) * 0.22));
+    pointer-events: none;
+}
+
+/* 6. Text colouring — labels blend into the pane instead of sitting on it.
+   Only element children can blend; bare text nodes keep the ink colour. */
+.lg > :not(svg),
+.site-nav > *,
+.cs-nav > *,
+.modal-close > *,
+.modal-nav-btn > *,
+.mf-btn > *,
+.glass-btn > *,
+.modal-nav-counter > * {
+    position: relative;
+    z-index: 3;
+    mix-blend-mode: var(--lg-blend);
+}
+
+/* Icons stay crisp */
+.lg > svg {
+    position: relative;
+    z-index: 3;
+}
+
+/* Hover and press — the pane itself answers, not just its label */
+@media (hover: hover) {
+    .lg:is(a, button):hover,
+    .lg.lg-hoverable:hover,
+    .modal-close:hover,
+    .modal-nav-btn:hover:not(:disabled),
+    .mf-btn:hover:not(:disabled),
+    .glass-btn:hover:not(:disabled) {
+        --lg-hover: 0.1;
+        color: var(--lg-ink);
+        background: rgb(var(--lg-tint) / calc(var(--lg-alpha) + var(--lg-hover)));
+        border-color: transparent;
+        transform: translateY(-1px);
+    }
+}
+
+.lg:is(a, button):active,
+.modal-close:active,
+.modal-nav-btn:active:not(:disabled),
+.mf-btn:active:not(:disabled),
+.glass-btn:active:not(:disabled) {
+    transform: scale(0.96);
+}
+
+/* Reduced transparency: a near-solid pane, no filter */
+@media (prefers-reduced-transparency: reduce) {
+    .lg, .site-nav, .cs-nav, .modal-close, .modal-nav-btn, .mf-btn, .glass-btn, .modal-nav-counter {
+        --lg-alpha: 0.94 !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    [data-lg="dark"].lg { --lg-alpha: 0.92 !important; }
+    .lg > :not(svg), .site-nav > *, .cs-nav > *, .modal-close > *, .modal-nav-btn > *, .mf-btn > *, .glass-btn > *, .modal-nav-counter > * {
+        mix-blend-mode: normal;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lg, .site-nav, .cs-nav, .modal-close, .modal-nav-btn, .mf-btn, .glass-btn, .modal-nav-counter { transition: none; }
+}
+
+
 /* ═══════════════════════════════
-   Liquid glass header
-   Sticky floating pill shared by every page (.site-nav / .cs-nav).
-   Layers: frosted backdrop, specular rim, inner glow, soft shadow.
-   js/glass.js adds .lg-refract on Chromium for real edge refraction.
+   Header pill (.site-nav / .cs-nav)
+   Sticky floating pill shared by every page.
 ═══════════════════════════════ */
 html { scroll-padding-top: 92px; }
 body { overflow-x: clip; }
@@ -17,60 +231,9 @@ body { overflow-x: clip; }
     height: auto;
     margin: 12px auto 0;
     padding: 0;
-    border: 0;
     border-radius: 28px;
-    isolation: isolate;
-    background: rgba(255, 255, 255, 0.12);
-    -webkit-backdrop-filter: blur(10px) saturate(170%) brightness(1.03);
-    backdrop-filter: blur(10px) saturate(170%) brightness(1.03);
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.06),
-        0 10px 30px rgba(0, 0, 0, 0.10),
-        0 2px 6px rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.3s ease, background 0.3s ease;
 }
 
-/* Chromium: real refraction of whatever scrolls underneath */
-.site-nav.lg-refract,
-.cs-nav.lg-refract {
-    -webkit-backdrop-filter: url(#lg-filter) blur(4px) saturate(170%) brightness(1.03);
-    backdrop-filter: url(#lg-filter) blur(4px) saturate(170%) brightness(1.03);
-}
-
-/* Specular rim: bright on the top-left and bottom-right edges */
-.site-nav::before,
-.cs-nav::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1.5px;
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.15) 32%,
-        rgba(255, 255, 255, 0.05) 60%,
-        rgba(255, 255, 255, 0.85) 100%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    pointer-events: none;
-}
-
-/* Inner glow and top highlight */
-.site-nav::after,
-.cs-nav::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.95),
-        inset 0 -1px 1px rgba(255, 255, 255, 0.45),
-        inset 0 0 14px 1px rgba(255, 255, 255, 0.22);
-    pointer-events: none;
-}
-
-/* Page-specific nav contents sit inside the pill */
 .site-nav {
     display: flex;
     align-items: center;
@@ -90,9 +253,10 @@ body { overflow-x: clip; }
 .nav-links { justify-content: center; gap: 0 22px; width: auto; }
 
 .nav-links a, .nav-back, .cs-back, .cs-nav-cta, .nav-center, .nav-right, .cs-nav-label {
-    color: #1a1a1a;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    color: var(--lg-ink);
 }
+.nav-right, .cs-nav-label { color: var(--lg-ink-soft); }
+.nav-links a:hover, .nav-back:hover, .cs-back:hover, .cs-nav-cta:hover { color: var(--lg-ink); }
 
 .nav-links a,
 .nav-back,
@@ -112,13 +276,6 @@ body { overflow-x: clip; }
     .nav-links { gap: 0 16px; }
 }
 
-@media (prefers-reduced-transparency: reduce) {
-    .site-nav, .cs-nav, .site-nav.lg-refract, .cs-nav.lg-refract {
-        background: rgba(255, 255, 255, 0.92);
-        -webkit-backdrop-filter: none;
-        backdrop-filter: none;
-    }
-}
 
 /* ═══════════════════════════════
    Glass buttons (blog reader)
@@ -127,85 +284,18 @@ body { overflow-x: clip; }
 .modal-nav-btn,
 .mf-btn,
 .glass-btn {
-    position: relative;
-    isolation: isolate;
-    border: 0;
     border-radius: 999px;
     min-height: 40px;
     padding: 0 18px;
-    color: #1a1a1a;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.12);
-    -webkit-backdrop-filter: blur(10px) saturate(170%) brightness(1.03);
-    backdrop-filter: blur(10px) saturate(170%) brightness(1.03);
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.06),
-        0 6px 18px rgba(0, 0, 0, 0.10),
-        0 1px 4px rgba(0, 0, 0, 0.06);
-    transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.5, 1), box-shadow 0.25s ease, background 0.25s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* Specular rim */
-.modal-close::before,
-.modal-nav-btn::before,
-.mf-btn::before,
-.glass-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1.5px;
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.15) 32%,
-        rgba(255, 255, 255, 0.05) 60%,
-        rgba(255, 255, 255, 0.85) 100%);
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-    pointer-events: none;
-}
-
-/* Inner glow and top highlight */
-.modal-close::after,
-.modal-nav-btn::after,
-.mf-btn::after,
-.glass-btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow:
-        inset 0 1px 1px rgba(255, 255, 255, 0.95),
-        inset 0 -1px 1px rgba(255, 255, 255, 0.45),
-        inset 0 0 12px 1px rgba(255, 255, 255, 0.22);
-    pointer-events: none;
-}
-
-.modal-close:hover,
-.modal-nav-btn:hover:not(:disabled),
-.mf-btn:hover:not(:disabled),
-.glass-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.26);
-    color: #000;
-    border-color: transparent;
-    transform: translateY(-1px);
-    box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.07),
-        0 10px 24px rgba(0, 0, 0, 0.14),
-        0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.modal-close:active,
-.modal-nav-btn:active:not(:disabled),
-.mf-btn:active:not(:disabled),
-.glass-btn:active:not(:disabled) {
-    transform: scale(0.96);
+    cursor: pointer;
 }
 
 .modal-nav-btn:disabled,
-.mf-btn:disabled { opacity: 0.35; }
+.mf-btn:disabled {
+    opacity: 1;
+    color: var(--lg-ink-soft);
+    cursor: not-allowed;
+}
 
 /* Reader bars let text scroll underneath so the glass has something to bend */
 .modal-nav {
@@ -226,18 +316,4 @@ body { overflow-x: clip; }
 .modal-nav-counter {
     padding: 6px 12px;
     border-radius: 999px;
-    color: #1a1a1a;
-    background: rgba(255, 255, 255, 0.55);
-    -webkit-backdrop-filter: blur(10px) saturate(170%);
-    backdrop-filter: blur(10px) saturate(170%);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-/* Disabled: dim the label, keep the glass itself intact */
-.modal-nav-btn:disabled,
-.mf-btn:disabled {
-    opacity: 1;
-    color: rgba(26, 26, 26, 0.38);
-    text-shadow: none;
-    cursor: not-allowed;
 }

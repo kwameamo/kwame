@@ -38,13 +38,15 @@ function pngPixel(r, g, b) {
   ]);
 }
 
-const COLORS = [[200,80,80],[80,160,90],[70,90,200],[210,170,60],[150,80,180]];
+const COLORS = [[200,80,80],[80,160,90],[70,90,200],[210,170,60],[150,80,180],[20,22,28],[240,240,236]];
 const ITEMS = [
-  { id: 1, caption: 'Studio shoot · Accra with a very long caption that should be fully visible to the reader', mime: 'image/png', createdAt: '2026-06-01T00:00:00Z' },
-  { id: 2, caption: 'Garment drop 02', mime: 'image/png', createdAt: '2026-06-02T00:00:00Z' },
-  { id: 3, caption: '', mime: 'image/png', createdAt: '2026-06-03T00:00:00Z' },
-  { id: 4, caption: 'Behind the scenes', mime: 'image/png', createdAt: '2026-06-04T00:00:00Z' },
-  { id: 5, caption: 'Kejetia merch', mime: 'image/png', createdAt: '2026-06-05T00:00:00Z' },
+  { id: 1, caption: "Studio shoot · Accra with a very long caption that should be fully visible to the reader", place: "Accra", takenAt: "2025-06-01", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-01T00:00:00Z" },
+  { id: 2, caption: "Garment drop 02", place: "Koforidua", takenAt: "2025-06-02", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-02T00:00:00Z" },
+  { id: 3, caption: "", takenAt: "2025-09-14", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-03T00:00:00Z" },
+  { id: 4, caption: "Behind the scenes", place: "Kumasi", takenAt: "2026-01-20", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-04T00:00:00Z" },
+  { id: 5, caption: "Kejetia merch", takenAt: "2026-01-20", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-05T00:00:00Z" },
+  { id: 6, caption: "Night print run", takenAt: "2026-03-02", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-06T00:00:00Z" },
+  { id: 7, caption: "", takenAt: "2026-03-02", w: 800, h: 1000, mime: "image/png", createdAt: "2026-06-07T00:00:00Z" },
 ];
 
 const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript',
@@ -58,9 +60,10 @@ http.createServer(async (req, res) => {
   // Read-only passthrough to the live gallery so local previews show real images.
   // Falls through to the mocks below if the live site is unreachable.
   if (req.method === 'GET' && !process.env.MOCK_GALLERY &&
-      (url.pathname === '/.netlify/functions/get-gallery' || url.pathname === '/.netlify/functions/get-gallery-image')) {
+      (url.pathname === '/.netlify/functions/get-gallery' || url.pathname === '/.netlify/functions/get-gallery-image' || url.pathname === '/.netlify/functions/get-posts')) {
     try {
-      const r = await fetch(LIVE + url.pathname + url.search);
+      const live = new URL(LIVE + url.pathname + url.search); live.searchParams.delete('fresh');
+      const r = await fetch(live);
       if (r.ok) {
         res.writeHead(200, { 'Content-Type': r.headers.get('content-type') || 'application/octet-stream' });
         res.end(Buffer.from(await r.arrayBuffer()));

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="/js/theme.js"></script>
+    <title>B-Roll — David Kwame Amo</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="DKA">
+    <link rel="apple-touch-icon" href="/photos/pwa-icon.png">
+    <link rel="icon" type="image/png" href="/photos/favicon.png">
+
+    <!-- SEO -->
+    <meta name="description" content="B-Roll — the camera roll around the work. Studio days, garments in progress, places, people and the things that keep David Kwame Amo inspired.">
+    <meta property="og:title" content="B-Roll — David Kwame Amo">
+    <meta property="og:description" content="The camera roll around the work: studio days, garments in progress, places, people and inspiration.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kwame.vision/roll.html">
+    <meta property="og:image" content="https://kwame.vision/photos/me.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="B-Roll — David Kwame Amo">
+    <meta name="twitter:description" content="The camera roll around the work: studio days, garments in progress, places, people and inspiration.">
+    <meta name="twitter:image" content="https://kwame.vision/photos/me.jpg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/glass.css">
+    <link rel="stylesheet" href="/css/roll.css">
+    <link rel="preload" href="/.netlify/functions/get-gallery" as="fetch" crossorigin>
+</head>
+<body class="roll-body">
+
+<!-- The roll: title top-left, photos oldest → newest, newest at the bottom like a camera roll -->
+<main class="br" id="br">
+    <h1 class="visually-hidden">B-Roll — a camera roll of the work around the work</h1>
+    <div class="br-top" id="br-top" aria-hidden="true">
+        <div class="br-top__text">
+            <p class="br-top__title">B-Roll</p>
+            <p class="br-top__sub" id="br-sub"></p>
+        </div>
+    </div>
+    <div class="br-stream" id="br-stream">
+        <div class="br-loading" id="br-loading" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+    </div>
+    <noscript><p class="br-empty">Photos need JavaScript to show.</p></noscript>
+</main>
+
+<button type="button" class="br-round lg br-theme" data-theme-toggle></button>
+
+<!-- Bottom bar: Library · Years / Months / All · Home -->
+<div class="br-bar" id="br-bar">
+    <button type="button" class="br-round br-round--accent lg" id="br-library" aria-label="Library and Favorites"><svg aria-hidden="true"><use href="#br-i-photos"/></svg></button>
+    <div class="br-seg lg" role="toolbar" aria-label="View">
+        <button type="button" class="br-seg__btn" data-view="years" aria-pressed="false">Years</button>
+        <button type="button" class="br-seg__btn" data-view="months" aria-pressed="false">Months</button>
+        <button type="button" class="br-seg__btn" data-view="all" aria-pressed="true">All</button>
+    </div>
+    <div class="br-tabs lg" role="toolbar" aria-label="Albums">
+        <button type="button" class="br-tab" data-tab="library" aria-pressed="true"><svg aria-hidden="true"><use href="#br-i-photos"/></svg><span>Library</span></button>
+        <button type="button" class="br-tab" data-tab="favorites" aria-pressed="false"><svg aria-hidden="true"><use href="#br-i-heart-line"/></svg><span>Favorites</span></button>
+    </div>
+    <a class="br-round lg" id="br-home" href="/index.html" aria-label="Home"><svg aria-hidden="true"><use href="#br-i-home"/></svg></a>
+</div>
+
+<!-- Viewer -->
+<div class="br-viewer" id="br-viewer" role="dialog" aria-modal="true" aria-label="Photo" aria-hidden="true">
+    <div class="br-viewer__top">
+        <button type="button" class="br-round lg" id="br-back" aria-label="Back"><svg aria-hidden="true"><use href="#br-i-back"/></svg></button>
+        <div class="br-head lg">
+            <p class="br-head__title" id="br-title"></p>
+            <p class="br-head__sub" id="br-when"></p>
+        </div>
+        <button type="button" class="br-round lg" id="br-more" aria-label="More" aria-expanded="false"><svg aria-hidden="true"><use href="#br-i-more"/></svg></button>
+    </div>
+    <div class="br-menu lg" id="br-menu" role="menu">
+        <button type="button" role="menuitem" id="br-save"><span>Save Photo</span><svg aria-hidden="true"><use href="#br-i-save"/></svg></button>
+        <button type="button" role="menuitem" id="br-copy"><span>Copy Link</span><svg aria-hidden="true"><use href="#br-i-link"/></svg></button>
+    </div>
+    <div class="br-stage" id="br-stage">
+        <div class="br-pages" id="br-pages"></div>
+        <button type="button" class="br-round lg br-arrow br-arrow--prev" id="br-prev" aria-label="Previous photo"><svg aria-hidden="true"><use href="#br-i-back"/></svg></button>
+        <button type="button" class="br-round lg br-arrow br-arrow--next" id="br-next" aria-label="Next photo"><svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#br-i-back"/></svg></button>
+        <p class="br-toast lg" id="br-toast" role="status"><span id="br-toast-text"></span></p>
+    </div>
+    <div class="br-sheet" id="br-info" aria-live="polite"></div>
+    <div class="br-viewer__foot">
+        <div class="br-strip" id="br-strip" aria-hidden="true"></div>
+        <div class="br-tools">
+            <button type="button" class="br-round lg" id="br-share" aria-label="Share or save photo"><svg aria-hidden="true"><use href="#br-i-share"/></svg></button>
+            <div class="br-pill lg">
+                <button type="button" class="br-pill__btn" id="br-like" aria-label="Favorite" aria-pressed="false"><svg aria-hidden="true"><use href="#br-i-heart-line"/></svg></button>
+                <button type="button" class="br-pill__btn" id="br-info-btn" aria-label="Info" aria-pressed="false"><svg aria-hidden="true"><use href="#br-i-info"/></svg></button>
+            </div>
+            <span class="br-tools__spacer"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="br-i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.1S4.2 16.4 2.4 11.6C1 8.4 3.2 4.9 6.8 4.9c2.2 0 3.7 1.3 5.2 3 1.5-1.7 3-3 5.2-3 3.6 0 5.8 3.5 4.4 6.7C19.8 16.4 12 21.1 12 21.1z"/></symbol>
+    <symbol id="br-i-heart-line" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M12 20.1s-7-4.3-8.7-8.6C2 8.6 4 5.6 7 5.6c2 0 3.4 1.2 5 3.2 1.6-2 3-3.2 5-3.2 3 0 5 3 3.7 5.9-1.7 4.3-8.7 8.6-8.7 8.6z"/></symbol>
+    <symbol id="br-i-share" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 3.2v12.3M8.2 7l3.8-3.8L15.8 7M7.2 10.2H5.7A1.7 1.7 0 0 0 4 11.9v7.4A1.7 1.7 0 0 0 5.7 21h12.6a1.7 1.7 0 0 0 1.7-1.7v-7.4a1.7 1.7 0 0 0-1.7-1.7h-1.5"/></symbol>
+    <symbol id="br-i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M10.5 10.9H12v5.9M10.4 16.8h3.2"/><circle cx="11.9" cy="7.7" r="1.15" fill="currentColor"/></symbol>
+    <symbol id="br-i-info-fill" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path fill="none" style="stroke: var(--br-info-ink, #fff)" stroke-width="1.9" stroke-linecap="round" d="M10.5 10.9H12v5.9M10.4 16.8h3.2"/><circle cx="11.9" cy="7.7" r="1.2" style="fill: var(--br-info-ink, #fff)"/></symbol>
+    <symbol id="br-i-photos" viewBox="0 0 24 24"><rect x="3" y="4.5" width="15" height="12" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 19.5h11a3 3 0 0 0 3-3V8.5"/><path fill="currentColor" d="M5 14.4l3.4-3.6 2.4 2.4 2.2-1.8 3 3z"/><circle cx="13.6" cy="8.4" r="1.4" fill="currentColor"/></symbol>
+    <symbol id="br-i-back" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="M15 4.5 7.5 12l7.5 7.5"/></symbol>
+    <symbol id="br-i-save" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></symbol>
+    <symbol id="br-i-link" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="br-i-home" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M4 10.4 12 4l8 6.4V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="br-i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="19" cy="12" r="1.9" fill="currentColor"/></symbol>
+</svg>
+
+<script defer src="/js/roll.js"></script>
+<script defer src="/js/glass.js"></script>
+<script defer src="/js/sw-updater.js"></script>
+</body>
+</html>

@@ -3,1644 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script src="/js/theme.js"></script>
     <title>Admin — David Kwame Amo</title>
+    <meta name="robots" content="noindex, nofollow">
     <link rel="manifest" href="/_p7n3x/manifest.webmanifest">
-    <meta name="theme-color" content="#0d0d0d">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f2f2f7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Admin">
     <link rel="apple-touch-icon" href="/photos/favicon.png">
     <link rel="icon" type="image/png" href="/photos/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Syne+Mono&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        /* Ensure [hidden] always wins over any display rule in this file */
-        [hidden] { display: none !important; }
-
-        :root {
-            --bg:      #0d0d0d;
-            --surface: #181818;
-            --border:  #2a2a2a;
-            --text:    #f0f0f0;
-            --muted:   #555;
-            --red:     #ff5c5c;
-            --green:   #4cde8f;
-        }
-
-        html {
-            height: 100%;
-            overflow-x: hidden;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Syne', sans-serif;
-            min-height: 100%;
-            /* Safe area for notched phones */
-            padding-top:    env(safe-area-inset-top);
-            padding-left:   env(safe-area-inset-left);
-            padding-right:  env(safe-area-inset-right);
-            padding-bottom: env(safe-area-inset-bottom);
-            overflow-x: hidden;
-        }
-
-        /* ── System style overrides ── */
-
-        input, textarea, select, button {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            font-family: inherit;
-            border-radius: 0; /* Firefox mobile adds border-radius */
-        }
-
-        /* Kill autofill background */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        textarea:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 1000px var(--surface) inset !important;
-            -webkit-text-fill-color: var(--text) !important;
-            caret-color: var(--text);
-            transition: background-color 9999s ease;
-        }
-
-        /* Date picker */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(0.5) brightness(1.2);
-            cursor: pointer;
-            padding: 0;
-            margin: 0;
-        }
-        input[type="date"]::-webkit-inner-spin-button   { display: none; }
-        input[type="date"]::-webkit-datetime-edit        { color: var(--text); padding: 0; }
-        input[type="date"]::-webkit-datetime-edit-text   { color: var(--muted); }
-        input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
-
-        /* Kill password reveal button (Edge, Safari, Chrome) */
-        input[type="password"]::-ms-reveal,
-        input[type="password"]::-ms-clear,
-        input[type="password"]::-webkit-credentials-auto-fill-button,
-        input[type="password"]::-webkit-strong-password-auto-fill-button,
-        input[type="password"]::-webkit-contacts-auto-fill-button { display: none !important; }
-
-        /* Textarea resize — keep vertical, hide the handle glyph */
-        textarea { resize: vertical; }
-        textarea::-webkit-resizer { display: none; }
-
-        /* Focus ring */
-        :focus-visible { outline: none; }
-
-        /* ── Lock screen ── */
-
-        #lock {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100dvh;
-            padding: 40px 24px;
-            padding-bottom: calc(40px + env(safe-area-inset-bottom));
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        #lock.exit {
-            opacity: 0;
-            transform: translateY(-16px);
-            pointer-events: none;
-        }
-
-        .lock-label {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 24px;
-        }
-
-        #lock-input {
-            width: 100%;
-            max-width: 300px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 16px; /* 16px prevents iOS zoom on focus */
-            letter-spacing: 0.14em;
-            padding: 14px 16px;
-            text-align: center;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-
-        #lock-input:focus  { border-color: #444; }
-        #lock-input.error  { border-color: var(--red); }
-
-        @keyframes shake {
-            0%, 100% { translate: 0px; }
-            20%       { translate: -8px; }
-            40%       { translate: 8px; }
-            60%       { translate: -5px; }
-            80%       { translate: 5px; }
-        }
-        #lock-input.shake { animation: shake 0.35s ease forwards; }
-
-        .lock-hint {
-            margin-top: 10px;
-            font-size: 11px;
-            color: var(--muted);
-            letter-spacing: 0.04em;
-        }
-
-        .lock-error {
-            margin-top: 10px;
-            font-size: 13px;
-            color: var(--red);
-            min-height: 18px;
-        }
-
-        /* ── App shell ── */
-
-        #app {
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            opacity: 0;
-            transition: opacity 0.35s ease;
-        }
-        #app.visible { opacity: 1; }
-
-        .app-bar {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: rgba(13, 13, 13, 0.88);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .app-bar-inner {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .app-title {
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--text);
-        }
-
-        .app-chip {
-            font-family: 'Syne Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            padding: 3px 10px;
-        }
-
-        .app-main { flex: 1; }
-
-        /* ── Views ── */
-
-        .view {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 28px 20px 48px;
-            padding-bottom: calc(110px + env(safe-area-inset-bottom)); /* room for tab bar */
-            animation: view-in 0.3s ease;
-        }
-
-        @keyframes view-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .view-hd { margin-bottom: 28px; }
-
-        .view-title {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .view-sub {
-            margin-top: 4px;
-            font-family: 'Syne Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.03em;
-            color: var(--muted);
-        }
-
-        /* ── Tab bar ── */
-
-        .tabbar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            z-index: 50;
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            background: rgba(13, 13, 13, 0.88);
-            -webkit-backdrop-filter: blur(12px);
-            backdrop-filter: blur(12px);
-            border-top: 1px solid var(--border);
-            padding: 8px 16px;
-            padding-bottom: calc(8px + env(safe-area-inset-bottom));
-        }
-
-        .tab {
-            flex: 1;
-            max-width: 130px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: var(--muted);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            padding: 8px 6px;
-            position: relative;
-            -webkit-tap-highlight-color: transparent;
-            transition: color 0.15s, background 0.15s;
-            min-height: 54px;
-        }
-
-        .tab[aria-current="page"] {
-            color: var(--text);
-            background: var(--surface);
-        }
-
-        .tab:active { background: #1e1e1e; }
-
-        .tab-icon { font-size: 17px; line-height: 1; }
-
-        .tab-label {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-
-        .tab-count {
-            position: absolute;
-            top: 4px;
-            right: 14px;
-            font-family: 'Syne Mono', monospace;
-            font-size: 9px;
-            color: var(--muted);
-            background: #222;
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            padding: 1px 6px;
-            min-width: 18px;
-            text-align: center;
-        }
-        .tab-count:empty { display: none; }
-
-        h1 { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
-
-        .field { margin-bottom: 18px; }
-
-        .field-row {
-            display: grid;
-            grid-template-columns: 80px 1fr;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-        .field-row .field { margin-bottom: 0; }
-
-        #post-id {
-            color: var(--muted);
-            cursor: default;
-            text-align: center;
-            letter-spacing: 0.04em;
-        }
-
-        label {
-            display: block;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 7px;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        textarea {
-            width: 100%;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            font-size: 16px; /* 16px prevents iOS zoom */
-            padding: 12px 14px;
-            outline: none;
-            transition: border-color 0.15s;
-            line-height: 1.5;
-        }
-
-        input[type="text"]:focus,
-        input[type="date"]:focus,
-        textarea:focus { border-color: #444; }
-
-        input.error, textarea.error { border-color: var(--red); }
-
-        textarea {
-            line-height: 1.65;
-            min-height: 80px;
-        }
-
-        /* ── Formatting toolbar ── */
-
-        .toolbar-wrap {
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .toolbar {
-            display: flex;
-            background: #111;
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .toolbar::-webkit-scrollbar { display: none; }
-
-        .toolbar-key {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 16px;
-            padding: 8px 12px;
-            background: #111;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .toolbar-key span {
-            font-family: 'Syne Mono', monospace;
-            font-size: 11px;
-            color: var(--muted);
-            white-space: nowrap;
-        }
-
-        .toolbar-key code {
-            color: #888;
-        }
-
-        .tb {
-            flex-shrink: 0;
-            background: transparent;
-            color: #999;
-            border: none;
-            border-right: 1px solid var(--border);
-            border-radius: 0;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 10px 16px;
-            cursor: pointer;
-            transition: background 0.1s, color 0.1s;
-            -webkit-tap-highlight-color: transparent;
-            letter-spacing: 0.01em;
-            white-space: nowrap;
-            min-width: 44px;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .tb:last-child { border-right: none; }
-        .tb:active     { background: #1e1e1e; color: var(--text); }
-
-        .tb-h2   { font-family: 'Syne Mono', monospace; font-size: 12px; }
-        .tb-bold { font-style: normal; font-weight: 700; font-size: 15px; }
-        .tb-ital { font-style: italic; font-size: 15px; }
-        .tb-link { font-size: 18px; letter-spacing: 0; }
-        .tb-para { font-size: 16px; letter-spacing: 0; }
-
-        #content {
-            font-family: 'Syne Mono', monospace;
-            font-size: 14px;
-            min-height: 280px;
-            border: none;
-            border-radius: 0;
-        }
-
-        #content:focus { border-color: transparent; }
-
-        .toolbar-wrap:focus-within {
-            border-color: #444;
-        }
-
-        /* ── Buttons ── */
-
-        .btn-primary {
-            width: 100%;
-            background: var(--text);
-            color: var(--bg);
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 700;
-            padding: 15px;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: opacity 0.15s;
-            letter-spacing: 0.01em;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 50px;
-        }
-
-        .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
-
-        .btn-ghost {
-            display: none;
-            width: 100%;
-            background: transparent;
-            color: var(--muted);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 400;
-            padding: 14px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: color 0.15s, border-color 0.15s;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 50px;
-        }
-        .btn-ghost:active { color: var(--text); border-color: #444; }
-
-        /* ── Status ── */
-
-        .status {
-            display: none;
-            margin-top: 16px;
-            padding: 13px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            line-height: 1.5;
-            align-items: center;
-            gap: 10px;
-        }
-        .status.success {
-            display: flex;
-            background: rgba(76,222,143,0.08);
-            border: 1px solid rgba(76,222,143,0.25);
-            color: var(--green);
-        }
-        .status.error {
-            display: flex;
-            background: rgba(255,92,92,0.08);
-            border: 1px solid rgba(255,92,92,0.25);
-            color: var(--red);
-        }
-        .status a {
-            color: inherit;
-            margin-left: auto;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            white-space: nowrap;
-        }
-
-        /* ── Posts list ── */
-
-        .posts-wrap {
-            margin-top: 36px;
-            padding-top: 28px;
-            border-top: 1px solid var(--border);
-        }
-
-        .posts-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .posts-heading {
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-
-        .posts-reload {
-            background: transparent;
-            border: none;
-            color: var(--muted);
-            font-size: 17px;
-            line-height: 1;
-            padding: 4px 8px;
-            cursor: pointer;
-            border-radius: 6px;
-            -webkit-tap-highlight-color: transparent;
-            transition: color 0.15s;
-            min-width: 36px;
-            min-height: 36px;
-        }
-        .posts-reload:active { color: var(--text); }
-
-        .posts-list { list-style: none; }
-
-        .post-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 11px 0;
-            border-bottom: 1px solid var(--border);
-            transition: opacity 0.25s;
-        }
-        .post-row:last-child { border-bottom: none; }
-        .post-row.removing  { opacity: 0; pointer-events: none; }
-
-        .post-row-info { flex: 1; min-width: 0; }
-
-        .post-row-title {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .post-row-meta {
-            display: block;
-            font-size: 11px;
-            color: var(--muted);
-            font-family: 'Syne Mono', monospace;
-            margin-top: 3px;
-        }
-
-        .post-row-del {
-            flex-shrink: 0;
-            background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--muted);
-            font-size: 16px;
-            line-height: 1;
-            padding: 0;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            transition: color 0.15s, border-color 0.15s;
-        }
-        .post-row-del:active { color: var(--red); border-color: var(--red); }
-
-        /* Confirmation state */
-        .post-row-confirm {
-            display: none;
-            flex: 1;
-            align-items: center;
-            gap: 8px;
-        }
-        .post-row.confirming .post-row-info    { display: none; }
-        .post-row.confirming .post-row-confirm { display: flex; }
-        .post-row.confirming .post-row-del     { display: none; }
-
-        .post-row-confirm-label {
-            font-size: 13px;
-            color: var(--red);
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .btn-del-yes {
-            flex-shrink: 0;
-            background: var(--red);
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 7px 12px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 32px;
-        }
-
-        .btn-del-no {
-            flex-shrink: 0;
-            background: transparent;
-            color: var(--muted);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 12px;
-            padding: 7px 12px;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 32px;
-        }
-
-        /* ── Gallery uploader ── */
-
-        .lbl-opt {
-            text-transform: none;
-            letter-spacing: 0;
-            color: #444;
-            font-weight: 400;
-        }
-
-        .g-drop {
-            display: block;
-            width: 100%;
-            background: var(--surface);
-            border: 1px dashed var(--border);
-            border-radius: 12px;
-            color: var(--text);
-            cursor: pointer;
-            overflow: hidden;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-            transition: border-color 0.15s;
-        }
-        .g-drop:active   { border-color: #444; }
-        .g-drop.has-img  { border-style: solid; }
-
-        .g-drop-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            min-height: 160px;
-            padding: 28px 16px;
-        }
-
-        .g-drop-icon { font-size: 28px; line-height: 1; color: var(--muted); }
-        .g-drop-text { font-size: 14px; font-weight: 600; }
-        .g-drop-hint {
-            font-family: 'Syne Mono', monospace;
-            font-size: 11px;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .g-previews {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            padding: 8px;
-        }
-
-        .g-pv {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .g-pv-thumb {
-            flex-shrink: 0;
-            width: 48px;
-            height: 60px; /* 4:5 */
-            border-radius: 8px;
-            object-fit: cover;
-            background: #222;
-        }
-
-        .g-pv-cap {
-            flex: 1;
-            min-width: 0;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 16px; /* 16px prevents iOS zoom */
-            padding: 10px 12px;
-            outline: none;
-            transition: border-color 0.15s;
-        }
-        .g-pv-cap:focus { border-color: #444; }
-
-        .g-pv-x {
-            flex-shrink: 0;
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--muted);
-            font-size: 17px;
-            line-height: 1;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            -webkit-tap-highlight-color: transparent;
-            transition: color 0.15s, border-color 0.15s;
-        }
-
-        .g-pv-x:active { color: var(--red); border-color: var(--red); }
-
-        .g-addmore { display: none; }
-        .g-addmore[hidden] { display: none; }
-        .g-addmore.show { display: block; }
-
-        .g-cap-hint {
-            margin-top: 10px;
-            font-family: 'Syne Mono', monospace;
-            font-size: 11px;
-            color: var(--muted);
-            letter-spacing: 0.02em;
-        }
-
-        /* List thumbnails reuse .post-row */
-        .g-thumb {
-            flex-shrink: 0;
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: #222;
-            border: 1px solid var(--border);
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/glass.css">
+    <link rel="stylesheet" href="/_p7n3x/admin.css">
 </head>
-<body>
+<body class="ad">
 
-<!-- ── Lock screen ── -->
-<div id="lock">
-    <p class="lock-label">David Kwame Amo</p>
-    <input
-        type="password"
-        id="lock-input"
-        autocomplete="current-password"
-        placeholder="Password"
-        aria-label="Admin password"
-    >
-    <p class="lock-hint">Press Enter to continue</p>
-    <p class="lock-error" id="lock-error" role="alert"></p>
-</div>
-
-<!-- ── App shell ── -->
-<div id="app" hidden>
-
-<header class="app-bar">
-    <div class="app-bar-inner">
-        <span class="app-title">David Kwame Amo</span>
-        <span class="app-chip">Admin</span>
+<!-- ── Lock ── -->
+<main class="ad-lock" id="lock">
+    <div class="ad-lock__card">
+        <img class="ad-lock__avatar" src="/photos/me.PNG" alt="" width="84" height="84">
+        <h1 class="ad-lock__title">Admin</h1>
+        <p class="ad-lock__sub">Notes and B-Roll for kwame.vision</p>
+        <form class="ad-lock__field lg" id="lock-form" autocomplete="on">
+            <input type="text" name="username" value="admin" autocomplete="username" hidden>
+            <input type="password" id="lock-input" placeholder="Password" autocomplete="current-password" aria-label="Admin password" required>
+            <button type="submit" class="ad-lock__go" aria-label="Unlock"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </form>
+        <p class="ad-lock__error" id="lock-error" role="alert"></p>
     </div>
-</header>
-
-<main class="app-main">
-
-<!-- ── Write view ── -->
-<section id="post-wrap" class="view" hidden>
-    <div class="view-hd">
-        <h1 class="view-title">New Post</h1>
-        <p class="view-sub">Write and publish to the blog.</p>
-    </div>
-
-    <form id="form" novalidate>
-
-        <div class="field-row">
-            <div class="field">
-                <label for="post-id">Post ID</label>
-                <input type="text" id="post-id" readonly tabindex="-1">
-            </div>
-            <div class="field">
-                <label for="date">Date</label>
-                <input type="date" id="date" required>
-            </div>
-        </div>
-
-        <div class="field">
-            <label for="title">Title</label>
-            <input type="text" id="title" placeholder="Post title" autocomplete="off" required>
-        </div>
-
-        <div class="field">
-            <label for="excerpt">Excerpt</label>
-            <textarea id="excerpt" rows="3" placeholder="One or two sentences shown on the blog listing." required></textarea>
-        </div>
-
-        <div class="field">
-            <label for="content">Content</label>
-            <div class="toolbar-wrap">
-                <div class="toolbar" role="toolbar" aria-label="Formatting">
-                    <button type="button" class="tb tb-h2"   data-fmt="h2"     title="Heading (## )">H2</button>
-                    <button type="button" class="tb tb-bold" data-fmt="bold"   title="Bold (**text**)">B</button>
-                    <button type="button" class="tb tb-ital" data-fmt="italic" title="Italic (*text*)">I</button>
-                    <button type="button" class="tb tb-link" data-fmt="link"   title="Link ([text](url))">↗</button>
-                    <button type="button" class="tb tb-para" data-fmt="para"   title="New paragraph">¶</button>
-                </div>
-                <div class="toolbar-key">
-                    <span><code>##</code> h2</span>
-                    <span><code>**bold**</code></span>
-                    <span><code>*italic*</code></span>
-                    <span><code>[text](url)</code></span>
-                    <span><code>¶</code> new §</span>
-                </div>
-                <textarea id="content" placeholder="Write your post here..." required></textarea>
-            </div>
-        </div>
-
-        <button type="submit" class="btn-primary" id="submit-btn">Publish Post</button>
-        <div class="status" id="status" role="status" aria-live="polite"></div>
-        <button type="button" class="btn-ghost" id="another-btn">Write another post</button>
-
-    </form>
-</section>
-
-<!-- ── Posts view ── -->
-<section id="list-wrap" class="view" hidden>
-    <div class="view-hd">
-        <h1 class="view-title">Posts</h1>
-        <p class="view-sub">Everything published on the blog.</p>
-    </div>
-    <div class="posts-wrap">
-        <div class="posts-header">
-            <span class="posts-heading" id="posts-heading">All Posts</span>
-            <button type="button" class="posts-reload" id="posts-reload" title="Refresh">↻</button>
-        </div>
-        <ul class="posts-list" id="posts-list"></ul>
-    </div>
-</section>
-
-<!-- ── Gallery view ── -->
-<section id="gallery-wrap" class="view" hidden>
-    <div class="view-hd">
-        <h1 class="view-title">Gallery</h1>
-        <p class="view-sub">Images shown in the homepage slider.</p>
-    </div>
-
-    <form id="gallery-form" novalidate>
-        <div class="field">
-            <label>Images</label>
-            <div class="g-drop" id="g-drop" role="button" tabindex="0" aria-label="Choose photos">
-                <input type="file" id="g-file" accept="image/jpeg,image/png,image/webp" multiple hidden>
-                <span class="g-drop-empty" id="g-drop-empty">
-                    <span class="g-drop-icon">+</span>
-                    <span class="g-drop-text">Tap to choose photos</span>
-                    <span class="g-drop-hint">JPG, PNG or WebP · pick one or many · resized automatically</span>
-                </span>
-                <span class="g-previews" id="g-previews" hidden></span>
-            </div>
-            <button type="button" class="btn-ghost g-addmore" id="g-addmore" hidden>+ Add more photos</button>
-            <p class="g-cap-hint" id="g-cap-hint" hidden>Add an optional caption to each image below.</p>
-        </div>
-
-        <button type="submit" class="btn-primary" id="g-submit" disabled>Upload Image</button>
-        <div class="status" id="g-status" role="status" aria-live="polite"></div>
-    </form>
-
-    <div class="posts-wrap">
-        <div class="posts-header">
-            <span class="posts-heading">Uploaded</span>
-            <button type="button" class="posts-reload" id="g-reload" title="Refresh">↻</button>
-        </div>
-        <ul class="posts-list" id="gallery-list"></ul>
-    </div>
-</section>
-
 </main>
 
-<!-- ── Tab bar ── -->
-<nav class="tabbar" aria-label="Sections">
-    <button type="button" class="tab" id="tab-post" data-view="post-wrap" aria-current="page">
-        <span class="tab-icon">✎</span>
-        <span class="tab-label">Write</span>
-    </button>
-    <button type="button" class="tab" id="tab-posts" data-view="list-wrap">
-        <span class="tab-icon">≡</span>
-        <span class="tab-label">Posts</span>
-        <span class="tab-count" id="menu-count"></span>
-    </button>
-    <button type="button" class="tab" id="tab-gallery" data-view="gallery-wrap">
-        <span class="tab-icon">✦</span>
-        <span class="tab-label">Gallery</span>
-        <span class="tab-count" id="menu-gallery-count"></span>
-    </button>
-</nav>
-
-</div><!-- /app -->
-
-<script>
-(function () {
-
-    /* ── Lock ── */
-    var lockEl    = document.getElementById('lock');
-    var lockInput = document.getElementById('lock-input');
-    var lockError = document.getElementById('lock-error');
-    var appEl     = document.getElementById('app');
-    var savedPw   = '';
-
-    /* ── Tabs ── */
-    var tabs  = Array.prototype.slice.call(document.querySelectorAll('.tabbar .tab'));
-    var views = {};
-    tabs.forEach(function (tab) {
-        views[tab.dataset.view] = document.getElementById(tab.dataset.view);
-    });
-
-    function switchTab(viewId) {
-        tabs.forEach(function (tab) {
-            var current = tab.dataset.view === viewId;
-            if (current) tab.setAttribute('aria-current', 'page');
-            else tab.removeAttribute('aria-current');
-        });
-        Object.keys(views).forEach(function (id) {
-            views[id].hidden = id !== viewId;
-        });
-        window.scrollTo(0, 0);
-    }
-
-    tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () { switchTab(tab.dataset.view); });
-    });
-
-    lockInput.focus();
-
-    lockInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') { e.preventDefault(); attemptUnlock(); }
-    });
-
-    async function attemptUnlock() {
-        var pw = lockInput.value;
-        if (!pw) return;
-        lockInput.disabled = true;
-        lockError.textContent = '';
-
-        try {
-            var res = await fetch('/.netlify/functions/save-post', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ verify: true, password: pw })
-            });
-
-            if (res.status === 401) {
-                lockInput.disabled = false;
-                lockInput.value = '';
-                lockInput.classList.remove('shake');
-                void lockInput.offsetWidth;
-                lockInput.classList.add('shake', 'error');
-                lockError.textContent = 'Wrong password.';
-                lockInput.focus();
-                return;
-            }
-
-            if (res.status !== 200) {
-                lockInput.disabled = false;
-                lockError.textContent = 'Server error (' + res.status + '). Try again.';
-                return;
-            }
-
-            savedPw = pw;
-            lockEl.classList.add('exit');
-            setTimeout(function () {
-                lockEl.hidden = true;
-                appEl.hidden = false;
-                switchTab('post-wrap');
-                requestAnimationFrame(function () {
-                    requestAnimationFrame(function () {
-                        appEl.classList.add('visible');
-                        syncPosts();
-                        syncGallery();
-                    });
-                });
-            }, 300);
-
-        } catch (_) {
-            lockInput.disabled = false;
-            lockError.textContent = 'Connection error. Try again.';
-        }
-    }
-
-    lockInput.addEventListener('input', function () {
-        lockInput.classList.remove('error', 'shake');
-        lockError.textContent = '';
-    });
-
-    /* ── Formatting toolbar ── */
-    var ta = document.getElementById('content');
-
-    // Store selection before toolbar button steals focus
-    var savedSel = { start: 0, end: 0 };
-    ta.addEventListener('keyup',   saveSel);
-    ta.addEventListener('mouseup', saveSel);
-    ta.addEventListener('touchend', saveSel);
-    ta.addEventListener('blur', saveSel);
-
-    function saveSel() {
-        savedSel.start = ta.selectionStart;
-        savedSel.end   = ta.selectionEnd;
-    }
-
-    function restoreSel() {
-        ta.focus();
-        ta.setSelectionRange(savedSel.start, savedSel.end);
-    }
-
-    document.querySelector('.toolbar').addEventListener('mousedown', function (e) {
-        // Prevent textarea from losing selection when clicking toolbar
-        e.preventDefault();
-    });
-
-    document.querySelector('.toolbar').addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-fmt]');
-        if (!btn) return;
-        applyFormat(btn.dataset.fmt);
-    });
-
-    function applyFormat(action) {
-        restoreSel();
-        var start = ta.selectionStart;
-        var end   = ta.selectionEnd;
-        var val   = ta.value;
-        var sel   = val.slice(start, end);
-
-        if (action === 'h2') {
-            var lineStart = val.lastIndexOf('\n', start - 1) + 1;
-            if (val.slice(lineStart, lineStart + 3) === '## ') {
-                // Toggle off
-                ta.value = val.slice(0, lineStart) + val.slice(lineStart + 3);
-                ta.setSelectionRange(Math.max(lineStart, start - 3), Math.max(lineStart, end - 3));
-            } else {
-                ta.value = val.slice(0, lineStart) + '## ' + val.slice(lineStart);
-                ta.setSelectionRange(start + 3, end + 3);
-            }
-        } else if (action === 'bold') {
-            wrap('**', '**', sel, start, end, val);
-        } else if (action === 'italic') {
-            wrap('*', '*', sel, start, end, val);
-        } else if (action === 'link') {
-            if (sel) {
-                var replacement = '[' + sel + ']()';
-                ta.value = val.slice(0, start) + replacement + val.slice(end);
-                // Place cursor inside the ()
-                var cur = start + sel.length + 3;
-                ta.setSelectionRange(cur, cur);
-            } else {
-                var tpl = '[]()';
-                ta.value = val.slice(0, start) + tpl + val.slice(end);
-                // Select the placeholder text slot (inside [])
-                ta.setSelectionRange(start + 1, start + 1);
-            }
-        } else if (action === 'para') {
-            var ins = '\n\n';
-            ta.value = val.slice(0, start) + ins + val.slice(start);
-            ta.setSelectionRange(start + ins.length, start + ins.length);
-        }
-
-        ta.focus();
-        ta.dispatchEvent(new Event('input'));
-    }
-
-    function wrap(before, after, sel, start, end, val) {
-        if (sel) {
-            var rep = before + sel + after;
-            ta.value = val.slice(0, start) + rep + val.slice(end);
-            ta.setSelectionRange(start, start + rep.length);
-        } else {
-            var rep2 = before + after;
-            ta.value = val.slice(0, start) + rep2 + val.slice(end);
-            var mid = start + before.length;
-            ta.setSelectionRange(mid, mid);
-        }
-    }
-
-    /* ── Post form ── */
-    document.getElementById('date').value = new Date().toISOString().slice(0, 10);
-
-    var nextId   = 1;
-    var allPosts = [];
-    var idEl     = document.getElementById('post-id');
-
-    async function syncPosts() {
-        try {
-            var res = await fetch('/.netlify/functions/get-posts');
-            if (res.ok) {
-                var data = await res.json();
-                if (Array.isArray(data)) allPosts = data;
-            }
-        } catch (_) {}
-        nextId = allPosts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
-        idEl.value = '#' + nextId;
-        var count = allPosts.length;
-        document.getElementById('menu-count').textContent = count > 0 ? count : '';
-        renderPostList();
-    }
-
-    function renderPostList() {
-        var list = document.getElementById('posts-list');
-        while (list.firstChild) list.removeChild(list.firstChild);
-
-        var sorted = allPosts.slice().sort(function (a, b) {
-            return new Date(b.date) - new Date(a.date);
-        });
-
-        if (sorted.length === 0) {
-            var empty = document.createElement('li');
-            empty.style.cssText = 'padding:14px 0;color:var(--muted);font-size:13px;text-align:center;';
-            empty.textContent = 'No posts yet.';
-            list.appendChild(empty);
-            return;
-        }
-
-        sorted.forEach(function (post) {
-            var li = document.createElement('li');
-            li.className = 'post-row';
-
-            // Info
-            var info = document.createElement('div');
-            info.className = 'post-row-info';
-            var t = document.createElement('span');
-            t.className = 'post-row-title';
-            t.textContent = post.title;
-            var m = document.createElement('span');
-            m.className = 'post-row-meta';
-            m.textContent = '#' + post.id + ' · ' + post.date;
-            info.appendChild(t);
-            info.appendChild(m);
-
-            // Confirm strip (shown on tap of ×)
-            var confirmStrip = document.createElement('div');
-            confirmStrip.className = 'post-row-confirm';
-            var label = document.createElement('span');
-            label.className = 'post-row-confirm-label';
-            label.textContent = 'Delete "' + post.title + '"?';
-            var yes = document.createElement('button');
-            yes.type = 'button';
-            yes.className = 'btn-del-yes';
-            yes.textContent = 'Delete';
-            yes.addEventListener('click', function () { deletePost(post.id, li); });
-            var no = document.createElement('button');
-            no.type = 'button';
-            no.className = 'btn-del-no';
-            no.textContent = 'Cancel';
-            no.addEventListener('click', function () { li.classList.remove('confirming'); });
-            confirmStrip.appendChild(label);
-            confirmStrip.appendChild(yes);
-            confirmStrip.appendChild(no);
-
-            // Delete button
-            var del = document.createElement('button');
-            del.type = 'button';
-            del.className = 'post-row-del';
-            del.setAttribute('aria-label', 'Delete post');
-            del.textContent = '×';
-            del.addEventListener('click', function () { li.classList.add('confirming'); });
-
-            li.appendChild(info);
-            li.appendChild(confirmStrip);
-            li.appendChild(del);
-            list.appendChild(li);
-        });
-    }
-
-    async function deletePost(postId, rowEl) {
-        rowEl.classList.add('removing');
-        try {
-            var res = await fetch('/.netlify/functions/delete-post', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: postId, password: savedPw })
-            });
-            var data = await res.json();
-            if (!res.ok || !data.ok) throw new Error(data.error || 'Delete failed.');
-
-            allPosts = allPosts.filter(function (p) { return p.id !== postId; });
-            nextId = allPosts.reduce(function (m, p) { return Math.max(m, p.id || 0); }, 0) + 1;
-            idEl.value = '#' + nextId;
-            setTimeout(function () { rowEl.remove(); }, 250);
-        } catch (err) {
-            rowEl.classList.remove('removing');
-            rowEl.classList.remove('confirming');
-            showError('Delete failed: ' + err.message);
-        }
-    }
-
-    document.getElementById('posts-reload').addEventListener('click', syncPosts);
-
-    function toHtml(raw) {
-        return raw.trim().split(/\n{2,}/).map(function (block) {
-            var t = block.trim();
-            if (!t) return '';
-            if (t.startsWith('## '))  return '<h2>'  + inline(t.slice(3).trim())  + '</h2>';
-            if (t.startsWith('### ')) return '<h3>'  + inline(t.slice(4).trim())  + '</h3>';
-            return '<p>' + t.split('\n').map(function (l) { return inline(l.trim()); }).join('<br>') + '</p>';
-        }).filter(Boolean).join('');
-    }
-
-    function inline(t) {
-        t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-        t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        t = t.replace(/\*(.+?)\*/g, '<em>$1</em>');
-        return t;
-    }
-
-    var statusEl   = document.getElementById('status');
-    var submitBtn  = document.getElementById('submit-btn');
-    var anotherBtn = document.getElementById('another-btn');
-
-    function showError(msg) {
-        statusEl.className = 'status error';
-        while (statusEl.firstChild) statusEl.removeChild(statusEl.firstChild);
-        statusEl.textContent = msg;
-    }
-
-    function showSuccess() {
-        statusEl.className = 'status success';
-        while (statusEl.firstChild) statusEl.removeChild(statusEl.firstChild);
-        statusEl.textContent = '✓ Post saved. Live in ~30 seconds.';
-        var a = document.createElement('a');
-        a.href = '/blog.html';
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.textContent = 'View blog →';
-        statusEl.appendChild(a);
-    }
-
-    function hideStatus() {
-        statusEl.className = 'status';
-        while (statusEl.firstChild) statusEl.removeChild(statusEl.firstChild);
-    }
-
-    document.getElementById('form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var fields = ['date', 'title', 'excerpt', 'content'];
-        var valid = true;
-        fields.forEach(function (id) {
-            var el = document.getElementById(id);
-            if (!el.value.trim()) { el.classList.add('error'); valid = false; }
-            else el.classList.remove('error');
-        });
-        if (!valid) { showError('Fill in all fields before publishing.'); return; }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Publishing…';
-        hideStatus();
-
-        try {
-            var res = await fetch('/.netlify/functions/save-post', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    password: savedPw,
-                    date:     document.getElementById('date').value.trim(),
-                    title:    document.getElementById('title').value.trim(),
-                    excerpt:  document.getElementById('excerpt').value.trim(),
-                    content:  toHtml(document.getElementById('content').value.trim())
-                })
-            });
-            var data = await res.json();
-            if (!res.ok || !data.ok) throw new Error(data.error || 'Something went wrong.');
-
-            showSuccess();
-            anotherBtn.style.display = 'block';
-            ['title', 'excerpt', 'content'].forEach(function (id) {
-                var el = document.getElementById(id);
-                el.value = '';
-                el.classList.remove('error');
-            });
-            document.getElementById('date').value = new Date().toISOString().slice(0, 10);
-            nextId += 1;
-            idEl.value = '#' + nextId;
-            syncPosts();
-
-        } catch (err) {
-            showError(err.message);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Publish Post';
-        }
-    });
-
-    anotherBtn.addEventListener('click', function () {
-        anotherBtn.style.display = 'none';
-        hideStatus();
-        document.getElementById('title').focus();
-    });
-
-    document.getElementById('form').querySelectorAll('input, textarea').forEach(function (el) {
-        el.addEventListener('input', function () { el.classList.remove('error'); });
-    });
-
-    /* ── Gallery ── */
-    var gDrop     = document.getElementById('g-drop');
-    var gFile     = document.getElementById('g-file');
-    var gEmpty    = document.getElementById('g-drop-empty');
-    var gPreviews = document.getElementById('g-previews');
-    var gAddMore  = document.getElementById('g-addmore');
-    var gCapHint  = document.getElementById('g-cap-hint');
-    var gSubmit   = document.getElementById('g-submit');
-    var gStatus   = document.getElementById('g-status');
-    var gList     = document.getElementById('gallery-list');
-
-    var pending = [];            // [{ uid, dataUrl, caption }] queued for upload
-    var uidSeq = 0;
-    var galleryItems = [];
-
-    function gShowStatus(cls, msg) {
-        gStatus.className = 'status ' + cls;
-        gStatus.textContent = msg;
-    }
-    function gHideStatus() {
-        gStatus.className = 'status';
-        gStatus.textContent = '';
-    }
-
-    document.getElementById('g-reload').addEventListener('click', syncGallery);
-
-    // Open the file picker
-    function openPicker() { gFile.click(); }
-    gDrop.addEventListener('click', function () { if (pending.length === 0) openPicker(); });
-    gDrop.addEventListener('keydown', function (e) {
-        if ((e.key === 'Enter' || e.key === ' ') && pending.length === 0) {
-            e.preventDefault(); openPicker();
-        }
-    });
-    gAddMore.addEventListener('click', openPicker);
-
-    gFile.addEventListener('change', function () {
-        var files = Array.prototype.slice.call(gFile.files || []);
-        gFile.value = ''; // allow re-picking the same file later
-        if (!files.length) return;
-        gHideStatus();
-
-        var skipped = 0;
-        files.forEach(function (file) {
-            if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { skipped++; return; }
-            downscale(file, 1600, 0.82).then(function (dataUrl) {
-                pending.push({ uid: ++uidSeq, dataUrl: dataUrl, caption: '' });
-                renderPending();
-            }).catch(function () { /* skip unreadable file */ });
-        });
-        if (skipped) gShowStatus('error', skipped + ' file(s) skipped — JPG, PNG or WebP only.');
-    });
-
-    function renderPending() {
-        while (gPreviews.firstChild) gPreviews.removeChild(gPreviews.firstChild);
-
-        pending.forEach(function (p) {
-            var row = document.createElement('div');
-            row.className = 'g-pv';
-
-            var img = document.createElement('img');
-            img.className = 'g-pv-thumb';
-            img.src = p.dataUrl;
-            img.alt = '';
-            row.appendChild(img);
-
-            var cap = document.createElement('input');
-            cap.type = 'text';
-            cap.className = 'g-pv-cap';
-            cap.maxLength = 140;
-            cap.placeholder = 'Caption (optional)';
-            cap.value = p.caption;
-            cap.setAttribute('aria-label', 'Caption for this image');
-            // Update the model only — no re-render, so typing keeps focus.
-            cap.addEventListener('input', function () { p.caption = cap.value; });
-            row.appendChild(cap);
-
-            var x = document.createElement('button');
-            x.type = 'button';
-            x.className = 'g-pv-x';
-            x.setAttribute('aria-label', 'Remove image');
-            x.textContent = '×';
-            x.addEventListener('click', function (ev) {
-                ev.stopPropagation();
-                pending = pending.filter(function (q) { return q.uid !== p.uid; });
-                renderPending();
-            });
-            row.appendChild(x);
-
-            gPreviews.appendChild(row);
-        });
-
-        var has = pending.length > 0;
-        gPreviews.hidden = !has;
-        gEmpty.hidden = has;
-        gDrop.classList.toggle('has-img', has);
-        gAddMore.hidden = !has;
-        gAddMore.classList.toggle('show', has);
-        if (gCapHint) gCapHint.hidden = !has;
-        gSubmit.disabled = !has;
-        gSubmit.textContent = has && pending.length > 1
-            ? 'Upload ' + pending.length + ' Images'
-            : 'Upload Image';
-    }
-
-    // Shrink image client-side before upload — keeps payloads small + fast.
-    function downscale(file, maxDim, quality) {
-        return new Promise(function (resolve, reject) {
-            var img = new Image();
-            var url = URL.createObjectURL(file);
-            img.onload = function () {
-                URL.revokeObjectURL(url);
-                var w = img.naturalWidth, h = img.naturalHeight;
-                var scale = Math.min(1, maxDim / Math.max(w, h));
-                var cw = Math.max(1, Math.round(w * scale));
-                var ch = Math.max(1, Math.round(h * scale));
-                var canvas = document.createElement('canvas');
-                canvas.width = cw; canvas.height = ch;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, cw, ch);
-                try {
-                    resolve(canvas.toDataURL('image/jpeg', quality));
-                } catch (err) {
-                    reject(new Error('Could not process image.'));
-                }
-            };
-            img.onerror = function () {
-                URL.revokeObjectURL(url);
-                reject(new Error('Could not read that image.'));
-            };
-            img.src = url;
-        });
-    }
-
-    document.getElementById('gallery-form').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        if (pending.length === 0) { gShowStatus('error', 'Choose at least one image first.'); return; }
-
-        gSubmit.disabled = true;
-        gAddMore.disabled = true;
-        gHideStatus();
-
-        var queue = pending.slice();
-        var total = queue.length;
-        var done = 0;
-        var uploadedUids = [];
-
-        // Upload sequentially so we stay within function payload limits.
-        for (var i = 0; i < queue.length; i++) {
-            var p = queue[i];
-            gSubmit.textContent = 'Uploading ' + (i + 1) + ' / ' + total + '…';
-            try {
-                var res = await fetch('/.netlify/functions/save-gallery', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        password: savedPw,
-                        caption:  (p.caption || '').trim(),
-                        image:    p.dataUrl
-                    })
-                });
-                var data = await res.json();
-                if (!res.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
-                done++;
-                uploadedUids.push(p.uid);
-            } catch (err) { /* leave this one queued */ }
-        }
-
-        // Drop only the ones that actually uploaded; failures stay queued for retry.
-        pending = pending.filter(function (q) { return uploadedUids.indexOf(q.uid) === -1; });
-        var failed = total - done;
-
-        gAddMore.disabled = false;
-
-        if (failed === 0) {
-            gShowStatus('success', '✓ ' + done + ' image' + (done === 1 ? '' : 's') + ' added. Live in ~30 seconds.');
-        } else {
-            gShowStatus('error', done + ' uploaded, ' + failed + ' failed — the failed ones are still queued, try again.');
-        }
-        renderPending();
-        syncGallery();
-    });
-
-    async function syncGallery() {
-        try {
-            var res = await fetch('/.netlify/functions/get-gallery');
-            if (res.ok) {
-                var data = await res.json();
-                if (Array.isArray(data)) galleryItems = data;
-            }
-        } catch (_) {}
-        var count = galleryItems.length;
-        document.getElementById('menu-gallery-count').textContent = count > 0 ? count : '';
-        renderGalleryList();
-    }
-
-    function renderGalleryList() {
-        while (gList.firstChild) gList.removeChild(gList.firstChild);
-
-        if (galleryItems.length === 0) {
-            var empty = document.createElement('li');
-            empty.style.cssText = 'padding:14px 0;color:var(--muted);font-size:13px;text-align:center;';
-            empty.textContent = 'No images yet.';
-            gList.appendChild(empty);
-            return;
-        }
-
-        galleryItems.forEach(function (item) {
-            var li = document.createElement('li');
-            li.className = 'post-row';
-
-            var thumb = document.createElement('img');
-            thumb.className = 'g-thumb';
-            thumb.src = '/.netlify/functions/get-gallery-image?id=' + encodeURIComponent(item.id);
-            thumb.alt = '';
-
-            var info = document.createElement('div');
-            info.className = 'post-row-info';
-            var t = document.createElement('span');
-            t.className = 'post-row-title';
-            t.textContent = item.caption || 'Untitled';
-            var m = document.createElement('span');
-            m.className = 'post-row-meta';
-            m.textContent = '#' + item.id;
-            info.appendChild(t);
-            info.appendChild(m);
-
-            var confirmStrip = document.createElement('div');
-            confirmStrip.className = 'post-row-confirm';
-            var label = document.createElement('span');
-            label.className = 'post-row-confirm-label';
-            label.textContent = 'Delete this image?';
-            var yes = document.createElement('button');
-            yes.type = 'button';
-            yes.className = 'btn-del-yes';
-            yes.textContent = 'Delete';
-            yes.addEventListener('click', function () { deleteGalleryItem(item.id, li); });
-            var no = document.createElement('button');
-            no.type = 'button';
-            no.className = 'btn-del-no';
-            no.textContent = 'Cancel';
-            no.addEventListener('click', function () { li.classList.remove('confirming'); });
-            confirmStrip.appendChild(label);
-            confirmStrip.appendChild(yes);
-            confirmStrip.appendChild(no);
-
-            var del = document.createElement('button');
-            del.type = 'button';
-            del.className = 'post-row-del';
-            del.setAttribute('aria-label', 'Delete image');
-            del.textContent = '×';
-            del.addEventListener('click', function () { li.classList.add('confirming'); });
-
-            li.appendChild(thumb);
-            li.appendChild(info);
-            li.appendChild(confirmStrip);
-            li.appendChild(del);
-            gList.appendChild(li);
-        });
-    }
-
-    async function deleteGalleryItem(id, rowEl) {
-        rowEl.classList.add('removing');
-        try {
-            var res = await fetch('/.netlify/functions/delete-gallery', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: id, password: savedPw })
-            });
-            var data = await res.json();
-            if (!res.ok || !data.ok) throw new Error(data.error || 'Delete failed.');
-
-            galleryItems = galleryItems.filter(function (it) { return it.id !== id; });
-            document.getElementById('menu-gallery-count').textContent =
-                galleryItems.length > 0 ? galleryItems.length : '';
-            setTimeout(function () { rowEl.remove(); }, 250);
-        } catch (err) {
-            rowEl.classList.remove('removing', 'confirming');
-            gShowStatus('error', 'Delete failed: ' + err.message);
-        }
-    }
-
-
-}());
-</script>
+<!-- ── App ── -->
+<div class="ad-app" id="app" hidden>
+
+    <!-- Notes -->
+    <section class="ad-view" id="view-notes" aria-label="Notes">
+        <header class="ad-top">
+            <a class="ad-round lg" href="/blog.html" target="_blank" rel="noopener" aria-label="Open the blog"><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <p class="ad-top__title" aria-hidden="true">Blog</p>
+            <button type="button" class="ad-round lg" data-menu="menu-notes" aria-label="More" aria-expanded="false"><svg aria-hidden="true"><use href="#i-more"/></svg></button>
+        </header>
+        <div class="ad-menu lg" id="menu-notes" role="menu">
+            <button type="button" role="menuitem" data-act="refresh-notes"><span>Refresh</span><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
+            <a role="menuitem" href="/blog.html" target="_blank" rel="noopener"><span>View Blog</span><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <button type="button" role="menuitem" data-theme-toggle="label"></button>
+            <button type="button" role="menuitem" data-act="lock"><span>Lock</span><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
+        </div>
+        <div class="ad-main">
+            <h1 class="ad-title">Blog</h1>
+            <p class="ad-count" id="notes-count">&nbsp;</p>
+            <label class="ad-search">
+                <svg aria-hidden="true"><use href="#i-search"/></svg>
+                <input type="search" id="notes-q" placeholder="Search" autocomplete="off" aria-label="Search notes">
+            </label>
+            <div id="notes-list" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <!-- B-Roll -->
+    <section class="ad-view" id="view-roll" aria-label="B-Roll" hidden>
+        <header class="ad-top">
+            <a class="ad-round lg" href="/roll.html" target="_blank" rel="noopener" aria-label="Open B-Roll"><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <p class="ad-top__title" aria-hidden="true">B-Roll</p>
+            <button type="button" class="ad-round lg" data-menu="menu-roll" aria-label="More" aria-expanded="false"><svg aria-hidden="true"><use href="#i-more"/></svg></button>
+        </header>
+        <div class="ad-menu lg" id="menu-roll" role="menu">
+            <button type="button" role="menuitem" data-act="refresh-roll"><span>Refresh</span><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
+            <button type="button" role="menuitem" data-act="build-thumbs"><span>Build Fast Previews</span><svg aria-hidden="true"><use href="#i-bolt"/></svg></button>
+            <a role="menuitem" href="/roll.html" target="_blank" rel="noopener"><span>View B-Roll</span><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <button type="button" role="menuitem" data-theme-toggle="label"></button>
+            <button type="button" role="menuitem" data-act="lock"><span>Lock</span><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
+        </div>
+        <div class="ad-main ad-main--roll">
+            <h1 class="ad-title">B-Roll</h1>
+            <p class="ad-count" id="roll-count">&nbsp;</p>
+            <div class="ad-banner" id="thumb-banner" hidden>
+                <div class="ad-banner__text">
+                    <p class="ad-banner__title" id="thumb-title"></p>
+                    <p class="ad-banner__sub" id="thumb-sub">Build small previews so the grid opens instantly.</p>
+                    <div class="ad-progress" id="thumb-progress" hidden><span></span></div>
+                </div>
+                <button type="button" class="ad-btn ad-btn--accent" id="thumb-go">Build</button>
+            </div>
+            <div class="ad-grid" id="roll-grid"></div>
+        </div>
+    </section>
+
+    <!-- Bottom bar: Notes / B-Roll, and the action for the current one -->
+    <nav class="ad-bar" aria-label="Sections">
+        <div class="ad-tabs lg" role="tablist">
+            <button type="button" class="ad-tab" role="tab" data-view="view-notes" aria-selected="true"><svg aria-hidden="true"><use href="#i-note"/></svg><span>Notes</span></button>
+            <button type="button" class="ad-tab" role="tab" data-view="view-roll" aria-selected="false"><svg aria-hidden="true"><use href="#i-photos"/></svg><span>B-Roll</span></button>
+        </div>
+        <button type="button" class="ad-round ad-round--big lg" id="act-new" aria-label="New note"><svg aria-hidden="true"><use href="#i-compose"/></svg></button>
+        <input type="file" id="roll-file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+    </nav>
+</div>
+
+<!-- ── Note editor ── -->
+<section class="ad-editor" id="editor" aria-hidden="true" aria-label="Note">
+    <header class="ad-editor__top">
+        <button type="button" class="ad-round lg" id="ed-back" aria-label="Back to notes"><svg aria-hidden="true"><use href="#i-back"/></svg></button>
+        <div class="ad-editor__right">
+            <div class="ad-pill lg">
+                <button type="button" class="ad-pill__btn" id="ed-pin" aria-label="Pin note" aria-pressed="false"><svg aria-hidden="true"><use href="#i-pin"/></svg></button>
+                <button type="button" class="ad-pill__btn" id="ed-info" aria-label="Note details"><svg aria-hidden="true"><use href="#i-info"/></svg></button>
+            </div>
+            <button type="button" class="ad-done lg" id="ed-save"><span>Publish</span></button>
+        </div>
+    </header>
+    <div class="ad-editor__scroll" id="ed-scroll">
+        <div class="ad-editor__inner">
+            <button type="button" class="ad-stamp" id="ed-stamp" aria-label="Change date and folder"></button>
+            <textarea class="ad-ed-title" id="ed-title" rows="1" placeholder="Title" aria-label="Title" maxlength="200"></textarea>
+            <textarea class="ad-ed-body" id="ed-body" placeholder="Start writing…" aria-label="Note"></textarea>
+            <p class="ad-ed-hint">## heading · **bold** · *italic* · [text](link) · - list · &gt; quote</p>
+        </div>
+    </div>
+    <footer class="ad-editor__bar">
+        <div class="ad-pill ad-pill--tools lg" role="toolbar" aria-label="Formatting">
+            <button type="button" class="ad-pill__btn ad-fmt" data-fmt="h2" aria-label="Heading"><span class="ad-aa">Aa</span></button>
+            <button type="button" class="ad-pill__btn ad-fmt" data-fmt="bold" aria-label="Bold"><b>B</b></button>
+            <button type="button" class="ad-pill__btn ad-fmt" data-fmt="italic" aria-label="Italic"><i>I</i></button>
+            <button type="button" class="ad-pill__btn ad-fmt" data-fmt="list" aria-label="List"><svg aria-hidden="true"><use href="#i-list"/></svg></button>
+            <button type="button" class="ad-pill__btn ad-fmt" data-fmt="quote" aria-label="Quote"><svg aria-hidden="true"><use href="#i-quote"/></svg></button>
+            <button type="button" class="ad-pill__btn ad-fmt" data-fmt="link" aria-label="Link"><svg aria-hidden="true"><use href="#i-link"/></svg></button>
+        </div>
+        <button type="button" class="ad-round ad-round--big lg" id="ed-new" aria-label="New note"><svg aria-hidden="true"><use href="#i-compose"/></svg></button>
+    </footer>
+</section>
+
+<!-- ── Note details sheet ── -->
+<div class="ad-sheet" id="sheet-note" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sn-title">
+    <div class="ad-sheet__scrim" data-close></div>
+    <div class="ad-sheet__panel">
+        <header class="ad-sheet__hd">
+            <span class="ad-sheet__spacer"></span>
+            <h2 id="sn-title">Note Details</h2>
+            <button type="button" class="ad-btn ad-btn--accent" data-close>Done</button>
+        </header>
+        <div class="ad-form">
+            <div class="ad-group">
+                <label class="ad-field"><span>Date</span><input type="date" id="sn-date"></label>
+                <label class="ad-field"><span>Folder</span><input type="text" id="sn-folder" list="sn-folders" placeholder="Notes" maxlength="40" autocomplete="off"></label>
+                <label class="ad-field ad-field--switch"><span>Pinned</span><input type="checkbox" id="sn-pinned" class="ad-switch" role="switch"></label>
+            </div>
+            <datalist id="sn-folders"></datalist>
+            <div class="ad-group">
+                <label class="ad-field ad-field--stack"><span>Preview</span><textarea id="sn-excerpt" rows="3" maxlength="300" placeholder="Left empty, the list shows the first lines of the note."></textarea></label>
+            </div>
+            <div class="ad-group ad-group--actions">
+                <a class="ad-row-btn" id="sn-view" href="/blog.html" target="_blank" rel="noopener" hidden>View on Site</a>
+                <button type="button" class="ad-row-btn ad-row-btn--danger" id="sn-delete" hidden>Delete Note</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Import photos sheet ── -->
+<div class="ad-sheet ad-sheet--tall" id="sheet-import" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="si-title">
+    <div class="ad-sheet__scrim" data-close></div>
+    <div class="ad-sheet__panel">
+        <header class="ad-sheet__hd">
+            <button type="button" class="ad-btn" data-close>Cancel</button>
+            <h2 id="si-title">Add Photos</h2>
+            <button type="button" class="ad-btn ad-btn--accent" id="si-go" disabled>Add</button>
+        </header>
+        <div class="ad-form">
+            <div class="ad-group">
+                <label class="ad-field"><span>Place</span><input type="text" id="si-place" maxlength="80" placeholder="Koforidua" autocomplete="off" list="si-places"></label>
+            </div>
+            <datalist id="si-places"></datalist>
+            <p class="ad-note">The place goes on every photo here. Each date is read from the photo and can be changed.</p>
+            <ul class="ad-import" id="si-list"></ul>
+            <div class="ad-group ad-group--actions">
+                <button type="button" class="ad-row-btn" id="si-more">Add More Photos</button>
+            </div>
+            <p class="ad-status" id="si-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+</div>
+
+<!-- ── Photo sheet ── -->
+<div class="ad-sheet ad-sheet--tall" id="sheet-photo" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sp-title">
+    <div class="ad-sheet__scrim" data-close></div>
+    <div class="ad-sheet__panel">
+        <header class="ad-sheet__hd">
+            <button type="button" class="ad-btn" data-close>Cancel</button>
+            <h2 id="sp-title">Photo</h2>
+            <button type="button" class="ad-btn ad-btn--accent" id="sp-save">Save</button>
+        </header>
+        <div class="ad-form">
+            <div class="ad-photo"><img id="sp-img" alt=""></div>
+            <div class="ad-group">
+                <label class="ad-field ad-field--stack"><span>Caption</span><textarea id="sp-caption" rows="2" maxlength="140" placeholder="What's happening here?"></textarea></label>
+            </div>
+            <div class="ad-group">
+                <label class="ad-field"><span>Place</span><input type="text" id="sp-place" maxlength="80" list="si-places" autocomplete="off" placeholder="Where"></label>
+                <label class="ad-field"><span>Date</span><input type="date" id="sp-date"></label>
+                <label class="ad-field"><span>Link</span><input type="url" id="sp-link" maxlength="500" placeholder="https://" autocomplete="off"></label>
+            </div>
+            <p class="ad-note" id="sp-meta"></p>
+            <div class="ad-group ad-group--actions">
+                <a class="ad-row-btn" id="sp-view" target="_blank" rel="noopener">Open in B-Roll</a>
+                <button type="button" class="ad-row-btn ad-row-btn--danger" id="sp-delete">Delete Photo</button>
+            </div>
+            <p class="ad-status" id="sp-status" role="status" aria-live="polite"></p>
+        </div>
+    </div>
+</div>
+
+<p class="ad-toast lg" id="toast" role="status"><span id="toast-text"></span></p>
+
+<!-- Icons -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-back" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M15 4.5 7.5 12l7.5 7.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h13M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="19" cy="12" r="1.9" fill="currentColor"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="m15.6 15.6 4.9 4.9"/></symbol>
+    <symbol id="i-compose" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M11 4.5H6.5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V13"/><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" d="M17.6 3.6a1.9 1.9 0 0 1 2.8 2.8l-7.7 7.7-3.6.8.8-3.6z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.3" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="15" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M8 8.5h8M8 12h8M8 15.5h5"/></symbol>
+    <symbol id="i-photos" viewBox="0 0 24 24"><rect x="3" y="4.5" width="15" height="12" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 19.5h11a3 3 0 0 0 3-3V8.5"/><path fill="currentColor" d="M5 14.4l3.4-3.6 2.4 2.4 2.2-1.8 3 3z"/></symbol>
+    <symbol id="i-out" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M14 4.5h5.5V10M19.5 4.5 11 13M17 14v4.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1H10"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4h-4"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M14.6 3.3 20.7 9.4l-1.4 1.4-1.4-.4-3.4 3.4.4 3.8-1.6 1.6-3.6-3.6-4.9 4.9M9.3 16.1l-3.6-3.6 1.6-1.6 3.8.4 3.4-3.4-.4-1.4z"/></symbol>
+    <symbol id="i-pin-fill" viewBox="0 0 24 24"><path fill="currentColor" d="M14.6 2.8a1 1 0 0 1 1.4 0l5.2 5.2a1 1 0 0 1 0 1.4l-.7.7a2 2 0 0 1-2.1.5l-3.2 3.2.5 3.6a1 1 0 0 1-.3.8l-1.1 1.1a1 1 0 0 1-1.4 0L9.2 15.6l-4.7 4.7a.9.9 0 0 1-1.3-1.3l4.7-4.7-3.7-3.7a1 1 0 0 1 0-1.4l1.1-1.1a1 1 0 0 1 .8-.3l3.6.5L13 5.1a2 2 0 0 1 .5-2.1z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M10.5 10.9H12v5.9M10.4 16.8h3.2"/><circle cx="11.9" cy="7.7" r="1.15" fill="currentColor"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><circle cx="5.5" cy="7" r="1.4" fill="currentColor"/><circle cx="5.5" cy="12" r="1.4" fill="currentColor"/><circle cx="5.5" cy="17" r="1.4" fill="currentColor"/><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M10 7h9.5M10 12h9.5M10 17h9.5"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path fill="currentColor" d="M5 17.5v-4.2c0-3.4 1.5-5.6 4.6-6.8l.8 1.4C8.6 8.7 7.8 9.9 7.6 11.5H10v6zM13.6 17.5v-4.2c0-3.4 1.5-5.6 4.6-6.8l.8 1.4c-1.8.8-2.6 2-2.8 3.6h2.4v6z"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M3.5 7.2a1.7 1.7 0 0 1 1.7-1.7h4.2l2 2h7.4a1.7 1.7 0 0 1 1.7 1.7v8.6a1.7 1.7 0 0 1-1.7 1.7H5.2a1.7 1.7 0 0 1-1.7-1.7z"/><path stroke="currentColor" stroke-width="1.5" d="M3.5 10h17"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="m7 7 10 10M17 7 7 17"/></symbol>
+</svg>
+
+<script src="/js/notes-core.js"></script>
+<script src="/_p7n3x/admin.js"></script>
+<script defer src="/js/glass.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-        navigator.serviceWorker.getRegistrations().then(function (regs) {
-            regs.forEach(function (r) {
-                if (r.scope && r.scope.includes('/admin/')) r.unregister();
-            });
-        });
-        navigator.serviceWorker.register('/_p7n3x/sw.js').catch(function () {});
-    });
+    navigator.serviceWorker.register('/_p7n3x/sw.js', { scope: '/_p7n3x/' }).catch(function () {});
 }
 </script>
 </body>

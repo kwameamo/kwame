@@ -1,210 +1,359 @@
+/* ─────────────────────────────────────────
+   BLOG — Apple Notes
+   Lists notes in Notes' groups, searches them
+   as you type, and opens one full screen with
+   share, copy link and newer / older notes.
+   Every note keeps its link: blog.html?post=<id>
+───────────────────────────────────────── */
 (function () {
-    var posts = [];
-    var currentPostIndex = 0;
-    var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    'use strict';
 
-    function fmtDate(d) {
-        return MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+    var N = window.NotesCore;
+    if (!N) return;
+
+    var groupsEl  = document.getElementById('nt-groups');
+    var countEl   = document.getElementById('nt-count');
+    var topBar    = document.getElementById('nt-top');
+    var titleEl   = document.getElementById('nt-title');
+    var q         = document.getElementById('nt-q');
+    var clearBtn  = document.getElementById('nt-clear');
+    var reader    = document.getElementById('nt-reader');
+    var scroller  = document.getElementById('nt-scroll');
+    var toast     = document.getElementById('nt-toast');
+    var toastText = document.getElementById('nt-toast-text');
+    var menu      = document.getElementById('nt-menu');
+    var moreBtn   = document.getElementById('nt-more');
+    var rmenu     = document.getElementById('nt-rmenu');
+    var rmoreBtn  = document.getElementById('nt-rmore');
+
+    var notes = [];   // newest first
+    var at = -1;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function el(tag, className, text) {
+        var e = document.createElement(tag);
+        if (className) e.className = className;
+        if (text != null) e.textContent = text;
+        return e;
     }
-
-    function setPostContent(html, container) {
-        container.replaceChildren();
-        var parsed = new DOMParser().parseFromString(html, 'text/html');
-        Array.from(parsed.body.childNodes).forEach(function (node) {
-            container.appendChild(document.importNode(node, true));
-        });
+    function icon(id) {
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('aria-hidden', 'true');
+        var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+        use.setAttribute('href', '#' + id);
+        svg.appendChild(use);
+        return svg;
     }
+    function glassRefresh() { if (window.LiquidGlass) window.LiquidGlass.refresh(); }
 
-    async function loadPosts() {
-        try {
-            var res = await fetch('/.netlify/functions/get-posts');
-            if (!res.ok) throw new Error();
-            var data = await res.json();
-            if (!Array.isArray(data)) throw new Error();
-            posts = data.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
-            posts.forEach(function (p) { p.displayDate = fmtDate(new Date(p.date)); });
-        } catch (_) {
-            posts = [{
-                id: 1,
-                date: new Date().toISOString(),
-                displayDate: fmtDate(new Date()),
-                title: 'Welcome to the Blog',
-                excerpt: 'Blog posts will appear here once blog-posts.json is configured.',
-                content: '<p>Add your blog posts to blog-posts.json to see them here.</p>'
-            }];
-        }
-        renderCards();
-
-        // URL param takes precedence over session storage
-        var urlId = new URLSearchParams(location.search).get('post');
-        if (urlId) {
-            var targetId  = parseInt(urlId, 10);
-            var targetIdx = posts.findIndex(function (p) { return p.id === targetId; });
-            if (targetIdx >= 0) { openPost(targetIdx, true); return; }
-        }
-
-        var saved = sessionStorage.getItem('blog_openPost');
-        if (saved !== null) {
-            openPost(parseInt(saved, 10), true);
-        } else {
-            var y = sessionStorage.getItem('blog_scrollY');
-            if (y) requestAnimationFrame(function () { window.scrollTo(0, parseInt(y, 10)); });
-        }
-    }
-
-    function renderCards() {
-        var grid = document.getElementById('blog-grid');
+    // Text with the search match highlighted, built without innerHTML
+    function marked(text, query) {
         var frag = document.createDocumentFragment();
-
-        posts.forEach(function (post, i) {
-            var card = document.createElement('div');
-            card.className = 'blog-card';
-            card.addEventListener('click', function () { openPost(i); });
-
-            var date = document.createElement('div');
-            date.className = 'blog-date';
-            date.textContent = post.displayDate;
-
-            var title = document.createElement('h3');
-            title.className = 'blog-title';
-            title.textContent = post.title;
-
-            var excerpt = document.createElement('p');
-            excerpt.className = 'blog-excerpt';
-            excerpt.textContent = post.excerpt;
-
-            var arrow = document.createElement('span');
-            arrow.className = 'blog-arrow';
-            arrow.textContent = '→';
-
-            card.appendChild(date);
-            card.appendChild(title);
-            card.appendChild(excerpt);
-            card.appendChild(arrow);
-            frag.appendChild(card);
-        });
-
-        grid.appendChild(frag);
-
-        var n = posts.length;
-        var label = n + (n === 1 ? ' post' : ' posts');
-        document.getElementById('posts-count').textContent = label;
-        var navRight = document.getElementById('nav-right-count');
-        if (navRight) navRight.textContent = label;
-    }
-
-    function openPost(index, skipScrollRestore) {
-        currentPostIndex = index;
-        var post = posts[index];
-
-        document.getElementById('modal-title').textContent = post.title;
-        document.getElementById('modal-date').textContent = post.displayDate;
-        document.getElementById('modal-eyebrow').textContent = 'Post ' + (index + 1) + ' of ' + posts.length;
-
-        setPostContent(post.content, document.getElementById('modal-body'));
-
-        var modal = document.getElementById('blog-modal');
-        modal.classList.add('active');
-        requestAnimationFrame(function () {
-            requestAnimationFrame(function () { modal.classList.add('visible'); });
-        });
-        document.body.style.overflow = 'hidden';
-        updateNavBtns();
-
-        var savedScroll = sessionStorage.getItem('blog_modalScrollY_' + index);
-        if (!skipScrollRestore && savedScroll !== null) {
-            requestAnimationFrame(function () { modal.scrollTop = parseInt(savedScroll, 10); });
-        } else {
-            modal.scrollTop = 0;
+        if (!query) { frag.appendChild(document.createTextNode(text)); return frag; }
+        var lower = text.toLowerCase(), from = 0, i;
+        while ((i = lower.indexOf(query, from)) !== -1) {
+            if (i > from) frag.appendChild(document.createTextNode(text.slice(from, i)));
+            frag.appendChild(el('mark', '', text.slice(i, i + query.length)));
+            from = i + query.length;
         }
-
-        sessionStorage.setItem('blog_openPost', index);
-        modal.onscroll = function () {
-            sessionStorage.setItem('blog_modalScrollY_' + currentPostIndex, modal.scrollTop);
-        };
-
-        // Push shareable URL
-        history.pushState({ postId: post.id }, '', '?post=' + post.id);
-        document.title = post.title + ' — David Kwame Amo';
+        if (from < text.length) frag.appendChild(document.createTextNode(text.slice(from)));
+        return frag;
     }
 
-    function closePost() {
-        var modal = document.getElementById('blog-modal');
-        modal.classList.remove('visible');
-        setTimeout(function () {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }, 220);
-        sessionStorage.removeItem('blog_openPost');
-        history.pushState(null, '', location.pathname);
-        document.title = 'Blog — David Kwame Amo';
-        var y = sessionStorage.getItem('blog_scrollY');
-        if (y) requestAnimationFrame(function () { window.scrollTo(0, parseInt(y, 10)); });
+    /* ── Load ── */
+    function load() {
+        return fetch('/.netlify/functions/get-posts')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) { if (Array.isArray(d)) return d; throw new Error('no posts'); })
+            .catch(function () {
+                return fetch('/blog-posts.json').then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; });
+            });
     }
 
-    function navigatePost(dir) {
-        var next = currentPostIndex + dir;
-        if (next >= 0 && next < posts.length) openPost(next, false);
+    load().then(function (list) {
+        notes = N.sort(Array.isArray(list) ? list : []);
+        notes.forEach(function (n) {
+            n.folder = n.folder || 'Notes';
+            n.text = N.plain(n.content);
+            n.preview = N.preview(n);
+        });
+        countEl.textContent = notes.length + (notes.length === 1 ? ' Note' : ' Notes');
+        render();
+        openFromUrl(true);
+    });
+
+    /* ── List ── */
+    function row(note, query) {
+        var b = el('button', 'nt-row');
+        b.type = 'button';
+        b.dataset.id = note.id;
+        var t = el('span', 'nt-row__title');
+        t.appendChild(marked(note.title || 'New Note', query));
+        b.appendChild(t);
+        var line = el('span', 'nt-row__line');
+        line.appendChild(el('span', 'nt-row__date', N.rowDate(note.date)));
+        var p = el('span', 'nt-row__preview');
+        var prev = note.preview;
+        // While searching, show the words around the match
+        if (query) {
+            var hit = note.text.toLowerCase().indexOf(query);
+            if (hit > 40 && note.preview.toLowerCase().indexOf(query) === -1) prev = '…' + note.text.slice(hit - 30, hit + 120);
+        }
+        p.appendChild(marked(prev, query));
+        line.appendChild(p);
+        b.appendChild(line);
+        var f = el('span', 'nt-row__folder');
+        f.appendChild(icon(note.pinned ? 'nt-i-pin' : 'nt-i-folder'));
+        f.appendChild(document.createTextNode(note.folder));
+        b.appendChild(f);
+        return b;
     }
 
-    function updateNavBtns() {
-        var atStart = currentPostIndex === 0;
-        var atEnd   = currentPostIndex === posts.length - 1;
-        var label   = (currentPostIndex + 1) + ' / ' + posts.length;
-        document.getElementById('prev-btn').disabled      = atStart;
-        document.getElementById('next-btn').disabled      = atEnd;
-        document.getElementById('prev-btn-foot').disabled = atStart;
-        document.getElementById('next-btn-foot').disabled = atEnd;
-        document.getElementById('modal-counter').textContent = label;
+    function section(label, list, query) {
+        var s = el('section', 'nt-group');
+        var h = el('h2', 'nt-group__hd', label);
+        s.appendChild(h);
+        var card = el('div', 'nt-card');
+        list.forEach(function (n) { card.appendChild(row(n, query)); });
+        s.appendChild(card);
+        return s;
     }
 
-    function sharePost() {
-        var post = posts[currentPostIndex];
-        var url  = location.href;
-        var btn  = document.getElementById('modal-share-btn');
+    function render() {
+        var query = (q.value || '').trim().toLowerCase();
+        groupsEl.replaceChildren();
+        clearBtn.hidden = !query;
 
-        if (navigator.share) {
-            navigator.share({ title: post.title + ' — David Kwame Amo', url: url }).catch(function () {});
+        if (!notes.length) {
+            var e = el('p', 'nt-empty');
+            e.appendChild(el('strong', '', 'No Notes'));
+            e.appendChild(document.createTextNode('Notes from the build will show up here.'));
+            groupsEl.appendChild(e);
             return;
         }
 
-        var reset = function () { btn.textContent = '↗ share'; };
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(function () {
-                btn.textContent = '✓ copied';
-                setTimeout(reset, 2000);
-            }).catch(reset);
+        if (query) {
+            var top = [], rest = [];
+            notes.forEach(function (n) {
+                if ((n.title || '').toLowerCase().indexOf(query) !== -1) top.push(n);
+                else if (n.text.toLowerCase().indexOf(query) !== -1 || n.folder.toLowerCase().indexOf(query) !== -1) rest.push(n);
+            });
+            if (!top.length && !rest.length) {
+                var none = el('p', 'nt-empty');
+                none.appendChild(el('strong', '', 'No Results'));
+                none.appendChild(document.createTextNode('Check the spelling or try a new search.'));
+                groupsEl.appendChild(none);
+            }
+            if (top.length) groupsEl.appendChild(section('Top Hits', top, query));
+            if (rest.length) groupsEl.appendChild(section('Notes', rest, query));
         } else {
-            var ta = document.createElement('textarea');
-            ta.value = url;
-            ta.style.cssText = 'position:fixed;opacity:0';
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            btn.textContent = '✓ copied';
-            setTimeout(reset, 2000);
+            N.group(notes).forEach(function (g) { groupsEl.appendChild(section(g.label, g.notes, '')); });
         }
+        glassRefresh();
     }
 
-    document.getElementById('modal-share-btn').addEventListener('click', sharePost);
-
-    document.addEventListener('keydown', function (e) {
-        var modal = document.getElementById('blog-modal');
-        if (!modal.classList.contains('active')) return;
-        if (e.key === 'Escape')     closePost();
-        if (e.key === 'ArrowLeft')  navigatePost(-1);
-        if (e.key === 'ArrowRight') navigatePost(1);
+    groupsEl.addEventListener('click', function (e) {
+        var b = e.target.closest('.nt-row');
+        if (!b) return;
+        var i = indexOf(+b.dataset.id);
+        if (i >= 0) open(i);
     });
 
-    window.addEventListener('scroll', function () {
-        document.getElementById('site-nav').classList.toggle('dark', window.scrollY > 10);
-        sessionStorage.setItem('blog_scrollY', window.scrollY);
+    var searchTimer = null;
+    q.addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(render, 80);
+    });
+    q.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { q.value = ''; render(); q.blur(); }
+        if (e.key === 'Enter') {
+            var first = groupsEl.querySelector('.nt-row');
+            if (first) first.click();
+        }
+    });
+    clearBtn.addEventListener('click', function () { q.value = ''; render(); q.focus(); });
+
+    // The big title tucks into the bar as it scrolls away, like Notes
+    function onScroll() {
+        var past = titleEl.getBoundingClientRect().bottom < topBar.getBoundingClientRect().bottom;
+        topBar.classList.toggle('is-scrolled', past);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    /* ── Menus ── */
+    function closeMenus() {
+        [menu, rmenu].forEach(function (m) { m.classList.remove('is-shown'); });
+        moreBtn.setAttribute('aria-expanded', 'false');
+        rmoreBtn.setAttribute('aria-expanded', 'false');
+    }
+    function toggle(m, btn) {
+        return function (e) {
+            e.stopPropagation();
+            var show = !m.classList.contains('is-shown');
+            closeMenus();
+            m.classList.toggle('is-shown', show);
+            btn.setAttribute('aria-expanded', String(show));
+            glassRefresh();
+        };
+    }
+    moreBtn.addEventListener('click', toggle(menu, moreBtn));
+    rmoreBtn.addEventListener('click', toggle(rmenu, rmoreBtn));
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.nt-menu')) closeMenus();
+    });
+
+    /* ── Reader ── */
+    function indexOf(id) {
+        for (var i = 0; i < notes.length; i++) if (notes[i].id === id) return i;
+        return -1;
+    }
+
+    function fill(i) {
+        var n = notes[i];
+        at = i;
+        document.getElementById('nt-stamp').textContent = N.longDate(n.date);
+        document.getElementById('nt-r-title').textContent = n.title;
+        var body = document.getElementById('nt-r-body');
+        body.replaceChildren();
+        var parsed = new DOMParser().parseFromString(n.content || '', 'text/html');
+        // Scripts and inline handlers never come along
+        parsed.querySelectorAll('script, style, iframe, object, embed').forEach(function (x) { x.remove(); });
+        parsed.querySelectorAll('*').forEach(function (x) {
+            Array.prototype.slice.call(x.attributes).forEach(function (a) {
+                if (/^on/i.test(a.name) || (/^(href|src)$/i.test(a.name) && /^\s*javascript:/i.test(a.value))) x.removeAttribute(a.name);
+            });
+            if (x.tagName === 'A') { x.setAttribute('target', '_blank'); x.setAttribute('rel', 'noopener'); }
+        });
+        Array.prototype.forEach.call(parsed.body.childNodes, function (node) { body.appendChild(document.importNode(node, true)); });
+
+        var folder = document.getElementById('nt-r-folder');
+        folder.replaceChildren(icon('nt-i-folder'), document.createTextNode(n.folder));
+
+        document.getElementById('nt-pos').textContent = (i + 1) + ' / ' + notes.length;
+        ['nt-up', 'nt-prev'].forEach(function (id) { document.getElementById(id).disabled = i === 0; });
+        ['nt-down', 'nt-next'].forEach(function (id) { document.getElementById(id).disabled = i === notes.length - 1; });
+        document.title = n.title + ' — David Kwame Amo';
+        scroller.scrollTop = 0;
+    }
+
+    var listScroll = 0;
+    function open(i, fromHistory) {
+        if (i < 0 || i >= notes.length) return;
+        closeMenus();
+        if (!reader.classList.contains('is-open')) listScroll = window.scrollY;
+        fill(i);
+        reader.classList.add('is-open');
+        reader.setAttribute('aria-hidden', 'false');
+        document.documentElement.classList.add('nt-reading');
+        var url = location.pathname + '?post=' + notes[i].id;
+        if (!fromHistory) {
+            if (history.state && history.state.note) history.replaceState({ note: notes[i].id }, '', url);
+            else history.pushState({ note: notes[i].id }, '', url);
+        }
+        setTimeout(glassRefresh, 450);
+        document.getElementById('nt-back').focus({ preventScroll: true });
+    }
+
+    function close(fromHistory) {
+        if (!reader.classList.contains('is-open')) return;
+        closeMenus();
+        reader.classList.remove('is-open');
+        reader.setAttribute('aria-hidden', 'true');
+        document.documentElement.classList.remove('nt-reading');
+        document.title = 'Blog — David Kwame Amo';
+        window.scrollTo(0, listScroll);
+        var row = groupsEl.querySelector('.nt-row[data-id="' + (notes[at] && notes[at].id) + '"]');
+        if (row) row.focus({ preventScroll: true });
+        if (!fromHistory) {
+            if (history.state && history.state.note && history.length > 1 && cameFromList) history.back();
+            else history.replaceState(null, '', location.pathname);
+        }
+        cameFromList = true;
+        setTimeout(glassRefresh, 450);
+    }
+
+    // A shared link opens the note straight away; Back then goes to the list
+    var cameFromList = true;
+    function openFromUrl(initial) {
+        var id = parseInt(new URLSearchParams(location.search).get('post'), 10);
+        var i = isNaN(id) ? -1 : indexOf(id);
+        if (i >= 0) {
+            if (initial) { cameFromList = false; history.replaceState({ note: id }, '', location.href); }
+            open(i, true);
+        } else {
+            close(true);
+        }
+    }
+    window.addEventListener('popstate', function () { openFromUrl(false); });
+
+    function step(d) { if (at + d >= 0 && at + d < notes.length) open(at + d); }
+
+    document.getElementById('nt-back').addEventListener('click', function () { close(); });
+    document.getElementById('nt-up').addEventListener('click', function () { step(-1); });
+    document.getElementById('nt-down').addEventListener('click', function () { step(1); });
+    document.getElementById('nt-prev').addEventListener('click', function () { closeMenus(); step(-1); });
+    document.getElementById('nt-next').addEventListener('click', function () { closeMenus(); step(1); });
+
+    document.addEventListener('keydown', function (e) {
+        if (!reader.classList.contains('is-open')) {
+            if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+            return;
+        }
+        if (e.key === 'Escape') { if (rmenu.classList.contains('is-shown')) closeMenus(); else close(); }
+        if (e.key === 'ArrowUp' && e.altKey) step(-1);
+        if (e.key === 'ArrowDown' && e.altKey) step(1);
+    });
+
+    // Swipe right from the left edge goes back, like iOS
+    var swipe = null;
+    reader.addEventListener('touchstart', function (e) {
+        var t = e.touches[0];
+        swipe = t.clientX < 28 ? { x: t.clientX, y: t.clientY } : null;
     }, { passive: true });
+    reader.addEventListener('touchend', function (e) {
+        if (!swipe) return;
+        var t = e.changedTouches[0];
+        if (t.clientX - swipe.x > 80 && Math.abs(t.clientY - swipe.y) < 60) close();
+        swipe = null;
+    });
 
-    // Expose close/navigate to inline onclick handlers
-    window.closePost    = closePost;
-    window.navigatePost = navigatePost;
+    /* ── Share / copy ── */
+    var toastTimer = null;
+    function say(msg) {
+        toastText.textContent = msg;
+        toast.classList.add('is-shown');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('is-shown'); }, 1600);
+        glassRefresh();
+    }
+    function copy(url) {
+        var legacy = function () {
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            ta.setAttribute('readonly', '');
+            ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+            document.body.appendChild(ta);
+            ta.select();
+            var ok = false;
+            try { ok = document.execCommand('copy'); } catch (_) {}
+            ta.remove();
+            say(ok ? 'Link Copied' : url);
+        };
+        if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { say('Link Copied'); }, legacy);
+        else legacy();
+    }
+    function noteUrl() { return location.origin + location.pathname + '?post=' + notes[at].id; }
 
-    loadPosts(); /* SW registration is handled by sw-updater.js */
+    document.getElementById('nt-share').addEventListener('click', function () {
+        var n = notes[at];
+        if (navigator.share) navigator.share({ title: n.title + ' — David Kwame Amo', text: n.preview, url: noteUrl() }).catch(function () {});
+        else copy(noteUrl());
+    });
+    document.getElementById('nt-copy').addEventListener('click', function () { closeMenus(); copy(noteUrl()); });
+    document.getElementById('nt-copy-folder').addEventListener('click', function () {
+        closeMenus();
+        var url = location.origin + location.pathname;
+        if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { say('Link Copied'); }, function () { say(url); });
+        else say(url);
+    });
 }());

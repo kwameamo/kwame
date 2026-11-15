@@ -1,43 +1,36 @@
-const CACHE = 'admin-v6';
+/*
+  Admin service worker.
+  Network-first, so a new deploy of the admin shows up on the next open;
+  the cache is only a fallback for opening the shell offline.
+  Live data (/.netlify/) is never cached.
+*/
+const CACHE = 'admin-v7';
 
-const PRECACHE = [
-  '/_p7n3x/',
-  '/_p7n3x/index.html'
-];
-
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(PRECACHE))
-  );
-  self.skipWaiting();
-});
+self.addEventListener('install', () => { self.skipWaiting(); });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
-  const url = new URL(e.request.url);
-
-  // Always network for Netlify functions — never cache live data
+  const req = e.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== location.origin) return;
   if (url.pathname.startsWith('/.netlify/')) return;
 
-  // Cache-first with network fallback for everything else
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
+    fetch(req)
+      .then(res => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
         }
-        return response;
-      });
-    })
+        return res;
+      })
+      .catch(() => caches.match(req))
   );
 });

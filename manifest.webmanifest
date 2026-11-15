@@ -9,7 +9,11 @@
   "background_color": "#ffffff",
   "theme_color": "#000000",
   "lang": "en",
-  "categories": ["design", "portfolio", "business"],
+  "categories": [
+    "design",
+    "portfolio",
+    "business"
+  ],
   "icons": [
     {
       "src": "/photos/pwa-icon.png",
@@ -26,18 +30,43 @@
   ],
   "shortcuts": [
     {
+      "name": "B-Roll",
+      "short_name": "B-Roll",
+      "description": "The camera roll around the work",
+      "url": "/roll.html",
+      "icons": [
+        {
+          "src": "/photos/pwa-icon.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "Blog",
       "short_name": "Blog",
       "description": "Read notes on design, tools, and culture",
       "url": "/blog.html",
-      "icons": [{ "src": "/photos/pwa-icon.png", "sizes": "512x512", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "/photos/pwa-icon.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Commission Work",
       "short_name": "Hire",
       "description": "Start a branding, clothing, or web project",
       "url": "/#inquire",
-      "icons": [{ "src": "/photos/pwa-icon.png", "sizes": "512x512", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "/photos/pwa-icon.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
