@@ -1024,6 +1024,156 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
 
 .ad-photo img, .ad-photo video { display: block; max-width: 100%; max-height: 46vh; object-fit: contain; }
 .ad-photo video[hidden], .ad-photo img[hidden] { display: none; }
+.ad-photo video { cursor: pointer; }
+
+/* Trim: the phone's video editor. A film strip of the clip inside a frame
+   with a handle at each end; the frame turns yellow once it's trimmed, the
+   parts left out are dimmed, and a white line marks where playback is. */
+.ad-trim {
+    --trim-h: 50px;
+    --trim-handle: 15px;
+    --trim-edge: 3px;
+    --trim-frame: #c7c7cc;
+    --trim-chevron: #fff;
+    margin: 12px 0 0;
+}
+
+:root[data-scheme="dark"] .ad-trim { --trim-frame: #636366; }
+.ad-trim.is-trimmed { --trim-frame: #ffcc00; --trim-chevron: #000; }
+.ad-trim[hidden] { display: none; }
+
+.ad-trim__row { display: flex; align-items: center; gap: 8px; }
+
+.ad-trim__btn {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ad-ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 160ms var(--ad-ease);
+}
+
+.ad-trim__btn:active { transform: scale(0.88); }
+.ad-trim__btn svg { width: 24px; height: 24px; }
+
+.ad-trim__strip {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: var(--trim-h);
+    touch-action: none;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.ad-trim__frames {
+    position: absolute;
+    inset: var(--trim-edge) var(--trim-handle);
+    display: flex;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--ad-fill);
+}
+
+.ad-trim__frames canvas { flex: 1 1 0; min-width: 0; height: 100%; object-fit: cover; }
+
+.ad-trim__shade {
+    position: absolute;
+    top: var(--trim-edge);
+    bottom: var(--trim-edge);
+    background: rgba(0, 0, 0, 0.55);
+    pointer-events: none;
+}
+
+:root:not([data-scheme="dark"]) .ad-trim__shade { background: rgba(255, 255, 255, 0.62); }
+
+.ad-trim__frame {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border: solid var(--trim-frame);
+    border-width: var(--trim-edge) var(--trim-handle);
+    border-radius: 7px;
+    pointer-events: none;
+    transition: border-color 200ms ease;
+}
+
+.ad-trim__handle {
+    position: absolute;
+    top: calc(var(--trim-edge) * -1);
+    bottom: calc(var(--trim-edge) * -1);
+    width: calc(var(--trim-handle) + 14px);
+    pointer-events: auto;
+    cursor: ew-resize;
+    touch-action: none;
+}
+
+.ad-trim__handle--l { left: calc(var(--trim-handle) * -1 - 7px); }
+.ad-trim__handle--r { right: calc(var(--trim-handle) * -1 - 7px); }
+
+/* The chevrons on the handles */
+.ad-trim__handle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    border: solid var(--trim-chevron);
+    border-width: 0 0 2.4px 2.4px;
+    border-radius: 1px;
+    transform: translate(-30%, -50%) rotate(45deg);
+    transition: border-color 200ms ease;
+}
+
+.ad-trim__handle--r::after { transform: translate(-70%, -50%) rotate(-135deg); }
+.ad-trim__handle:focus-visible { outline: none; }
+.ad-trim__handle:focus-visible::before { content: ''; position: absolute; inset: 4px 5px; border-radius: 5px; box-shadow: 0 0 0 2px var(--ad-blue); }
+
+.ad-trim__head {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 4px;
+    margin-left: -2px;
+    border-radius: 2px;
+    background: #fff;
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+.ad-trim__foot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 32px;
+    margin-top: 6px;
+}
+
+.ad-trim__time { color: var(--ad-ink-2); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ad-trim.is-trimmed .ad-trim__time { color: var(--ad-ink); font-weight: 600; }
+
+.ad-trim__revert {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--ad-fill);
+    color: var(--ad-ink);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ad-trim__revert[hidden] { display: none; }
 
 /* Photos waiting to be added */
 .ad-import { display: grid; gap: 10px; margin-top: 16px; list-style: none; }

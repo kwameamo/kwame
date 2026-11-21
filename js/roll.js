@@ -54,6 +54,14 @@
         .then(function (list) { roll(Array.isArray(list) ? list : []); })
         .catch(function () { roll([]); });
 
+    // A video's trim as [start, end] seconds; the whole clip when it has none
+    function trimOf(v) {
+        var d = v && +v.dur > 0 ? +v.dur : Infinity;
+        var t = v && Array.isArray(v.trim) ? v.trim : null;
+        if (!t || !(t[1] > t[0])) return [0, d];
+        return [Math.max(0, +t[0] || 0), Math.min(d, +t[1])];
+    }
+
     function shotTime(it) {
         var stamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(it.takenStamp || '') ? it.takenStamp : null;
         if (!stamp && /^\d{4}-\d{2}-\d{2}$/.test(it.takenAt || '')) {
@@ -84,7 +92,9 @@
                 mime: it.mime || 'image/jpeg',
                 // A video's image is its poster; the clip plays over it in the viewer
                 video: it.video && it.video.uid ? VID + encodeURIComponent(it.video.uid) : '',
-                dur: it.video ? +it.video.dur || 0 : 0,
+                // A trimmed video plays only [start, end]; its length is the trimmed one
+                trim: trimOf(it.video),
+                dur: it.video ? trimOf(it.video)[1] - trimOf(it.video)[0] || +it.video.dur || 0 : 0,
                 w: +it.w || 0,
                 h: +it.h || 0,
                 date: date,
@@ -473,36 +483,27 @@
         // One player for the whole viewer: it moves onto the current page when that
         // page is a video, laid exactly over the poster, looping, with sound when
         // the browser allows it (muted otherwise, until the sound button is tapped).
+        // The iOS player bar sits over the bottom of the stage while a video shows.
         var player = document.createElement('video');
         player.className = 'br-page__video';
         player.loop = true;
-        var soundBtn = document.getElementById('br-sound');
-        var soundOn = true;
-        function paintSound() {
-            var on = !player.muted;
-            soundBtn.querySelector('use').setAttribute('href', on ? '#br-i-sound' : '#br-i-mute');
-            soundBtn.setAttribute('aria-label', on ? 'Mute' : 'Turn Sound On');
-        }
-        function startPlayer() {
-            player.muted = !soundOn;
-            paintSound();
-            player.play().catch(function (err) {
-                // Sound wasn't allowed without a tap: play muted and let the button turn it on
-                if (err && err.name === 'NotAllowedError' && !player.muted) {
-                    player.muted = true;
-                    paintSound();
-                    player.play().catch(function () {});
-                }
-            });
-        }
-        soundBtn.addEventListener('click', function () {
-            soundOn = player.muted;
-            startPlayer();
-        });
         player.playsInline = true;
         player.setAttribute('playsinline', '');
         player.setAttribute('aria-hidden', 'true');
         player.preload = 'auto';
+        var soundOn = true;
+        var vbar = window.VPlayer ? VPlayer.create(player, { className: 'br-vp', onSound: function (muted) { soundOn = !muted; } }) : null;
+        if (vbar) document.getElementById('br-stage').appendChild(vbar.el);
+        function startPlayer() {
+            player.muted = !soundOn;
+            player.play().catch(function (err) {
+                // Sound wasn't allowed without a tap: play muted and let the bar turn it on
+                if (err && err.name === 'NotAllowedError' && !player.muted) {
+                    player.muted = true;
+                    player.play().catch(function () {});
+                }
+            });
+        }
         function playFor(i) {
             var photo = photos[i];
             if (!photo || !photo.video || !viewer.classList.contains('is-open')) { stopVideo(); return; }
@@ -514,20 +515,20 @@
                 player.classList.remove('is-playing');
                 player.src = photo.video;
             }
+            if (vbar) vbar.setRange(photo.trim[0], photo.trim[1]);
             viewer.classList.add('is-video');
-            soundBtn.disabled = false;
             startPlayer();
         }
         function stopVideo() {
             player.pause();
             if (player.parentNode) player.parentNode.removeChild(player);
             viewer.classList.remove('is-video');
-            soundBtn.disabled = true;
         }
-        // No sound from a tab that isn't showing
+        // No sound from a tab that isn't showing; it carries on when the tab is back
+        var hiddenWhilePlaying = false;
         document.addEventListener('visibilitychange', function () {
-            if (document.hidden) player.pause();
-            else if (viewer.classList.contains('is-open') && player.parentNode) player.play().catch(function () {});
+            if (document.hidden) { hiddenWhilePlaying = !player.paused; player.pause(); }
+            else if (hiddenWhilePlaying && viewer.classList.contains('is-open') && player.parentNode) player.play().catch(function () {});
         });
         // Show the clip only once frames are coming, so the poster never flashes black.
         player.addEventListener('playing', function () { player.classList.add('is-playing'); });
@@ -1134,7 +1135,8 @@
                 else close();
             } else if (evt.key === 'ArrowLeft') { evt.preventDefault(); goTo(atPos() - 1, true); }
             else if (evt.key === 'ArrowRight') { evt.preventDefault(); goTo(atPos() + 1, true); }
-            else if ((evt.key === 'm' || evt.key === 'M') && !soundBtn.disabled) soundBtn.click();
+            else if ((evt.key === 'm' || evt.key === 'M') && vbar && viewer.classList.contains('is-video')) vbar.el.querySelector('.vp__sound').click();
+            else if (evt.key === ' ' && vbar && viewer.classList.contains('is-video') && !evt.target.closest('button')) { evt.preventDefault(); vbar.el.querySelector('.vp__play').click(); }
             else if (evt.key === 'Tab') {
                 var focusable = Array.prototype.filter.call(viewer.querySelectorAll('.br-round, .br-pill__btn'), function (b) { return b.offsetParent && !b.disabled; });
                 var first = focusable[0], last = focusable[focusable.length - 1];

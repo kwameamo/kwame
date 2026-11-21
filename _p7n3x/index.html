@@ -274,7 +274,28 @@
             <button type="button" class="ad-btn ad-btn--accent" id="sp-save">Save</button>
         </header>
         <div class="ad-form">
-            <div class="ad-photo"><img id="sp-img" alt=""><video id="sp-video" loop playsinline controls hidden></video></div>
+            <div class="ad-photo"><img id="sp-img" alt=""><video id="sp-video" loop playsinline hidden></video></div>
+            <!-- Trim, like editing a video on the phone: drag the yellow ends in, the white line to look through -->
+            <div class="ad-trim" id="sp-trim" hidden>
+                <div class="ad-trim__row">
+                    <button type="button" class="ad-trim__btn" id="sp-play" aria-label="Play"></button>
+                    <div class="ad-trim__strip" id="sp-strip">
+                        <div class="ad-trim__frames" id="sp-frames"></div>
+                        <div class="ad-trim__shade" id="sp-shade-l"></div>
+                        <div class="ad-trim__shade" id="sp-shade-r"></div>
+                        <div class="ad-trim__frame" id="sp-frame">
+                            <span class="ad-trim__handle ad-trim__handle--l" id="sp-h-l" role="slider" tabindex="0" aria-label="Start"></span>
+                            <span class="ad-trim__handle ad-trim__handle--r" id="sp-h-r" role="slider" tabindex="0" aria-label="End"></span>
+                        </div>
+                        <div class="ad-trim__head" id="sp-head"></div>
+                    </div>
+                    <button type="button" class="ad-trim__btn" id="sp-sound" aria-label="Mute"></button>
+                </div>
+                <div class="ad-trim__foot">
+                    <span class="ad-trim__time" id="sp-trim-time">0:00</span>
+                    <button type="button" class="ad-trim__revert" id="sp-revert" hidden>Revert</button>
+                </div>
+            </div>
             <div class="ad-group">
                 <label class="ad-field ad-field--stack"><span>Caption</span><textarea id="sp-caption" rows="2" maxlength="140" placeholder="What's happening here?"></textarea></label>
             </div>
@@ -365,6 +386,7 @@
 </svg>
 
 <script src="/js/notes-core.js"></script>
+<script src="/js/vplayer.js"></script>
 <script src="/_p7n3x/admin.js"></script>
 <script defer src="/js/glass.js"></script>
 <script>

@@ -13,7 +13,7 @@ const THUMB_MIME = ['image/jpeg', 'image/webp'];
 
 /*
   Edit one B-Roll photo.
-  { password, id, caption?, place?, takenAt?, link?, thumb?, w?, h? }
+  { password, id, caption?, place?, takenAt?, link?, thumb?, w?, h?, trim? }
   Only the fields sent are changed. `thumb` is a small data URL built in
   the admin from the full photo, used for fast grid tiles.
 */
@@ -76,6 +76,26 @@ export default async (req, context) => {
       // The version goes into the tile URL, so a cached older tile is never reused.
       item.thumb = (+item.thumb || 0) + 1;
     }
+    // A video's trim: [start, end] in seconds, played without changing the file.
+    // null (or the whole clip) clears it.
+    if ('trim' in body && item.video) {
+      const dur = Number(item.video.dur) || Infinity;
+      const t = body.trim;
+      const video = { ...item.video };
+      if (t == null) {
+        delete video.trim;
+      } else {
+        const a = Number(Array.isArray(t) ? t[0] : NaN), b = Number(Array.isArray(t) ? t[1] : NaN);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || a < 0 || b - a < 0.5 || b > dur + 0.5) {
+          return json({ error: 'That trim doesn’t fit the video.' }, 400);
+        }
+        const start = Math.round(a * 100) / 100, end = Math.round(Math.min(b, dur) * 100) / 100;
+        if (start <= 0.05 && end >= dur - 0.05) delete video.trim;
+        else video.trim = [start, end];
+      }
+      item.video = video;
+    }
+
     if (Number.isFinite(+body.w) && +body.w > 0 && +body.w <= 20000) item.w = Math.round(+body.w);
     if (Number.isFinite(+body.h) && +body.h > 0 && +body.h <= 20000) item.h = Math.round(+body.h);
 

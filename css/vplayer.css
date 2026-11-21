@@ -1,0 +1,81 @@
+/* ─────────────────────────────────────────────────────────────
+   VIDEO CONTROLS — the iOS player bar (js/vplayer.js)
+   Ink comes from the glass pane (--lg-ink), so it reads on any video.
+───────────────────────────────────────────────────────────── */
+.vp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font: 500 12px/1 Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: none;
+}
+
+.vp__btn {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.vp__btn:active { transform: scale(0.88); }
+.vp__btn svg { width: 22px; height: 22px; }
+.vp__sound svg { width: 20px; height: 20px; }
+.vp__btn:focus-visible, .vp__track:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+.vp__time {
+    flex: 0 0 auto;
+    min-width: 32px;
+    opacity: 0.8;
+    text-align: center;
+}
+
+/* The scrubber: a thin bar that grows while it's held, like the phone's */
+.vp__track {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 60px;
+    height: 30px;
+    cursor: pointer;
+    touch-action: none;
+    --vp-bar: 5px;
+}
+
+.vp__track::before,
+.vp__fill {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: var(--vp-bar);
+    border-radius: 999px;
+    background: currentColor;
+    transform: translateY(-50%);
+    transition: height 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.vp__track::before { right: 0; opacity: 0.24; }
+.vp__fill { width: 0; }
+
+.vp.is-scrubbing .vp__track,
+.vp__track:hover { --vp-bar: 9px; }
+.vp.is-scrubbing .vp__time { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+    .vp__btn, .vp__track::before, .vp__fill { transition: none; }
+}

@@ -604,9 +604,24 @@
 #br-info-btn[aria-pressed="true"] { color: inherit; }
 .br-tools__spacer { width: 40px; }
 
-/* Sound on or off: only there while a video is showing; its place is kept otherwise */
-.br-sound { visibility: hidden; }
-.br-viewer.is-video .br-sound { visibility: visible; }
+/* The iOS player bar: over the bottom of the stage while a video shows,
+   and it goes with the other controls when a tap hides them */
+.br-vp {
+    position: absolute;
+    left: 50%;
+    bottom: 52px;
+    z-index: 3;
+    width: min(calc(100% - 32px), 560px);
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease, background-color 0.35s ease, color 0.35s ease;
+}
+
+.br-viewer.is-video .br-vp { opacity: 1; pointer-events: auto; }
+.br-viewer.is-bare .br-vp,
+.br-viewer.is-zoomed .br-vp,
+.br-viewer.is-info .br-vp { opacity: 0; pointer-events: none; }
 
 /* Info: the photo slides up, the details rise under it */
 .br-viewer.is-info .br-stage { bottom: 50%; }

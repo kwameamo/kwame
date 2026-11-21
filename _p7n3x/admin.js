@@ -1320,7 +1320,7 @@
             b.type = 'button';
             b.dataset.id = p.id;
             b.setAttribute('aria-label', (p.caption || (p.video ? 'Video' : 'Photo')) + ', ' + N.rowDate(dayOf(p)));
-            if (p.video) b.appendChild(el('span', 'ad-tile__dur', clockTime(p.video.dur)));
+            if (p.video) b.appendChild(el('span', 'ad-tile__dur', clockTime(videoLength(p.video))));
             var img = document.createElement('img');
             img.alt = '';
             img.decoding = 'async';
@@ -1482,7 +1482,7 @@
 
     function encodeSound(s, a, muxer) {
         return new Promise(function (resolve, reject) {
-            var enc = new AudioEncoder({ output: function (chunk, meta) { muxer.addAudioChunk(chunk, meta); }, error: reject });
+            var enc = new AudioEncoder({ output: function (chunk, meta) { try { muxer.addAudioChunk(chunk, meta); } catch (e) { reject(e); } }, error: reject });
             enc.configure(a.cfg);
             var STEP = Math.round(s.rate / 10);
             for (var off = 0; off < s.frames; off += STEP) {
@@ -1595,7 +1595,11 @@
             // The sound encodes while the frames are read; a failure there leaves the clip silent.
             var audioDone = snd ? encodeSound(snd.s, snd.a, muxer).then(function () { return true; }, function () { return false; }) : Promise.resolve(false);
             var failure = null;
-            var enc = new VideoEncoder({ output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta); }, error: function (e) { failure = e; } });
+            // A muxer error here would otherwise vanish and leave an empty movie
+            var enc = new VideoEncoder({
+                output: function (chunk, meta) { try { muxer.addVideoChunk(chunk, meta); } catch (e) { failure = failure || e; } },
+                error: function (e) { failure = e; }
+            });
             enc.configure(cfg);
             var c = canvas(tw, th), g = c.getContext('2d');
             var n = 0, lastT = -1;
@@ -1609,7 +1613,8 @@
                     if (t > lastT) {
                         lastT = t;
                         g.drawImage(v, 0, 0, tw, th);
-                        var frame = new VideoFrame(c, { timestamp: Math.round(t * 1e6) });
+                        // The muxer needs every frame's duration
+                        var frame = new VideoFrame(c, { timestamp: Math.round(t * 1e6), duration: Math.round(1e6 / 30) });
                         enc.encode(frame, { keyFrame: n % 60 === 0 });
                         frame.close();
                         n++;
@@ -1624,6 +1629,7 @@
                     if (!n) return reject(new Error('No frames could be read from this video.'));
                     Promise.all([enc.flush(), audioDone]).then(function (r) {
                         enc.close();
+                        if (failure) return reject(new Error('This video couldn’t be shrunk here (' + (failure.message || failure) + ').'));
                         muxer.finalize();
                         if (snd) snd.s.data = null;
                         resolve({ blob: new Blob([muxer.target.buffer], { type: 'video/mp4' }), silent: lost || (snd && !r[1]) });
@@ -1829,6 +1835,205 @@
         });
     });
 
+    /* ── Trim a video, the way the phone's editor does ──
+       Nothing is cut from the file: the trim is saved with the video and both
+       players keep to it. The strip is drawn from a second, hidden copy of the
+       clip, seeked to evenly spaced points. */
+    var trim = (function () {
+        var vid = $('sp-video'), box = $('sp-trim'), strip = $('sp-strip'), framesEl = $('sp-frames');
+        var frameEl = $('sp-frame'), head = $('sp-head'), shadeL = $('sp-shade-l'), shadeR = $('sp-shade-r');
+        var hl = $('sp-h-l'), hr = $('sp-h-r'), playBtn = $('sp-play'), soundBtn = $('sp-sound');
+        var timeEl = $('sp-trim-time'), revert = $('sp-revert');
+        var ICON = window.VPlayer ? VPlayer.ICON : { play: '▶', pause: '❚❚', sound: '🔊', mute: '🔇' };
+        var HANDLE = 15, MIN = 1;
+        var item = null, dur = 0, a = 0, b = 0, saved = [0, 0], drag = null, raf = 0, filmToken = 0;
+
+        function length() { return Math.max(0, b - a); }
+        function isFull() { return a <= 0.05 && b >= dur - 0.05; }
+        function inner() { return Math.max(1, strip.clientWidth - HANDLE * 2); }
+        function x(t) { return HANDLE + (dur ? t / dur : 0) * inner(); }
+        function timeAt(clientX) {
+            var r = strip.getBoundingClientRect();
+            return Math.min(dur, Math.max(0, (clientX - r.left - HANDLE) / inner() * dur));
+        }
+
+        function paint() {
+            if (!item) return;
+            var l = x(a), r = x(b), W = strip.clientWidth;
+            frameEl.style.left = (l - HANDLE) + 'px';
+            frameEl.style.width = (r - l + HANDLE * 2) + 'px';
+            shadeL.style.left = HANDLE + 'px';
+            shadeL.style.width = Math.max(0, l - HANDLE) + 'px';
+            shadeR.style.left = r + 'px';
+            shadeR.style.width = Math.max(0, W - HANDLE - r) + 'px';
+            var t = drag && drag.kind !== 'head' ? (drag.kind === 'l' ? a : b) : Math.min(b, Math.max(a, vid.currentTime || 0));
+            head.style.left = x(t) + 'px';
+            head.hidden = !!(drag && drag.kind !== 'head');
+            box.classList.toggle('is-trimmed', !isFull());
+            revert.hidden = isFull();
+            timeEl.textContent = drag && drag.kind !== 'head' ? clockTime(drag.kind === 'l' ? a : b) + ' · ' + clockTime(length()) : clockTime(length());
+            hl.setAttribute('aria-valuetext', clockTime(a));
+            hr.setAttribute('aria-valuetext', clockTime(b));
+            var playing = !vid.paused && !vid.ended;
+            playBtn.innerHTML = playing ? ICON.pause : ICON.play;
+            playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+            soundBtn.innerHTML = vid.muted ? ICON.mute : ICON.sound;
+            soundBtn.setAttribute('aria-label', vid.muted ? 'Turn Sound On' : 'Mute');
+        }
+
+        // Playback stays inside the trim and loops it
+        function guard() {
+            if (!item || drag) return;
+            var t = vid.currentTime;
+            if (t >= b - 0.03 || t < a - 0.25) vid.currentTime = a;
+        }
+        function tick() { guard(); paint(); raf = !vid.paused ? requestAnimationFrame(tick) : 0; }
+        vid.addEventListener('play', function () { if (!raf) raf = requestAnimationFrame(tick); paint(); });
+        vid.addEventListener('pause', paint);
+        vid.addEventListener('volumechange', paint);
+        vid.addEventListener('timeupdate', function () { if (!raf) { guard(); paint(); } });
+        vid.addEventListener('loadedmetadata', function () {
+            if (!item) return;
+            // The stored length is rounded; the file's own is exact
+            if (isFinite(vid.duration) && vid.duration > 0 && Math.abs(vid.duration - dur) > 0.01) {
+                var wasFull = b >= dur - 0.05, savedFull = saved[1] >= dur - 0.05;
+                dur = vid.duration;
+                b = wasFull ? dur : Math.min(b, dur);
+                saved[1] = savedFull ? dur : Math.min(saved[1], dur);
+            }
+            if (vid.currentTime < a || vid.currentTime > b) vid.currentTime = a;
+            film();
+            paint();
+        });
+
+        // The film strip: as many frames as fit along it
+        function film() {
+            var token = ++filmToken;
+            framesEl.innerHTML = '';
+            if (!item || !dur) return;
+            var h = framesEl.clientHeight || 44, w = framesEl.clientWidth || 300;
+            // Narrow, cropped frames like the phone's, so the strip reads as a timeline
+            var ratio = 0.72;
+            var n = Math.max(4, Math.min(24, Math.round(w / (h * ratio))));
+            var cells = [];
+            for (var i = 0; i < n; i++) {
+                var c = document.createElement('canvas');
+                c.width = Math.round(h * ratio * 2); c.height = Math.round(h * 2);
+                framesEl.appendChild(c);
+                cells.push(c);
+            }
+            var src = document.createElement('video');
+            src.muted = true; src.playsInline = true; src.preload = 'auto';
+            src.setAttribute('playsinline', '');
+            src.src = videoUrl(item);
+            var k = 0;
+            function next() {
+                if (token !== filmToken) { src.removeAttribute('src'); src.load(); return; }
+                if (k >= n) { src.removeAttribute('src'); src.load(); return; }
+                src.currentTime = Math.min(dur - 0.05, (k + 0.5) / n * dur);
+            }
+            src.addEventListener('seeked', function () {
+                if (token !== filmToken) return;
+                var c = cells[k], g = c.getContext('2d');
+                var sw = src.videoWidth, sh = src.videoHeight, cr = c.width / c.height;
+                var cw = sw, ch = sw / cr;
+                if (ch > sh) { ch = sh; cw = sh * cr; }
+                try { g.drawImage(src, (sw - cw) / 2, (sh - ch) / 2, cw, ch, 0, 0, c.width, c.height); } catch (e) {}
+                k++;
+                next();
+            });
+            src.addEventListener('loadeddata', next, { once: true });
+            src.addEventListener('error', function () { filmToken++; }, { once: true });
+        }
+
+        // Dragging: an end handle trims, anywhere else on the strip moves the white line
+        function down(evt, kind) {
+            if (!item || (evt.pointerType === 'mouse' && evt.button !== 0)) return;
+            evt.preventDefault();
+            evt.stopPropagation();
+            drag = { kind: kind, playing: !vid.paused, id: evt.pointerId };
+            vid.pause();
+            try { (kind === 'head' ? strip : evt.currentTarget).setPointerCapture(evt.pointerId); } catch (e) {}
+            move(evt);
+        }
+        function move(evt) {
+            if (!drag || evt.pointerId !== drag.id) return;
+            var t = timeAt(evt.clientX);
+            if (drag.kind === 'l') { a = Math.min(t, b - MIN); a = Math.max(0, a); seek(a); }
+            else if (drag.kind === 'r') { b = Math.max(t, a + MIN); b = Math.min(dur, b); seek(b); }
+            else seek(Math.min(b, Math.max(a, t)));
+            paint();
+        }
+        function up(evt) {
+            if (!drag || evt.pointerId !== drag.id) return;
+            var d = drag;
+            drag = null;
+            if (d.kind !== 'head') vid.currentTime = a;     // play the trimmed clip from its start
+            if (d.playing || d.kind !== 'head') vid.play().catch(function () {});
+            paint();
+        }
+        function seek(t) { if (vid.fastSeek) vid.fastSeek(t); else vid.currentTime = t; }
+        hl.addEventListener('pointerdown', function (evt) { down(evt, 'l'); });
+        hr.addEventListener('pointerdown', function (evt) { down(evt, 'r'); });
+        strip.addEventListener('pointerdown', function (evt) { if (!evt.target.closest('.ad-trim__handle')) down(evt, 'head'); });
+        [hl, hr, strip].forEach(function (el) {
+            el.addEventListener('pointermove', move);
+            el.addEventListener('pointerup', up);
+            el.addEventListener('pointercancel', up);
+        });
+        // Keys: arrows move a focused handle by a tenth of a second (a whole second with Shift)
+        [[hl, 'l'], [hr, 'r']].forEach(function (pair) {
+            pair[0].addEventListener('keydown', function (evt) {
+                var step = (evt.shiftKey ? 1 : 0.1) * (evt.key === 'ArrowLeft' ? -1 : evt.key === 'ArrowRight' ? 1 : 0);
+                if (!step || !item) return;
+                evt.preventDefault();
+                if (pair[1] === 'l') { a = Math.max(0, Math.min(b - MIN, a + step)); vid.currentTime = a; }
+                else { b = Math.min(dur, Math.max(a + MIN, b + step)); vid.currentTime = b; }
+                paint();
+            });
+        });
+
+        playBtn.addEventListener('click', function () {
+            if (vid.paused || vid.ended) {
+                if (vid.currentTime >= b - 0.05 || vid.currentTime < a) vid.currentTime = a;
+                vid.play().catch(function () {});
+            } else vid.pause();
+        });
+        vid.addEventListener('click', function () { playBtn.click(); });
+        soundBtn.addEventListener('click', function () {
+            vid.muted = !vid.muted;
+            if (!vid.muted && vid.paused) vid.play().catch(function () {});
+        });
+        revert.addEventListener('click', function () {
+            a = 0; b = dur;
+            vid.currentTime = 0;
+            paint();
+        });
+        window.addEventListener('resize', function () { if (item && !box.hidden) { paint(); film(); } });
+
+        return {
+            open: function (p) {
+                item = p;
+                dur = +p.video.dur || 0;
+                var t = Array.isArray(p.video.trim) && p.video.trim[1] > p.video.trim[0] ? p.video.trim : [0, dur];
+                a = +t[0]; b = Math.min(dur, +t[1]);
+                saved = [a, b];
+                drag = null;
+                framesEl.innerHTML = '';
+                // Laid out once the sheet is showing
+                requestAnimationFrame(function () { requestAnimationFrame(function () { paint(); film(); }); });
+            },
+            close: function () { item = null; filmToken++; framesEl.innerHTML = ''; },
+            changed: function () { return Math.abs(a - saved[0]) > 0.02 || Math.abs(b - saved[1]) > 0.02; },
+            value: function () { return isFull() ? null : [Math.round(a * 100) / 100, Math.round(b * 100) / 100]; }
+        };
+    }());
+
+    // A video's playing length: its trim when it has one
+    function videoLength(v) {
+        return v && Array.isArray(v.trim) && v.trim[1] > v.trim[0] ? v.trim[1] - v.trim[0] : (v && v.dur) || 0;
+    }
+
     /* ── Edit a photo ── */
     var editing = null;
     function openPhoto(p) {
@@ -1836,14 +2041,17 @@
         var img = $('sp-img'), vid = $('sp-video');
         img.hidden = !!p.video;
         vid.hidden = !p.video;
+        $('sp-trim').hidden = !p.video;
         if (p.video) {
             img.removeAttribute('src');
             vid.poster = fullUrl(p);
             vid.src = videoUrl(p);
+            trim.open(p);
             vid.muted = false;
-            // With sound when the browser allows it; otherwise muted, and the controls turn it on.
+            // With sound when the browser allows it; otherwise muted, and the sound button turns it on.
             vid.play().catch(function () { vid.muted = true; vid.play().catch(function () {}); });
         } else {
+            trim.close();
             vid.pause(); vid.removeAttribute('src');
             img.src = tileUrl(p);
             var full = new Image();
@@ -1877,6 +2085,7 @@
         if (place !== (p.place || '')) change.place = place;
         if (link !== (p.link || '')) change.link = link;
         if (date && date !== dayOf(p)) change.takenAt = date;
+        if (p.video && trim.changed()) change.trim = trim.value();
         if (Object.keys(change).length === 1) { closeSheets(); return; }
         btn.disabled = true;
         api('update-gallery', change).then(function (data) {
