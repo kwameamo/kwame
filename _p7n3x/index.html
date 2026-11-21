@@ -136,10 +136,10 @@
                 <button type="button" role="radio" data-days="30">30 Days</button>
                 <button type="button" role="radio" data-days="90">90 Days</button>
             </div>
-            <div class="ad-tiles">
-                <div class="ad-tile"><p class="ad-tile__k">Visitors</p><p class="ad-tile__v" id="st-visitors">&nbsp;</p></div>
-                <div class="ad-tile"><p class="ad-tile__k">Page Views</p><p class="ad-tile__v" id="st-views">&nbsp;</p></div>
-                <div class="ad-tile"><p class="ad-tile__k"><span class="ad-live" aria-hidden="true"></span>Right Now</p><p class="ad-tile__v" id="st-now">&nbsp;</p></div>
+            <div class="ad-kpis">
+                <div class="ad-kpi"><p class="ad-kpi__k">Visitors</p><p class="ad-kpi__v" id="st-visitors">&nbsp;</p></div>
+                <div class="ad-kpi"><p class="ad-kpi__k">Page Views</p><p class="ad-kpi__v" id="st-views">&nbsp;</p></div>
+                <div class="ad-kpi"><p class="ad-kpi__k"><span class="ad-live" aria-hidden="true"></span>Right Now</p><p class="ad-kpi__v" id="st-now">&nbsp;</p></div>
             </div>
             <div class="ad-card ad-chart" id="st-chart" hidden>
                 <p class="ad-chart__hd">Visitors per day</p>
@@ -175,7 +175,7 @@
             <button type="button" class="ad-tab" role="tab" data-view="view-stats" aria-selected="false"><svg aria-hidden="true"><use href="#i-chart"/></svg><span>Stats</span></button>
         </div>
         <button type="button" class="ad-round ad-round--big lg" id="act-new" aria-label="New note"><svg aria-hidden="true"><use href="#i-compose"/></svg></button>
-        <input type="file" id="roll-file" accept="image/jpeg,image/png,image/webp" multiple hidden>
+        <input type="file" id="roll-file" accept="image/jpeg,image/png,image/webp,video/*" multiple hidden>
     </nav>
 </div>
 
@@ -253,10 +253,10 @@
                 <label class="ad-field"><span>Place</span><input type="text" id="si-place" maxlength="80" placeholder="Koforidua" autocomplete="off" list="si-places"></label>
             </div>
             <datalist id="si-places"></datalist>
-            <p class="ad-note">The place goes on every photo here. Each date is read from the photo and can be changed.</p>
+            <p class="ad-note">The place goes on everything here. Each date is read from the file and can be changed. Videos are shrunk to 720p before upload; keep this screen open while that runs.</p>
             <ul class="ad-import" id="si-list"></ul>
             <div class="ad-group ad-group--actions">
-                <button type="button" class="ad-row-btn" id="si-more">Add More Photos</button>
+                <button type="button" class="ad-row-btn" id="si-more">Add More</button>
             </div>
             <p class="ad-status" id="si-status" role="status" aria-live="polite"></p>
         </div>
@@ -273,7 +273,7 @@
             <button type="button" class="ad-btn ad-btn--accent" id="sp-save">Save</button>
         </header>
         <div class="ad-form">
-            <div class="ad-photo"><img id="sp-img" alt=""></div>
+            <div class="ad-photo"><img id="sp-img" alt=""><video id="sp-video" muted loop playsinline controls hidden></video></div>
             <div class="ad-group">
                 <label class="ad-field ad-field--stack"><span>Caption</span><textarea id="sp-caption" rows="2" maxlength="140" placeholder="What's happening here?"></textarea></label>
             </div>

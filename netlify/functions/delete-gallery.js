@@ -44,6 +44,7 @@ export default async (req, context) => {
     let items = await store.get('items', { type: 'json' });
     if (!Array.isArray(items)) items = [];
 
+    const gone = items.find(it => it.id === id);
     const filtered = items.filter(it => it.id !== id);
     if (filtered.length === items.length) {
       return json({ error: 'Image not found.' }, 404);
@@ -53,6 +54,12 @@ export default async (req, context) => {
     // Remove the binary too. Ignore if it's already gone.
     try { await store.delete(`img:${id}`); } catch {}
     try { await store.delete(`thumb:${id}`); } catch {}
+    // A video's chunks and size record.
+    if (gone && gone.video && gone.video.uid) {
+      const { uid, parts } = gone.video;
+      for (let i = 0; i < (parts || 0); i++) { try { await store.delete(`vid:${uid}:${i}`); } catch {} }
+      try { await store.delete(`vmeta:${uid}`); } catch {}
+    }
 
     return json({ ok: true });
   } catch (err) {

@@ -616,6 +616,19 @@
     box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.35);
 }
 
+.ad-tile__dur {
+    position: absolute;
+    z-index: 1;
+    right: 5px;
+    bottom: 4px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
 .ad-tile.is-uploading::after {
     content: '';
     position: absolute;
@@ -973,7 +986,8 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
     background: var(--ad-card);
 }
 
-.ad-photo img { display: block; max-width: 100%; max-height: 46vh; object-fit: contain; }
+.ad-photo img, .ad-photo video { display: block; max-width: 100%; max-height: 46vh; object-fit: contain; }
+.ad-photo video[hidden], .ad-photo img[hidden] { display: none; }
 
 /* Photos waiting to be added */
 .ad-import { display: grid; gap: 10px; margin-top: 16px; list-style: none; }
@@ -988,7 +1002,7 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
     background: var(--ad-card);
 }
 
-.ad-imp img { width: 76px; height: 76px; border-radius: 10px; object-fit: cover; background: var(--ad-fill); }
+.ad-imp img, .ad-imp video { width: 76px; height: 76px; border-radius: 10px; object-fit: cover; background: var(--ad-fill); }
 .ad-imp__fields { display: grid; gap: 6px; min-width: 0; }
 
 .ad-imp__fields input {
@@ -1068,10 +1082,10 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
 .ad-seg button[aria-checked="true"] { background: var(--ad-card); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
 :root[data-scheme="dark"] .ad-seg button[aria-checked="true"] { background: #636366; }
 
-.ad-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
-.ad-tile { padding: 14px 14px 12px; border-radius: 18px; background: var(--ad-card); }
-.ad-tile__k { display: flex; align-items: center; gap: 6px; color: var(--ad-ink-2); font-size: 13px; font-weight: 500; }
-.ad-tile__v { margin-top: 4px; font-family: var(--ad-display); font-size: 30px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.ad-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.ad-kpi { padding: 14px 14px 12px; border-radius: 18px; background: var(--ad-card); }
+.ad-kpi__k { display: flex; align-items: center; gap: 6px; color: var(--ad-ink-2); font-size: 13px; font-weight: 500; }
+.ad-kpi__v { margin-top: 4px; font-family: var(--ad-display); font-size: 30px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
 .ad-live { width: 7px; height: 7px; border-radius: 50%; background: var(--ad-green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ad-green) 25%, transparent); }
 
 .ad-chart { position: relative; margin-top: 14px; padding: 14px 16px 12px; border-radius: 18px; }
@@ -1133,8 +1147,8 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
 .ad-stat--empty { color: var(--ad-ink-2); font-size: 15px; }
 
 @media (max-width: 380px) {
-    .ad-tile__v { font-size: 26px; }
-    .ad-tile { padding: 12px 12px 10px; }
+    .ad-kpi__v { font-size: 26px; }
+    .ad-kpi { padding: 12px 12px 10px; }
 }
 
 /* ── Lock screen sheet ── */

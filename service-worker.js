@@ -48,6 +48,8 @@ self.addEventListener('fetch', function (event) {
     if (url.hostname === 'api.web3forms.com')    return;
     if (url.hostname === 'fonts.googleapis.com') return;
     if (url.hostname === 'fonts.gstatic.com')    return;
+    /* B-Roll videos stream in byte ranges, which a cache can't hold */
+    if (url.pathname === '/.netlify/functions/get-gallery-video') return;
 
     /* B-Roll photos never change for a given URL: cache-first, so a photo
        seen once opens instantly, even offline */

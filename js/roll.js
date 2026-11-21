@@ -25,6 +25,7 @@
     if (!stream || !bar) return;
 
     var IMG = '/.netlify/functions/get-gallery-image?id=';
+    var VID = '/.netlify/functions/get-gallery-video?uid=';
     var LS  = { likes: 'broll-likes', view: 'broll-view', cols: 'broll-cols' };
     var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     var DAYS   = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -81,6 +82,9 @@
                 place: (it.place || '').trim(),
                 link: (it.link || '').trim(),
                 mime: it.mime || 'image/jpeg',
+                // A video's image is its poster; the clip plays over it in the viewer
+                video: it.video && it.video.uid ? VID + encodeURIComponent(it.video.uid) : '',
+                dur: it.video ? +it.video.dur || 0 : 0,
                 w: +it.w || 0,
                 h: +it.h || 0,
                 date: date,
@@ -144,6 +148,10 @@
             el.dataset.index = photo.index;
             el.dataset.month = photo.month;
             el.appendChild(makeImg(photo));
+            if (photo.video) {
+                var s = Math.round(photo.dur);
+                el.appendChild(text('span', 'br-tile__dur', Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60)));
+            }
             if (likes[photo.id]) heart(el);
             if (favourites && !likes[photo.id]) el.hidden = true;
             return el;
@@ -462,6 +470,36 @@
             thumbs.push(thumb);
         });
 
+        // One player for the whole viewer: it moves onto the current page when that
+        // page is a video, laid exactly over the poster, muted and looping.
+        var player = document.createElement('video');
+        player.className = 'br-page__video';
+        player.muted = true;
+        player.loop = true;
+        player.playsInline = true;
+        player.setAttribute('playsinline', '');
+        player.setAttribute('aria-hidden', 'true');
+        player.preload = 'auto';
+        function playFor(i) {
+            var photo = photos[i];
+            if (!photo || !photo.video || !viewer.classList.contains('is-open')) { stopVideo(); return; }
+            var page = pageImgs[i].parentNode;
+            if (player.parentNode !== page) page.appendChild(player);
+            player.style.setProperty('--r', photo.w && photo.h ? photo.w / photo.h : 1);
+            if (player.dataset.src !== photo.video) {
+                player.dataset.src = photo.video;
+                player.classList.remove('is-playing');
+                player.src = photo.video;
+            }
+            player.play().catch(function () {});
+        }
+        function stopVideo() {
+            player.pause();
+            if (player.parentNode) player.parentNode.removeChild(player);
+        }
+        // Show the clip only once frames are coming, so the poster never flashes black.
+        player.addEventListener('playing', function () { player.classList.add('is-playing'); });
+
         // The viewer runs through the set it was opened from: the roll, or just Favorites
         var order = [], posOf = {};
         function setOrder(list) {
@@ -629,6 +667,7 @@
             var photo = photos[i];
             thumbs[i].classList.add('is-current');
             if (!viewer.classList.contains('is-zooming')) near(i);
+            playFor(i);
             prevBtn.disabled = posOf[i] === 0;
             nextBtn.disabled = posOf[i] === order.length - 1;
             var heading = photo.place || photo.note;
@@ -729,10 +768,12 @@
             }
             keyFocus(backBtn);
             if (!pushed) { history.pushState({ brPhoto: true }, '', '#photo-' + photos[i].id); pushed = true; }
+            playFor(at);
             glassRefresh();
         }
         function close(fromHistory) {
             if (!viewer.classList.contains('is-open')) return;
+            stopVideo();
             if (viewer.classList.contains('is-zoomed')) resetZoom(false);
             var img = pageImgs[at];
             var shownAt = fitted(img.getBoundingClientRect(), ratioOf(img, 1));

@@ -127,6 +127,18 @@
     filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.45));
 }
 
+.br-tile__dur {
+    position: absolute;
+    right: 6px;
+    bottom: 4px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
 .br-count {
     margin: 18px 0 0;
     font-size: 14px;
@@ -485,6 +497,25 @@
 }
 
 .br-page img.is-dragging { transition: none; }
+
+/* A video plays over its poster, sized exactly like it. Taps and swipes go
+   through to the page underneath; zooming shows the poster. */
+.br-page__video {
+    position: absolute;
+    inset: 0;
+    width: min(calc(100cqw - var(--br-side, 0px)), calc(100cqh * var(--r, 1)));
+    height: auto;
+    max-height: 100%;
+    margin: auto;
+    aspect-ratio: var(--r, 1);
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    pointer-events: none;
+}
+
+.br-page__video.is-playing { opacity: 1; }
+.br-viewer.is-zoomed .br-page__video { display: none; }
 
 .br-arrow {
     position: absolute;

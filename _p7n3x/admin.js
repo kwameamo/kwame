@@ -722,6 +722,7 @@
             s.setAttribute('aria-hidden', 'true');
             if (s.id === 'sheet-import') resetImport();
             if (s.id === 'sheet-wall') wl = null;   // let the photo and its cutout go
+            if (s.id === 'sheet-photo') $('sp-video').pause();
         });
         if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
     }
@@ -1155,21 +1156,59 @@
     /* The cutout. MediaPipe's person model gives a rough mask at 256px; a guided
        filter then snaps its edge to the edges in the photo, so hair and
        shoulders follow the real outline instead of a blurry blob. */
+    // MediaPipe comes from a CDN, so it runs in a sandboxed frame with its own
+    // opaque origin: it gets the pixels and returns the mask, and can never reach
+    // this page, the password in memory or this site's storage.
     var segmenterP = null;
     function segmenter() {
-        if (!segmenterP) {
-            segmenterP = import(MP + '/vision_bundle.mjs').then(function (vision) {
-                return vision.FilesetResolver.forVisionTasks(MP + '/wasm').then(function (files) {
-                    return vision.ImageSegmenter.createFromOptions(files, {
-                        baseOptions: { modelAssetPath: MP_MODEL, delegate: 'CPU' },
-                        runningMode: 'IMAGE',
-                        outputCategoryMask: false,
-                        outputConfidenceMasks: true
+        if (segmenterP) return segmenterP;
+        segmenterP = new Promise(function (resolve, reject) {
+            var frame = document.createElement('iframe');
+            frame.setAttribute('sandbox', 'allow-scripts');
+            frame.setAttribute('aria-hidden', 'true');
+            frame.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden';
+            frame.srcdoc = '<script type="module">' +
+                'try {' +
+                'const v = await import("' + MP + '/vision_bundle.mjs");' +
+                'const files = await v.FilesetResolver.forVisionTasks("' + MP + '/wasm");' +
+                'const seg = await v.ImageSegmenter.createFromOptions(files, { baseOptions: { modelAssetPath: "' + MP_MODEL + '", delegate: "CPU" }, runningMode: "IMAGE", outputCategoryMask: false, outputConfidenceMasks: true });' +
+                'addEventListener("message", (e) => {' +
+                '  try {' +
+                '    const res = seg.segment(e.data.image), m = res.confidenceMasks[0];' +
+                '    const mask = m.getAsFloat32Array().slice(), w = m.width, h = m.height;' +
+                '    res.confidenceMasks.forEach((x) => x.close());' +
+                '    parent.postMessage({ id: e.data.id, mask, w, h }, "*", [mask.buffer]);' +
+                '  } catch (err) { parent.postMessage({ id: e.data.id, error: String(err) }, "*"); }' +
+                '});' +
+                'parent.postMessage({ ready: true }, "*");' +
+                '} catch (err) { parent.postMessage({ failed: String(err) }, "*"); }' +
+                '<\/script>';
+            var pending = {}, nextId = 1;
+            var timer = setTimeout(function () { fail('timeout'); }, 60000);
+            function fail(why) { clearTimeout(timer); frame.remove(); segmenterP = null; reject(new Error(why)); }
+            window.addEventListener('message', function (e) {
+                if (e.source !== frame.contentWindow || !e.data) return;
+                if (e.data.failed) return fail(e.data.failed);
+                if (e.data.ready) {
+                    clearTimeout(timer);
+                    resolve({
+                        segment: function (imageData) {
+                            return new Promise(function (ok, no) {
+                                var id = nextId++;
+                                pending[id] = { ok: ok, no: no };
+                                frame.contentWindow.postMessage({ id: id, image: imageData }, '*');
+                            });
+                        }
                     });
-                });
+                    return;
+                }
+                var job = pending[e.data.id];
+                if (!job) return;
+                delete pending[e.data.id];
+                if (e.data.error) job.no(new Error(e.data.error)); else job.ok(e.data);
             });
-            segmenterP.catch(function () { segmenterP = null; });
-        }
+            document.body.appendChild(frame);
+        });
         return segmenterP;
     }
 
@@ -1209,16 +1248,16 @@
             var guide = canvas(gw, gh), gg = guide.getContext('2d');
             gg.drawImage(work, 0, 0, gw, gh);
 
-            var res = seg.segment(guide);
-            var bgMask = res.confidenceMasks[0], raw = bgMask.getAsFloat32Array(), mw = bgMask.width, mh = bgMask.height;
+            var pixels = gg.getImageData(0, 0, gw, gh);
+            return seg.segment(pixels).then(function (res) {
+            var raw = res.mask, mw = res.w, mh = res.h;
             var p = new Float32Array(n);
             for (var y = 0; y < gh; y++) for (var x = 0; x < gw; x++) {
                 var sx = Math.min(mw - 1, Math.floor(x * mw / gw)), sy = Math.min(mh - 1, Math.floor(y * mh / gh));
                 p[y * gw + x] = 1 - raw[sy * mw + sx];
             }
-            res.confidenceMasks.forEach(function (m) { m.close(); });
 
-            var px = gg.getImageData(0, 0, gw, gh).data, I = new Float32Array(n);
+            var px = pixels.data, I = new Float32Array(n);
             for (i = 0; i < n; i++) I[i] = (px[i * 4] * 0.299 + px[i * 4 + 1] * 0.587 + px[i * 4 + 2] * 0.114) / 255;
             var q = guidedFilter(I, p, gw, gh, Math.max(4, Math.round(Math.max(gw, gh) / 180)), 0.0008);
 
@@ -1235,6 +1274,7 @@
             cg.globalCompositeOperation = 'destination-in';
             cg.drawImage(mask, 0, 0, work.width, work.height);
             return { cut: cut, cover: cover / n };
+            });
         });
     }
 
@@ -1254,6 +1294,8 @@
         return isNaN(t) ? 0 : t;
     }
     function dayOf(p) { return /^\d{4}-\d{2}-\d{2}$/.test(p.takenAt || '') ? p.takenAt : String(p.createdAt || '').slice(0, 10); }
+    function videoUrl(p) { return FN + 'get-gallery-video?uid=' + encodeURIComponent(p.video.uid); }
+    function clockTime(s) { s = Math.round(+s || 0); return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
 
     function syncPhotos() {
         return fetch(FN + 'get-gallery?fresh=' + Date.now(), { cache: 'no-store' })
@@ -1270,13 +1312,15 @@
     function renderPhotos() {
         var grid = $('roll-grid');
         grid.replaceChildren();
-        $('roll-count').textContent = photos.length + (photos.length === 1 ? ' Photo' : ' Photos');
+        var vids = photos.filter(function (p) { return p.video; }).length, stills = photos.length - vids;
+        $('roll-count').textContent = [stills ? stills + (stills === 1 ? ' Photo' : ' Photos') : '', vids ? vids + (vids === 1 ? ' Video' : ' Videos') : ''].filter(Boolean).join(' · ') || '0 Photos';
         var frag = document.createDocumentFragment();
         photos.forEach(function (p, i) {
             var b = el('button', 'ad-tile');
             b.type = 'button';
             b.dataset.id = p.id;
-            b.setAttribute('aria-label', (p.caption || 'Photo') + ', ' + N.rowDate(dayOf(p)));
+            b.setAttribute('aria-label', (p.caption || (p.video ? 'Video' : 'Photo')) + ', ' + N.rowDate(dayOf(p)));
+            if (p.video) b.appendChild(el('span', 'ad-tile__dur', clockTime(p.video.dur)));
             var img = document.createElement('img');
             img.alt = '';
             img.decoding = 'async';
@@ -1399,6 +1443,177 @@
         }).catch(function () { return null; });
     }
 
+    /* ── Videos ──
+       Shrunk here before upload: 720p H.264 MP4 at about 2.5 Mbps, at most a
+       minute long, without sound (B-Roll plays muted). Frames come from playing
+       the file once in a hidden player, so it takes about as long as the clip. */
+    var VIDEO_LONG_SIDE = 1280, VIDEO_MAX_SECONDS = 60, VIDEO_PART = 3 * 1024 * 1024;
+
+    // When a video was shot: the movie header's creation time (seconds since 1904, UTC).
+    function videoDate(file) {
+        function find(buf) {
+            var b = new Uint8Array(buf);
+            for (var i = 4; i < b.length - 24; i++) {
+                if (b[i] === 0x6d && b[i + 1] === 0x76 && b[i + 2] === 0x68 && b[i + 3] === 0x64) {   // "mvhd"
+                    var v = new DataView(buf, i + 4), secs = v.getUint8(0) === 1 ? v.getUint32(4) * 4294967296 + v.getUint32(8) : v.getUint32(4);
+                    if (!secs) return null;
+                    var d = new Date((secs - 2082844800) * 1000);
+                    return d.getFullYear() > 2000 && d.getTime() < Date.now() + 86400000 ? localStamp(d) : null;
+                }
+            }
+            return null;
+        }
+        var head = file.slice(0, 1 << 20), tail = file.slice(Math.max(0, file.size - (4 << 20)));
+        return head.arrayBuffer().then(function (b) { return find(b) || tail.arrayBuffer().then(find); }).catch(function () { return null; });
+    }
+
+    function once(target, ev) {
+        return new Promise(function (res, rej) {
+            function ok() { target.removeEventListener('error', bad); res(); }
+            function bad() { target.removeEventListener(ev, ok); rej(new Error('This video can’t be read in this browser. Try adding it from your phone.')); }
+            target.addEventListener(ev, ok, { once: true });
+            target.addEventListener('error', bad, { once: true });
+        });
+    }
+    function even(n) { return Math.max(2, Math.round(n / 2) * 2); }
+
+    function processVideo(file, progress) {
+        var url = URL.createObjectURL(file);
+        var v = document.createElement('video');
+        v.muted = true; v.playsInline = true; v.preload = 'auto';
+        v.setAttribute('playsinline', '');
+        // On screen (barely) so phones keep decoding it
+        v.style.cssText = 'position:fixed;right:0;bottom:0;width:2px;height:2px;opacity:0.01;pointer-events:none';
+        document.body.appendChild(v);
+        var lock = null;
+        if (navigator.wakeLock) navigator.wakeLock.request('screen').then(function (l) { lock = l; }).catch(function () {});
+        function cleanup() { v.pause(); v.removeAttribute('src'); v.load(); v.remove(); URL.revokeObjectURL(url); if (lock) lock.release().catch(function () {}); }
+
+        var meta = once(v, 'loadedmetadata');
+        v.src = url;
+        return meta.then(function () {
+            var sw = v.videoWidth, sh = v.videoHeight;
+            if (!sw || !sh) throw new Error('This video can’t be read in this browser.');
+            var dur = Math.min(v.duration || 0, VIDEO_MAX_SECONDS);
+            var k = Math.min(1, VIDEO_LONG_SIDE / Math.max(sw, sh));
+            var tw = even(sw * k), th = even(sh * k);
+
+            // Poster and grid tile from the first frame
+            var seek = once(v, 'seeked');
+            v.currentTime = Math.min(0.1, dur / 2);
+            return seek.then(function () {
+                var pk = Math.min(1, 1600 / Math.max(sw, sh));
+                var pc = canvas(Math.round(sw * pk), Math.round(sh * pk));
+                pc.getContext('2d').drawImage(v, 0, 0, pc.width, pc.height);
+                var poster = pc.toDataURL('image/jpeg', 0.82);
+                var tk = Math.min(1, 400 / Math.min(pc.width, pc.height));
+                var tc = canvas(Math.max(1, Math.round(pc.width * tk)), Math.max(1, Math.round(pc.height * tk)));
+                tc.getContext('2d').drawImage(pc, 0, 0, tc.width, tc.height);
+                var thumb = webpOK ? tc.toDataURL('image/webp', 0.74) : tc.toDataURL('image/jpeg', 0.78);
+                var base = { poster: poster, thumb: thumb, w: pc.width, h: pc.height, dur: dur, trimmed: (v.duration || 0) > VIDEO_MAX_SECONDS + 0.5 };
+
+                if (!window.VideoEncoder || !window.VideoFrame) {
+                    // Can't shrink here: send the file as it is, if it's a reasonable size.
+                    if (file.size > 60 * 1024 * 1024) throw new Error('This browser can’t shrink videos and this one is over 60MB. Add it from your phone.');
+                    return Object.assign(base, { blob: file });
+                }
+                return encode(v, tw, th, dur, progress).then(function (blob) {
+                    // An MP4 that's already smaller (and not trimmed) is kept as it is.
+                    if (file.type === 'video/mp4' && file.size <= blob.size && !base.trimmed) blob = file;
+                    return Object.assign(base, { blob: blob });
+                });
+            });
+        }).then(function (out) { cleanup(); return out; }, function (err) { cleanup(); throw err; });
+    }
+
+    function encode(v, tw, th, dur, progress) {
+        var bitrate = Math.round(2500000 * (tw * th) / (1280 * 720));
+        var codecs = ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.42e01f'];
+        function pick(i) {
+            if (i >= codecs.length) return Promise.reject(new Error('This browser can’t make MP4 video. Try Safari or Chrome.'));
+            var cfg = { codec: codecs[i], width: tw, height: th, bitrate: bitrate, framerate: 30, avc: { format: 'avc' } };
+            return VideoEncoder.isConfigSupported(cfg).then(function (r) { return r.supported ? cfg : pick(i + 1); }, function () { return pick(i + 1); });
+        }
+        return Promise.all([pick(0), import('/_p7n3x/vendor/mp4-muxer.mjs')]).then(function (got) {
+            var cfg = got[0], M = got[1];
+            var muxer = new M.Muxer({ target: new M.ArrayBufferTarget(), video: { codec: 'avc', width: tw, height: th, frameRate: 30 }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' });
+            var failure = null;
+            var enc = new VideoEncoder({ output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta); }, error: function (e) { failure = e; } });
+            enc.configure(cfg);
+            var c = canvas(tw, th), g = c.getContext('2d');
+            var n = 0, lastT = -1;
+
+            return new Promise(function (resolve, reject) {
+                var finished = false;
+                function grab(t) {
+                    if (finished) return;
+                    if (failure) return finish(failure);
+                    if (t >= dur) return finish();
+                    if (t > lastT) {
+                        lastT = t;
+                        g.drawImage(v, 0, 0, tw, th);
+                        var frame = new VideoFrame(c, { timestamp: Math.round(t * 1e6) });
+                        enc.encode(frame, { keyFrame: n % 60 === 0 });
+                        frame.close();
+                        n++;
+                        progress(Math.min(1, t / dur));
+                    }
+                }
+                function finish(err) {
+                    if (finished) return;
+                    finished = true;
+                    v.pause();
+                    if (err) return reject(err instanceof Error ? err : new Error(String(err)));
+                    if (!n) return reject(new Error('No frames could be read from this video.'));
+                    enc.flush().then(function () {
+                        enc.close();
+                        muxer.finalize();
+                        resolve(new Blob([muxer.target.buffer], { type: 'video/mp4' }));
+                    }, reject);
+                }
+                if (v.requestVideoFrameCallback) {
+                    var onFrame = function (now, m) { grab(m.mediaTime); if (!finished) v.requestVideoFrameCallback(onFrame); };
+                    v.requestVideoFrameCallback(onFrame);
+                } else {
+                    var timer = setInterval(function () { if (finished) clearInterval(timer); else grab(v.currentTime); }, 33);
+                }
+                v.addEventListener('ended', function () { finish(); }, { once: true });
+                var start = once(v, 'seeked');
+                v.currentTime = 0;
+                start.then(function () { return v.play(); }).catch(finish);
+            });
+        });
+    }
+
+    // Upload in 3MB chunks (each request stays under the 6MB function limit).
+    function uploadVideo(blob, progress) {
+        var bytes = new Uint8Array(16);
+        crypto.getRandomValues(bytes);
+        var id = Array.prototype.map.call(bytes, function (b) { return (b < 16 ? '0' : '') + b.toString(16); }).join('');
+        var parts = Math.ceil(blob.size / VIDEO_PART);
+        function base64(part) {
+            return new Promise(function (res, rej) {
+                var r = new FileReader();
+                r.onload = function () { res(String(r.result).split(',')[1] || ''); };
+                r.onerror = function () { rej(new Error('Could not read the video.')); };
+                r.readAsDataURL(part);
+            });
+        }
+        function send(i, tries) {
+            return base64(blob.slice(i * VIDEO_PART, (i + 1) * VIDEO_PART)).then(function (data) {
+                return api('save-gallery-video', { uid: id, part: i, data: data });
+            }).catch(function (err) {
+                if (tries < 2 && !/Signed out/.test(err.message)) return send(i, tries + 1);
+                throw err;
+            });
+        }
+        var chain = Promise.resolve();
+        for (var i = 0; i < parts; i++) {
+            (function (i) { chain = chain.then(function () { return send(i, 0).then(function () { progress((i + 1) / parts); }); }); }(i));
+        }
+        return chain.then(function () { return { uid: id, parts: parts, size: blob.size }; });
+    }
+
     function localStamp(d) {
         function p(n) { return n < 10 ? '0' + n : String(n); }
         return N.iso(d) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
@@ -1415,12 +1630,13 @@
         if (!files.length) return;
         var skipped = 0;
         files.forEach(function (file) {
-            if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { skipped++; return; }
+            var isVideo = /^video\//.test(file.type) || /\.(mov|mp4|m4v)$/i.test(file.name || '');
+            if (!isVideo && !/^image\/(jpeg|png|webp)$/.test(file.type)) { skipped++; return; }
             // Until the metadata is read, fall back to the file's own date
             var mod = new Date(file.lastModified || Date.now());
-            var item = { uid: ++uid, file: file, url: URL.createObjectURL(file), caption: '', date: N.iso(mod), stamp: localStamp(mod), fromPhoto: false };
+            var item = { uid: ++uid, file: file, video: isVideo, url: URL.createObjectURL(file), caption: '', date: N.iso(mod), stamp: localStamp(mod), fromPhoto: false };
             queue.push(item);
-            exifDate(file).then(function (s) {
+            (isVideo ? videoDate(file) : exifDate(file)).then(function (s) {
                 if (!s) return;
                 item.stamp = s;
                 item.date = s.slice(0, 10);
@@ -1432,7 +1648,7 @@
         renderQueue();
         if (!$('sheet-import').classList.contains('is-open')) openSheet('sheet-import');
         $('si-status').className = 'ad-status' + (skipped ? ' is-error' : '');
-        $('si-status').textContent = skipped ? skipped + ' file' + (skipped === 1 ? '' : 's') + ' skipped. JPG, PNG or WebP only.' : '';
+        $('si-status').textContent = skipped ? skipped + ' file' + (skipped === 1 ? '' : 's') + ' skipped. Photos (JPG, PNG, WebP) and videos only.' : '';
     });
     $('si-more').addEventListener('click', function () { $('roll-file').click(); });
 
@@ -1444,9 +1660,16 @@
             li.dataset.uid = item.uid;
             if (item.state === 'done') li.classList.add('is-done');
             if (item.state === 'failed') li.classList.add('is-failed');
-            var img = document.createElement('img');
-            img.src = item.url;
-            img.alt = '';
+            var img;
+            if (item.video) {
+                img = document.createElement('video');
+                img.muted = true; img.playsInline = true; img.preload = 'metadata';
+                img.src = item.url + '#t=0.1';   // shows a frame, not a black box
+            } else {
+                img = document.createElement('img');
+                img.alt = '';
+                img.src = item.url;
+            }
             li.appendChild(img);
             var f = el('div', 'ad-imp__fields');
             var cap = document.createElement('input');
@@ -1486,7 +1709,9 @@
         var go = $('si-go');
         go.disabled = !left || importing;
         go.textContent = importing ? 'Adding…' : left > 1 ? 'Add ' + left : 'Add';
-        $('si-title').textContent = left === 1 ? 'Add 1 Photo' : 'Add ' + left + ' Photos';
+        var nv = queue.filter(function (q) { return q.state !== 'done' && q.video; }).length;
+        var noun = nv === 0 ? 'Photo' : nv === left ? 'Video' : 'Item';
+        $('si-title').textContent = 'Add ' + left + ' ' + noun + (left === 1 ? '' : 's');
     }
 
     function resetImport() {
@@ -1509,19 +1734,25 @@
         // One at a time keeps each request under the function size limit
         todo.reduce(function (chain, item, i) {
             return chain.then(function () {
-                status.textContent = 'Adding ' + (i + 1) + ' of ' + todo.length + '…';
-                return process(item.file).then(function (out) {
-                    return api('save-gallery', {
-                        image: out.image,
-                        thumb: out.thumb,
-                        w: out.w,
-                        h: out.h,
-                        caption: item.caption.trim(),
-                        place: place,
-                        takenAt: item.date,
-                        takenStamp: item.stamp
+                var of = (i + 1) + ' of ' + todo.length;
+                status.textContent = 'Adding ' + of + '…';
+                var fields = { caption: item.caption.trim(), place: place, takenAt: item.date, takenStamp: item.stamp };
+                var job = item.video
+                    ? processVideo(item.file, function (f) { status.textContent = 'Shrinking video ' + of + '… ' + Math.round(f * 100) + '%'; })
+                        .then(function (out) {
+                            if (out.trimmed) say('Videos are kept to the first minute');
+                            return uploadVideo(out.blob, function (f) { status.textContent = 'Uploading video ' + of + '… ' + Math.round(f * 100) + '%'; })
+                                .then(function (up) {
+                                    return api('save-gallery', Object.assign({ image: out.poster, thumb: out.thumb, w: out.w, h: out.h, video: { uid: up.uid, parts: up.parts, size: up.size, dur: out.dur } }, fields));
+                                });
+                        })
+                    : process(item.file).then(function (out) {
+                        return api('save-gallery', Object.assign({ image: out.image, thumb: out.thumb, w: out.w, h: out.h }, fields));
                     });
-                }).then(function () { item.state = 'done'; done++; }, function () { item.state = 'failed'; failed++; });
+                return job.then(function () { item.state = 'done'; done++; }, function (err) {
+                    item.state = 'failed'; failed++;
+                    item.error = err && err.message;
+                });
             }).then(renderQueue);
         }, Promise.resolve()).then(function () {
             importing = false;
@@ -1530,10 +1761,11 @@
             if (!failed) {
                 closeSheets();
                 $('si-place').value = '';
-                say(done === 1 ? 'Photo Added' : done + ' Photos Added');
+                say(done === 1 ? 'Added to B-Roll' : done + ' Added to B-Roll');
             } else {
+                var why = todo.filter(function (q) { return q.state === 'failed' && q.error; }).map(function (q) { return q.error; })[0];
                 status.className = 'ad-status is-error';
-                status.textContent = done + ' added, ' + failed + ' failed. The failed ones are outlined; tap Add to try again.';
+                status.textContent = done + ' added, ' + failed + ' failed' + (why ? ' (' + why + ')' : '') + '. The failed ones are outlined; tap Add to try again.';
             }
         });
     });
@@ -1542,23 +1774,35 @@
     var editing = null;
     function openPhoto(p) {
         editing = p;
-        var img = $('sp-img');
-        img.src = tileUrl(p);
-        var full = new Image();
-        full.onload = function () { if (editing === p) img.src = full.src; };
-        full.src = fullUrl(p);
+        var img = $('sp-img'), vid = $('sp-video');
+        img.hidden = !!p.video;
+        vid.hidden = !p.video;
+        if (p.video) {
+            img.removeAttribute('src');
+            vid.poster = fullUrl(p);
+            vid.src = videoUrl(p);
+            vid.play().catch(function () {});
+        } else {
+            vid.pause(); vid.removeAttribute('src');
+            img.src = tileUrl(p);
+            var full = new Image();
+            full.onload = function () { if (editing === p) img.src = full.src; };
+            full.src = fullUrl(p);
+        }
         $('sp-caption').value = p.caption || '';
         $('sp-place').value = p.place || '';
         $('sp-date').value = dayOf(p);
         $('sp-link').value = p.link || '';
         var meta = ['Added ' + N.longDate(String(p.createdAt || '').slice(0, 10))];
         if (p.w && p.h) meta.push(p.w + ' × ' + p.h);
+        if (p.video) meta.push(clockTime(p.video.dur) + ' video, ' + (p.video.size / 1048576).toFixed(1) + 'MB');
         meta.push(p.thumb ? 'Fast preview ready' : 'No fast preview yet');
         $('sp-meta').textContent = meta.join(' · ');
         $('sp-view').href = '/roll.html#photo-' + p.id;
         var del = $('sp-delete');
         del.classList.remove('is-confirm');
-        del.textContent = 'Delete Photo';
+        del.textContent = p.video ? 'Delete Video' : 'Delete Photo';
+        $('sp-title').textContent = p.video ? 'Video' : 'Photo';
         $('sp-status').textContent = '';
         openSheet('sheet-photo');
     }

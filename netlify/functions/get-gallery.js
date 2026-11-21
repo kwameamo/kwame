@@ -2,7 +2,8 @@ import { getStore } from '@netlify/blobs';
 
 /*
   Public read — the B-Roll photo list.
-  Each item: { id, caption, place, takenAt, link, w, h, thumb, mime, createdAt }
+  Each item: { id, caption, place, takenAt, link, w, h, thumb, video?, mime, createdAt }
+  A video item's image is its poster; video = { uid, parts, size, dur } plays from get-gallery-video?uid=.
   Image bytes come from get-gallery-image.
   The edge keeps the list for 30s and serves a stale copy while it refreshes,
   so the roll opens at once; the admin adds ?fresh=<time> to skip that.

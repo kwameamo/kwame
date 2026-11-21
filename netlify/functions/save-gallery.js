@@ -36,7 +36,7 @@ export default async (req, context) => {
     return json({ error: 'Invalid request body.' }, 400);
   }
 
-  const { password, caption, link, image, place, takenAt, takenStamp, w, h, thumb } = body;
+  const { password, caption, link, image, place, takenAt, takenStamp, w, h, thumb, video } = body;
 
   if (!password || password !== process.env.ADMIN_PASSWORD) {
     await recordFailure(ip);
@@ -78,6 +78,27 @@ export default async (req, context) => {
 
     const nextId = items.reduce((m, it) => Math.max(m, it.id || 0), 0) + 1;
 
+    // A video: the image above is its poster, and its chunks were uploaded first
+    // through save-gallery-video. Check they all arrived before listing it.
+    let videoInfo;
+    if (video && typeof video === 'object') {
+      const uid = String(video.uid || '');
+      const parts = parseInt(video.parts, 10), size = parseInt(video.size, 10);
+      if (!/^[a-f0-9]{16,40}$/.test(uid) || !(parts > 0 && parts <= 40) || !(size > 0)) {
+        return json({ error: 'Video details are incomplete.' }, 400);
+      }
+      let total = 0;
+      for (let i = 0; i < parts; i++) {
+        const m = await store.getMetadata(`vid:${uid}:${i}`);
+        if (!m) return json({ error: `Video chunk ${i + 1} of ${parts} is missing. Try again.` }, 400);
+        total += (m.metadata && m.metadata.size) || 0;
+      }
+      if (total !== size) return json({ error: 'The video upload is incomplete. Try again.' }, 400);
+      await store.setJSON(`vmeta:${uid}`, { size, parts });
+      const dur = Number(video.dur);
+      videoInfo = { uid, parts, size, dur: Number.isFinite(dur) && dur > 0 ? Math.round(dur * 10) / 10 : undefined };
+    }
+
     // Store the binary, with mime in blob metadata so the image route can echo it back.
     await store.set(`img:${nextId}`, buffer, { metadata: { mime } });
 
@@ -104,6 +125,7 @@ export default async (req, context) => {
       w:         dim(w),
       h:         dim(h),
       thumb:     hasThumb || undefined,
+      video:     videoInfo,
       mime,
       createdAt: new Date().toISOString()
     };
