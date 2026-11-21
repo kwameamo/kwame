@@ -317,3 +317,13 @@ body { overflow-x: clip; }
     padding: 6px 12px;
     border-radius: 999px;
 }
+
+/* Phones: every header item stays on one row; spacing shrinks with the screen */
+@media (max-width: 640px) {
+    .site-nav .nav-links { flex-wrap: nowrap; gap: 0 clamp(6px, 3.6vw, 16px); white-space: nowrap; }
+    .site-nav .nav-links a { font-size: clamp(11px, 3.2vw, 12px); }
+    .site-nav .nav-links .theme-btn { width: 28px; flex: none; }
+}
+@media (max-width: 340px) {
+    .site-nav { padding-left: 10px; padding-right: 10px; }
+}

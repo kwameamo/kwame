@@ -1,3 +1,7 @@
 node_modules/
 package-lock.json
 .claude/test/*.png
+
+# Local Netlify folder
+.netlify
+deno.lock
