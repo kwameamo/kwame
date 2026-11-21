@@ -16,8 +16,15 @@ const dayList = (n) => {
   return out;
 };
 
+// A day is read in full up to this many views; past it the rest are dropped,
+// so a flood of fake views can't stall the admin.
+const MAX_DAY_EVENTS = 15000;
+// One visitor can add at most this many views to a day.
+const MAX_VIEWS_PER_VISITOR = 100;
+
 async function readEvents(store, day) {
-  const { blobs } = await store.list({ prefix: `e/${day}/` });
+  let { blobs } = await store.list({ prefix: `e/${day}/` });
+  if (blobs.length > MAX_DAY_EVENTS) blobs = blobs.slice(0, MAX_DAY_EVENTS);
   const events = [];
   for (let i = 0; i < blobs.length; i += 40) {
     const batch = await Promise.all(blobs.slice(i, i + 40).map((b) => store.get(b.key, { type: 'json' }).catch(() => null)));
@@ -33,8 +40,10 @@ const bump = (map, k, n = 1) => { if (k) map[k] = (map[k] || 0) + n; };
 function summarise(events) {
   events.sort((a, b) => a.t - b.t);
   const s = { views: events.length, visitors: 0, pages: {}, sources: {}, countries: {}, cities: {}, devices: {}, names: {} };
-  const seen = new Set();
+  const seen = new Set(), perVisitor = {};
   for (const e of events) {
+    perVisitor[e.v] = (perVisitor[e.v] || 0) + 1;
+    if (perVisitor[e.v] > MAX_VIEWS_PER_VISITOR) { s.views--; continue; }
     bump(s.pages, e.p);
     if (seen.has(e.v)) continue;
     seen.add(e.v);

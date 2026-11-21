@@ -46,11 +46,25 @@ function sourceName(host) {
   return host;
 }
 
+// Only paths shaped like this site's pages (/, /blog.html, /work/ghana-duty.html …).
+const PAGE = /^\/(?:[a-z0-9-]+\/)*(?:[a-z0-9-]+(?:\.html)?)?$/i;
+
 function cleanPath(p) {
-  if (typeof p !== 'string' || !p.startsWith('/')) return null;
-  p = p.split(/[?#]/)[0].slice(0, 160);
+  if (typeof p !== 'string') return null;
+  p = p.split(/[?#]/)[0];
+  if (p.length > 120 || !PAGE.test(p)) return null;
   if (p === '/index.html') p = '/';
   return p;
+}
+
+// A random salt made once and kept in the store, so visitor ids never involve
+// any real secret. Cached for the life of the function instance.
+let saltCache = null;
+async function getSalt(store) {
+  if (saltCache) return saltCache;
+  let s = await store.get('salt');
+  if (!s) { s = randomBytes(32).toString('hex'); await store.set('salt', s); }
+  return (saltCache = s);
 }
 
 export default async (req, context) => {
@@ -59,6 +73,12 @@ export default async (req, context) => {
 
   const ua = req.headers.get('user-agent') || '';
   if (!ua || BOT.test(ua)) return done();
+
+  // Browsers send Origin with the beacon: only count views sent from this site.
+  const origin = req.headers.get('origin');
+  if (origin) {
+    try { if (new URL(origin).host !== new URL(req.url).host) return done(); } catch { return done(); }
+  }
 
   let d;
   try { d = JSON.parse(await req.text()); } catch { return done(); }
@@ -88,8 +108,12 @@ export default async (req, context) => {
   const now = Date.now();
   const day = new Date(now).toISOString().slice(0, 10);
   const ip = context?.ip || req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for') || '';
-  const salt = process.env.STATS_SALT || process.env.ADMIN_PASSWORD || 'kwame.vision';
-  const visitor = createHash('sha256').update(`${salt}|${day}|${ip}|${ua}`).digest('hex').slice(0, 16);
+  const store = getStore({ name: 'stats', consistency: 'strong' });
+  let visitor;
+  try {
+    const salt = await getSalt(store);
+    visitor = createHash('sha256').update(`${salt}|${day}|${ip}|${ua}`).digest('hex').slice(0, 16);
+  } catch { return done(); }
 
   const event = {
     t: now,
@@ -103,7 +127,6 @@ export default async (req, context) => {
   };
 
   try {
-    const store = getStore({ name: 'stats', consistency: 'strong' });
     await store.setJSON(`e/${day}/${now}-${randomBytes(4).toString('hex')}`, event);
   } catch { /* never break the page over a stat */ }
   return done();
