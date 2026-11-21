@@ -32,6 +32,7 @@
     font-family: var(--ad-font);
     -webkit-font-smoothing: antialiased;
     -webkit-text-size-adjust: 100%;
+    overflow-x: clip; /* nothing may widen the page past the screen (clip keeps sticky working) */
 }
 
 :root[data-scheme="dark"] .ad {
@@ -140,50 +141,188 @@
 .ad-btn--accent { background: var(--ad-accent); color: #000; font-weight: 600; }
 .ad-btn:disabled { opacity: 0.4; cursor: default; }
 
-/* ── Lock ── */
+/* ── Lock ──
+   Built like the iPhone lock screen it copies. The wallpaper is three layers:
+   a yellow gradient (sampled from the photo's own background), the clock, and
+   a cutout of the subject on top, so the clock sits behind him. Tapping or
+   swiping up blurs it all and shows the password field. */
 .ad-lock {
-    display: grid;
-    place-items: center;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 32px 20px calc(32px + env(safe-area-inset-bottom));
-    background:
-        radial-gradient(80% 60% at 20% 10%, rgba(255, 204, 0, 0.18), transparent 60%),
-        radial-gradient(70% 60% at 90% 90%, rgba(10, 132, 255, 0.14), transparent 60%),
-        var(--ad-bg);
+    --lk-ink: #fff6a8;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    overflow: hidden;
+    background: linear-gradient(180deg,
+        #e9be32 0%, #eec232 10%, #f1c535 25%, #f4c737 40%, #f6ca39 55%,
+        #f9cc3b 70%, #fbce3c 80%, #f8cb3c 88%, #f7cb3c 92%, #fdd03d 97%, #fed13e 100%);
+    color: #fff;
+    font-family: var(--ad-display);
+    -webkit-user-select: none;
+    user-select: none;
     transition: opacity 0.35s ease, transform 0.35s var(--ad-ease);
 }
 
 .ad-lock.is-leaving { opacity: 0; transform: scale(1.04); }
 
-.ad-lock__card { width: 100%; max-width: 360px; text-align: center; }
-
-.ad-lock__avatar {
-    width: 84px;
-    height: 84px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+/* The photo's frame, kept at its own proportions and pinned to the bottom of the
+   screen. On an iPhone it fills the screen exactly; anywhere else the gradient
+   carries on around it. Everything inside is placed in % of this frame. */
+.ad-lock__stage {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    height: min(100%, 100vw * 2556 / 1179);
+    aspect-ratio: 1179 / 2556;
+    container-type: size;
+    transform: translateX(-50%);
+    transition: transform 0.5s var(--ad-ease), filter 0.45s ease;
 }
+
+.ad-lock__date {
+    position: absolute;
+    z-index: 1;                 /* the date stays in front of the person, as on iOS */
+    top: 8.6%;
+    left: 0;
+    right: 0;
+    color: var(--lk-ink);
+    font-size: 5.6cqw;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: center;
+    transition: opacity 0.3s ease, transform 0.45s var(--ad-ease);
+}
+
+/* Tall, narrow numerals filling the top half, like the iOS clock. Antonio is
+   stretched upright; JS narrows it further if the time has four digits. */
+.ad-lock__clock {
+    position: absolute;
+    top: 6.96%;              /* numerals land at 13.25%-54.25% of the frame, as on the phone */
+    left: 0;
+    right: 0;
+    height: 41%;
+    display: flex;
+    justify-content: center;
+    transition: opacity 0.3s ease, transform 0.45s var(--ad-ease);
+}
+
+.ad-lock__clock span {
+    display: block;
+    font-family: 'Antonio', var(--ad-display);
+    font-size: 37.3cqh;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    transform-origin: top center;
+    transform: scale(var(--lk-sx, 1), 1.25);
+    background: linear-gradient(160deg, var(--lk-c1, #fffbd0) 0%, var(--lk-c2, #fff27a) 45%, var(--lk-c3, #fde86a) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.35)) drop-shadow(0 6px 14px var(--lk-shadow, rgba(150, 100, 0, 0.18)));
+}
+
+.ad-lock__subject {
+    position: absolute;
+    left: 9.584%;
+    top: 27.895%;
+    width: 76.59%;
+    height: 72.105%;
+    pointer-events: none;
+}
+
+/* The two round buttons sit where the phone's own are. */
+.ad-lock__btn {
+    position: absolute;
+    z-index: 2;
+    top: 90.75%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14.8cqw;
+    height: 14.8cqw;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.3s ease;
+}
+
+.ad-lock__btn--l { left: 18.96%; }
+.ad-lock__btn--r { left: 80.7%; }
+.ad-lock__btn svg { width: 38%; height: 38%; }
+
+/* Anywhere else on the lock face wakes it. */
+.ad-lock__wake {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ad-lock__wake:focus-visible { outline: none; }
+
+/* ── Password ── */
+.ad-lock__veil {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    background: rgba(40, 30, 0, 0.28);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0s 0.4s;
+}
+
+.ad-lock__pass {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: calc(17vh + env(safe-area-inset-top)) 28px calc(28px + env(safe-area-inset-bottom));
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(14px);
+    transition: opacity 0.3s ease, transform 0.45s var(--ad-ease), visibility 0s 0.3s;
+}
+
+.ad-lock.is-pass .ad-lock__veil,
+.ad-lock.is-pass .ad-lock__pass { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.ad-lock.is-pass .ad-lock__date,
+.ad-lock.is-pass .ad-lock__clock { opacity: 0; transform: translateY(-3%); }
+.ad-lock.is-pass .ad-lock__btn { opacity: 0; pointer-events: none; }
+.ad-lock.is-pass .ad-lock__stage { transform: translateX(-50%) scale(1.08); filter: blur(32px) brightness(0.82) saturate(1.15); }
+.ad-lock.is-pass .ad-lock__wake { pointer-events: none; }
 
 .ad-lock__title {
-    margin-top: 18px;
-    font-family: var(--ad-display);
-    font-size: 34px;
-    font-weight: 700;
-    letter-spacing: -0.035em;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: center;
 }
-
-.ad-lock__sub { margin-top: 2px; color: var(--ad-ink-2); font-size: 15px; }
 
 .ad-lock__field {
     display: flex;
     align-items: center;
     gap: 6px;
-    height: 54px;
-    margin-top: 28px;
-    padding: 0 6px 0 20px;
-    border-radius: 999px;
+    width: 100%;
+    max-width: 320px;
+    height: 50px;
+    margin-top: 26px;
+    padding: 0 5px 0 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
 }
 
 .ad-lock__field input {
@@ -192,29 +331,55 @@
     height: 100%;
     border: 0;
     background: none;
-    font-size: 17px;
+    color: #fff;
+    caret-color: #fff;
+    font-family: var(--ad-font);
+    font-size: 19px;
+    letter-spacing: 0.12em;
     outline: none;
+    -webkit-appearance: none;
+    appearance: none;
 }
-
-.ad-lock__field input::placeholder { color: var(--lg-ink-soft); }
 
 .ad-lock__go {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
     border: 0;
-    border-radius: 50%;
-    background: var(--ad-accent);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
     color: #000;
     cursor: pointer;
 }
 
-.ad-lock__go svg { width: 20px; height: 20px; }
+.ad-lock__go svg { width: 19px; height: 19px; }
 .ad-lock__go:disabled { opacity: 0.5; }
-.ad-lock__error { min-height: 20px; margin-top: 12px; color: var(--ad-red); font-size: 14px; }
+.ad-lock__error { min-height: 22px; margin-top: 14px; color: #fff; font-family: var(--ad-font); font-size: 15px; text-align: center; }
 .ad-lock__field.is-shaking { animation: ad-shake 0.4s ease; }
+
+.ad-lock__foot {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 330px;
+    margin-top: auto;
+    padding: 0 10px;
+}
+
+.ad-lock__foot a, .ad-lock__foot button {
+    padding: 12px 6px;
+    border: 0;
+    background: none;
+    color: #fff;
+    font-family: var(--ad-font);
+    font-size: 17px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
 
 @keyframes ad-shake {
     20% { transform: translateX(-8px); }
@@ -222,6 +387,22 @@
     60% { transform: translateX(-5px); }
     80% { transform: translateX(5px); }
 }
+
+/* A photo chosen in Lock Screen. It is cropped to the frame's shape, so it
+   fills the stage exactly; the cutout is the same size and lines up on top. */
+.ad-lock__bg,
+.ad-lock__fill {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ad-lock__fill { filter: blur(48px) brightness(0.85); transform: scale(1.2); }
+.ad-lock.is-pass .ad-lock__fill { filter: blur(48px) brightness(0.7); }
+.ad-lock__subject--full { left: 0; top: 0; width: 100%; height: 100%; }
 
 /* ── App shell ── */
 .ad-app { opacity: 0; transition: opacity 0.35s ease; }
@@ -243,7 +424,9 @@
 .ad-top::before {
     content: '';
     position: absolute;
-    inset: 0 -100vw -18px;
+    /* Span the screen, not past it. A -100vw inset made the page twice as
+       wide as the phone, so iOS zoomed out and squeezed the app into the left half. */
+    inset: 0 calc(50% - 50vw) -18px;
     z-index: -1;
     background: linear-gradient(var(--ad-bg) 30%, transparent);
     opacity: 0;
@@ -492,7 +675,7 @@
     align-items: center;
     justify-content: center;
     gap: 2px;
-    min-width: 92px;
+    min-width: 82px;
     height: 50px;
     padding: 0 14px;
     border: 0;
@@ -714,6 +897,7 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
 .ad-field--stack textarea { text-align: left; resize: none; line-height: 1.45; }
 
 .ad-field--switch { justify-content: space-between; }
+.ad-field--switch > span { flex: 1 1 auto; }
 
 .ad-switch {
     position: relative;
@@ -810,12 +994,12 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
 .ad-imp__fields input {
     width: 100%;
     min-width: 0;
-    height: 34px;
+    height: 36px;
     padding: 0 10px;
     border: 0;
     border-radius: 9px;
     background: var(--ad-fill);
-    font-size: 15px;
+    font-size: 16px; /* 16px or more, or iOS zooms in on focus */
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -858,6 +1042,142 @@ html.ad-editing, html.ad-editing body { overflow: hidden; }
 }
 
 .ad-toast.is-shown { opacity: 1; }
+
+/* ── Stats ── */
+.ad-seg {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 16px;
+    padding: 2px;
+    border-radius: 10px;
+    background: var(--ad-fill);
+}
+
+.ad-seg button {
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ad-seg button[aria-checked="true"] { background: var(--ad-card); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+:root[data-scheme="dark"] .ad-seg button[aria-checked="true"] { background: #636366; }
+
+.ad-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.ad-tile { padding: 14px 14px 12px; border-radius: 18px; background: var(--ad-card); }
+.ad-tile__k { display: flex; align-items: center; gap: 6px; color: var(--ad-ink-2); font-size: 13px; font-weight: 500; }
+.ad-tile__v { margin-top: 4px; font-family: var(--ad-display); font-size: 30px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.ad-live { width: 7px; height: 7px; border-radius: 50%; background: var(--ad-green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ad-green) 25%, transparent); }
+
+.ad-chart { position: relative; margin-top: 14px; padding: 14px 16px 12px; border-radius: 18px; }
+.ad-chart__hd { color: var(--ad-ink-2); font-size: 13px; font-weight: 500; }
+
+.ad-chart__plot {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 150px;
+    margin-top: 12px;
+    background: linear-gradient(var(--ad-line), var(--ad-line)) bottom / 100% 1px no-repeat;
+}
+
+/* Each day is a full-height hit target; the bar inside is the mark. */
+.ad-chart__col {
+    flex: 1 1 0;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.ad-chart__bar { width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: var(--ad-blue); transition: opacity 0.15s ease; }
+.ad-chart__col.is-zero .ad-chart__bar { background: var(--ad-ink-3); }
+.ad-chart__plot:hover .ad-chart__bar, .ad-chart__plot.is-picked .ad-chart__bar { opacity: 0.45; }
+.ad-chart__col:hover .ad-chart__bar, .ad-chart__col.is-on .ad-chart__bar { opacity: 1; }
+.ad-chart__axis { display: flex; justify-content: space-between; margin-top: 6px; color: var(--ad-ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+.ad-chart__tip {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    background: var(--ad-ink);
+    color: var(--ad-bg);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+
+/* Ranked lists: name and count, with a thin bar for share. */
+.ad-stat { position: relative; padding: 11px 18px 12px; }
+.ad-stat + .ad-stat::before { content: ''; position: absolute; top: 0; left: 18px; right: 18px; height: 1px; background: var(--ad-line); transform: scaleY(0.5); }
+.ad-stat__row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 16px; }
+.ad-stat__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ad-stat__n { flex: 0 0 auto; color: var(--ad-ink-2); font-variant-numeric: tabular-nums; }
+.ad-stat__meter { height: 4px; margin-top: 7px; border-radius: 2px; background: var(--ad-fill); }
+.ad-stat__meter span { display: block; height: 100%; border-radius: 2px; background: var(--ad-blue); }
+.ad-stat__sub { margin-top: 2px; color: var(--ad-ink-2); font-size: 14px; }
+.ad-stat--empty { color: var(--ad-ink-2); font-size: 15px; }
+
+@media (max-width: 380px) {
+    .ad-tile__v { font-size: 26px; }
+    .ad-tile { padding: 12px 12px 10px; }
+}
+
+/* ── Lock screen sheet ── */
+.ad-wall {
+    position: relative;
+    height: min(50vh, 440px);
+    aspect-ratio: 1179 / 2556;
+    margin: 4px auto 0;
+    overflow: hidden;
+    border-radius: 26px;
+    background: linear-gradient(180deg, #e9be32 0%, #f1c535 25%, #f6ca39 55%, #fbce3c 80%, #fed13e 100%);
+    box-shadow: 0 0 0 1px var(--ad-line), 0 12px 30px -12px rgba(0, 0, 0, 0.35);
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.ad-wall.is-photo { cursor: grab; }
+.ad-wall.is-photo:active { cursor: grabbing; }
+.ad-wall .ad-lock__date { color: var(--lk-ink, #fff6a8); pointer-events: none; }
+.ad-wall .ad-lock__clock { pointer-events: none; }
+.ad-note--center { margin: 12px 8px 0; text-align: center; }
+
+.ad-field input[type="range"] { flex: 1; height: 28px; padding: 0; accent-color: var(--ad-accent); -webkit-appearance: auto; appearance: auto; }
+.ad-chart:has(.is-picked) .ad-chart__hd { visibility: hidden; }  /* the tooltip takes the heading's place */
+
+.ad-swatches { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.ad-swatches button, .ad-swatches__pick {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--sw, var(--ad-fill));
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+}
+
+.ad-swatches button[data-clock="auto"] { width: auto; padding: 0 10px; border-radius: 15px; font-size: 13px; font-weight: 600; }
+.ad-swatches [aria-checked="true"] { box-shadow: 0 0 0 2px var(--ad-card), 0 0 0 4px var(--ad-blue); }
+.ad-swatches__pick { overflow: hidden; background: conic-gradient(#ff3b30, #ffcc00, #34c759, #0a84ff, #af52de, #ff3b30); }
+.ad-swatches__pick input { position: absolute; inset: -8px; width: 46px; height: 46px; opacity: 0; cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
     .ad-editor, .ad-sheet__panel, .ad-sheet__scrim, .ad-lock, .ad-app, .ad-menu, .ad-top__title, .ad-top::before { transition: none; }

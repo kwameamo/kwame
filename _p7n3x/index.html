@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
     <script src="/js/theme.js"></script>
     <title>Admin — David Kwame Amo</title>
     <meta name="robots" content="noindex, nofollow">
@@ -17,7 +17,7 @@
     <link rel="icon" type="image/png" href="/photos/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/glass.css">
     <link rel="stylesheet" href="/_p7n3x/admin.css">
@@ -26,17 +26,34 @@
 
 <!-- ── Lock ── -->
 <main class="ad-lock" id="lock">
-    <div class="ad-lock__card">
-        <img class="ad-lock__avatar" src="/photos/me.PNG" alt="" width="84" height="84">
-        <h1 class="ad-lock__title">Admin</h1>
-        <p class="ad-lock__sub">Notes and B-Roll for kwame.vision</p>
-        <form class="ad-lock__field lg" id="lock-form" autocomplete="on">
+    <!-- Wallpaper, built like an iPhone lock screen: background, then the clock, then the subject in front of it.
+         A custom photo (set in Lock Screen) replaces the yellow; a blurred copy fills the sides on wide screens. -->
+    <img class="ad-lock__fill" id="lock-fill" alt="" hidden>
+    <div class="ad-lock__stage" aria-hidden="true">
+        <img class="ad-lock__bg" id="lock-bg" alt="" hidden>
+        <p class="ad-lock__date" id="lock-date"></p>
+        <p class="ad-lock__clock"><span id="lock-time"></span></p>
+        <img class="ad-lock__subject" id="lock-subject" src="/_p7n3x/lock-subject.webp" alt="" width="903" height="1843" decoding="async" fetchpriority="high">
+        <a class="ad-lock__btn ad-lock__btn--l lg" href="/" aria-label="Open kwame.vision"><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+        <button type="button" class="ad-lock__btn ad-lock__btn--r lg" data-wake aria-label="Unlock"><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
+    </div>
+    <button type="button" class="ad-lock__wake" data-wake aria-label="Unlock"></button>
+
+    <!-- Password -->
+    <div class="ad-lock__veil" aria-hidden="true"></div>
+    <section class="ad-lock__pass" id="lock-pass" aria-labelledby="lock-pass-title">
+        <h1 class="ad-lock__title" id="lock-pass-title">Enter Password</h1>
+        <form class="ad-lock__field" id="lock-form" autocomplete="on">
             <input type="text" name="username" value="admin" autocomplete="username" hidden>
-            <input type="password" id="lock-input" placeholder="Password" autocomplete="current-password" aria-label="Admin password" required>
+            <input type="password" id="lock-input" autocomplete="current-password" aria-label="Admin password" enterkeyhint="go" required>
             <button type="submit" class="ad-lock__go" aria-label="Unlock"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
         </form>
         <p class="ad-lock__error" id="lock-error" role="alert"></p>
-    </div>
+        <div class="ad-lock__foot">
+            <a href="/">View Site</a>
+            <button type="button" id="lock-cancel">Cancel</button>
+        </div>
+    </section>
 </main>
 
 <!-- ── App ── -->
@@ -52,6 +69,7 @@
         <div class="ad-menu lg" id="menu-notes" role="menu">
             <button type="button" role="menuitem" data-act="refresh-notes"><span>Refresh</span><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
             <a role="menuitem" href="/blog.html" target="_blank" rel="noopener"><span>View Blog</span><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <button type="button" role="menuitem" data-act="wallpaper"><span>Lock Screen</span><svg aria-hidden="true"><use href="#i-photos"/></svg></button>
             <button type="button" role="menuitem" data-theme-toggle="label"></button>
             <button type="button" role="menuitem" data-act="lock"><span>Lock</span><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
         </div>
@@ -77,6 +95,7 @@
             <button type="button" role="menuitem" data-act="refresh-roll"><span>Refresh</span><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
             <button type="button" role="menuitem" data-act="build-thumbs"><span>Build Fast Previews</span><svg aria-hidden="true"><use href="#i-bolt"/></svg></button>
             <a role="menuitem" href="/roll.html" target="_blank" rel="noopener"><span>View B-Roll</span><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <button type="button" role="menuitem" data-act="wallpaper"><span>Lock Screen</span><svg aria-hidden="true"><use href="#i-photos"/></svg></button>
             <button type="button" role="menuitem" data-theme-toggle="label"></button>
             <button type="button" role="menuitem" data-act="lock"><span>Lock</span><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
         </div>
@@ -95,11 +114,65 @@
         </div>
     </section>
 
+    <!-- Stats -->
+    <section class="ad-view" id="view-stats" aria-label="Stats" hidden>
+        <header class="ad-top">
+            <a class="ad-round lg" href="/" target="_blank" rel="noopener" aria-label="Open the site"><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+            <p class="ad-top__title" aria-hidden="true">Stats</p>
+            <button type="button" class="ad-round lg" data-menu="menu-stats" aria-label="More" aria-expanded="false"><svg aria-hidden="true"><use href="#i-more"/></svg></button>
+        </header>
+        <div class="ad-menu lg" id="menu-stats" role="menu">
+            <button type="button" role="menuitem" data-act="refresh-stats"><span>Refresh</span><svg aria-hidden="true"><use href="#i-refresh"/></svg></button>
+            <button type="button" role="menuitem" data-act="wallpaper"><span>Lock Screen</span><svg aria-hidden="true"><use href="#i-photos"/></svg></button>
+            <button type="button" role="menuitem" data-theme-toggle="label"></button>
+            <button type="button" role="menuitem" data-act="lock"><span>Lock</span><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
+        </div>
+        <div class="ad-main">
+            <h1 class="ad-title">Stats</h1>
+            <p class="ad-count" id="stats-count">&nbsp;</p>
+            <div class="ad-seg" role="radiogroup" aria-label="Period">
+                <button type="button" role="radio" data-days="1">Today</button>
+                <button type="button" role="radio" data-days="7">7 Days</button>
+                <button type="button" role="radio" data-days="30">30 Days</button>
+                <button type="button" role="radio" data-days="90">90 Days</button>
+            </div>
+            <div class="ad-tiles">
+                <div class="ad-tile"><p class="ad-tile__k">Visitors</p><p class="ad-tile__v" id="st-visitors">&nbsp;</p></div>
+                <div class="ad-tile"><p class="ad-tile__k">Page Views</p><p class="ad-tile__v" id="st-views">&nbsp;</p></div>
+                <div class="ad-tile"><p class="ad-tile__k"><span class="ad-live" aria-hidden="true"></span>Right Now</p><p class="ad-tile__v" id="st-now">&nbsp;</p></div>
+            </div>
+            <div class="ad-card ad-chart" id="st-chart" hidden>
+                <p class="ad-chart__hd">Visitors per day</p>
+                <div class="ad-chart__plot" id="st-plot"></div>
+                <div class="ad-chart__axis" id="st-axis"></div>
+                <p class="ad-chart__tip" id="st-tip" role="status" hidden></p>
+            </div>
+            <h2 class="ad-group-hd">Where They Come From</h2>
+            <div class="ad-card" id="st-sources"></div>
+            <p class="ad-note">Add <b>?ref=ig</b> (or li, x, wa, be, cv, qr) to links you share and they show up here by name.</p>
+            <h2 class="ad-group-hd">Countries</h2>
+            <div class="ad-card" id="st-countries"></div>
+            <h2 class="ad-group-hd">Cities</h2>
+            <div class="ad-card" id="st-cities"></div>
+            <h2 class="ad-group-hd">Pages</h2>
+            <div class="ad-card" id="st-pages"></div>
+            <h2 class="ad-group-hd">Devices</h2>
+            <div class="ad-card" id="st-devices"></div>
+            <h2 class="ad-group-hd">Latest Visits Today</h2>
+            <div class="ad-card" id="st-recent"></div>
+            <div class="ad-group">
+                <label class="ad-field ad-field--switch"><span>Count my visits on this device</span><input type="checkbox" id="st-me" class="ad-switch" role="switch"></label>
+            </div>
+            <p class="ad-note">No cookies. Each visitor counts once a day and can't be followed from one day to the next. IP addresses aren't stored.</p>
+        </div>
+    </section>
+
     <!-- Bottom bar: Notes / B-Roll, and the action for the current one -->
     <nav class="ad-bar" aria-label="Sections">
         <div class="ad-tabs lg" role="tablist">
             <button type="button" class="ad-tab" role="tab" data-view="view-notes" aria-selected="true"><svg aria-hidden="true"><use href="#i-note"/></svg><span>Notes</span></button>
             <button type="button" class="ad-tab" role="tab" data-view="view-roll" aria-selected="false"><svg aria-hidden="true"><use href="#i-photos"/></svg><span>B-Roll</span></button>
+            <button type="button" class="ad-tab" role="tab" data-view="view-stats" aria-selected="false"><svg aria-hidden="true"><use href="#i-chart"/></svg><span>Stats</span></button>
         </div>
         <button type="button" class="ad-round ad-round--big lg" id="act-new" aria-label="New note"><svg aria-hidden="true"><use href="#i-compose"/></svg></button>
         <input type="file" id="roll-file" accept="image/jpeg,image/png,image/webp" multiple hidden>
@@ -219,6 +292,50 @@
     </div>
 </div>
 
+<!-- ── Lock screen sheet ── -->
+<div class="ad-sheet ad-sheet--tall" id="sheet-wall" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="wl-title">
+    <div class="ad-sheet__scrim" data-close></div>
+    <div class="ad-sheet__panel">
+        <header class="ad-sheet__hd">
+            <button type="button" class="ad-btn" data-close>Cancel</button>
+            <h2 id="wl-title">Lock Screen</h2>
+            <button type="button" class="ad-btn ad-btn--accent" id="wl-save" disabled>Save</button>
+        </header>
+        <div class="ad-form">
+            <div class="ad-wall" id="wl-frame">
+                <div class="ad-lock__stage">
+                    <canvas class="ad-lock__bg" id="wl-bg" hidden></canvas>
+                    <p class="ad-lock__date" id="wl-date"></p>
+                    <p class="ad-lock__clock"><span id="wl-time"></span></p>
+                    <img class="ad-lock__subject" id="wl-default" src="/_p7n3x/lock-subject.webp" alt="">
+                    <img class="ad-lock__subject ad-lock__subject--full" id="wl-saved" alt="" hidden>
+                    <canvas class="ad-lock__subject ad-lock__subject--full" id="wl-cut" hidden></canvas>
+                </div>
+            </div>
+            <p class="ad-note ad-note--center" id="wl-hint">Choose a photo of yourself. You get cut out so the clock sits behind you, like on your phone.</p>
+            <div class="ad-group" id="wl-controls" hidden>
+                <label class="ad-field"><span>Zoom</span><input type="range" id="wl-zoom" min="1" max="3" step="0.01" value="1"></label>
+                <label class="ad-field ad-field--switch"><span>Clock behind me</span><input type="checkbox" id="wl-depth" class="ad-switch" role="switch"></label>
+                <div class="ad-field"><span>Clock</span>
+                    <div class="ad-swatches" role="radiogroup" aria-label="Clock colour">
+                        <button type="button" role="radio" data-clock="auto" aria-label="Match the photo">Auto</button>
+                        <button type="button" role="radio" data-clock="#ffffff" aria-label="White" style="--sw:#ffffff"></button>
+                        <button type="button" role="radio" data-clock="#fff27a" aria-label="Yellow" style="--sw:#fff27a"></button>
+                        <button type="button" role="radio" data-clock="#111111" aria-label="Black" style="--sw:#111111"></button>
+                        <label class="ad-swatches__pick" aria-label="Pick a colour"><input type="color" id="wl-color" value="#ffffff"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="ad-group ad-group--actions">
+                <button type="button" class="ad-row-btn" id="wl-pick">Choose Photo</button>
+                <button type="button" class="ad-row-btn ad-row-btn--danger" id="wl-reset">Use the Original Wallpaper</button>
+            </div>
+            <p class="ad-status" id="wl-status" role="status" aria-live="polite"></p>
+            <input type="file" id="wl-file" accept="image/*" hidden>
+        </div>
+    </div>
+</div>
+
 <p class="ad-toast lg" id="toast" role="status"><span id="toast-text"></span></p>
 
 <!-- Icons -->
@@ -233,6 +350,7 @@
     <symbol id="i-photos" viewBox="0 0 24 24"><rect x="3" y="4.5" width="15" height="12" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 19.5h11a3 3 0 0 0 3-3V8.5"/><path fill="currentColor" d="M5 14.4l3.4-3.6 2.4 2.4 2.2-1.8 3 3z"/></symbol>
     <symbol id="i-out" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M14 4.5h5.5V10M19.5 4.5 11 13M17 14v4.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1H10"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4v4h-4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" d="M5 20V12M10 20V5M15 20v-9M20 20v-5"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M14.6 3.3 20.7 9.4l-1.4 1.4-1.4-.4-3.4 3.4.4 3.8-1.6 1.6-3.6-3.6-4.9 4.9M9.3 16.1l-3.6-3.6 1.6-1.6 3.8.4 3.4-3.4-.4-1.4z"/></symbol>

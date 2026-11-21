@@ -64,6 +64,120 @@
     var lockEl = $('lock'), app = $('app');
     var lockInput = $('lock-input'), lockErr = $('lock-error'), lockForm = $('lock-form');
 
+    // Clock and date, iPhone style: "3:35", "Sat Nov 21". The Lock Screen sheet's preview shows the same.
+    var clocks = [[$('lock-time'), $('lock-date')], [$('wl-time'), $('wl-date')]], clockTimer = 0;
+    function tick() {
+        var now = new Date(), h = now.getHours() % 12 || 12, m = now.getMinutes();
+        var t = h + ':' + (m < 10 ? '0' : '') + m;
+        var d = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).replace(',', '');
+        clocks.forEach(function (c) {
+            if (c[0].textContent !== t) { c[0].textContent = t; fitClock(c[0]); }
+            c[1].textContent = d;
+        });
+    }
+    // Keep the numerals inside the frame: 12:35 is wider than 3:35, so squeeze it sideways.
+    function fitClock(span) {
+        if (!span) { clocks.forEach(function (c) { fitClock(c[0]); }); return; }
+        var frame = span.parentNode.clientWidth;
+        if (!frame) return;
+        // "3:35" spans ~80% of the frame, as on the phone; "12:47" gets nearly the full width so it isn't squeezed thin.
+        var box = frame * (span.textContent.length > 4 ? 0.97 : 0.86);
+        span.style.setProperty('--lk-sx', 1);
+        var w = span.scrollWidth;
+        if (w > box) span.style.setProperty('--lk-sx', (box / w).toFixed(3));
+    }
+    function startClock() {
+        tick();
+        clearInterval(clockTimer);
+        clockTimer = setInterval(tick, 1000);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fitClock(); });
+    window.addEventListener('resize', function () { fitClock(); });
+
+    // The status bar takes the wallpaper's colour while the lock screen is up.
+    var themeMeta = document.querySelector('meta[name="theme-color"]'), appTheme = themeMeta.content, wallTop = '#e9be32';
+    function lockTheme(on) { themeMeta.content = on ? wallTop : appTheme; }
+
+    /* Wallpaper: the built-in yellow one, or a photo set in Lock Screen.
+       The last one seen is kept on this device so the lock screen paints right away. */
+    var WALL = 'ad-wall';
+    var wallCfg = recall(WALL) || {};
+    function wallUrl(part, v) { return FN + 'get-lock?part=' + part + '&v=' + encodeURIComponent(v); }
+
+    // Clock colours from one base colour: a lighter top, the colour, a slightly deeper bottom.
+    function mix(hex, to, t) {
+        var a = parseInt(hex.slice(1), 16), b = parseInt(to.slice(1), 16);
+        var r = Math.round(((a >> 16) & 255) * (1 - t) + ((b >> 16) & 255) * t);
+        var g = Math.round(((a >> 8) & 255) * (1 - t) + ((b >> 8) & 255) * t);
+        var bl = Math.round((a & 255) * (1 - t) + (b & 255) * t);
+        return '#' + ((1 << 24) | (r << 16) | (g << 8) | bl).toString(16).slice(1);
+    }
+    function paintClock(root, hex) {
+        var vars = ['--lk-c1', '--lk-c2', '--lk-c3', '--lk-ink', '--lk-shadow'];
+        if (!hex) { vars.forEach(function (v) { root.style.removeProperty(v); }); return; }
+        var dark = parseInt(hex.slice(1, 3), 16) * 0.3 + parseInt(hex.slice(3, 5), 16) * 0.59 + parseInt(hex.slice(5, 7), 16) * 0.11 < 110;
+        root.style.setProperty('--lk-c1', mix(hex, dark ? '#000000' : '#ffffff', dark ? 0.2 : 0.55));
+        root.style.setProperty('--lk-c2', hex);
+        root.style.setProperty('--lk-c3', mix(hex, '#000000', 0.08));
+        root.style.setProperty('--lk-ink', mix(hex, dark ? '#000000' : '#ffffff', 0.35));
+        root.style.setProperty('--lk-shadow', dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.18)');
+    }
+
+    function applyWall(cfg) {
+        wallCfg = cfg || {};
+        var custom = !!wallCfg.v;
+        var bg = $('lock-bg'), fill = $('lock-fill'), sub = $('lock-subject');
+        lockEl.classList.toggle('is-custom', custom);
+        if (custom) {
+            bg.src = fill.src = wallUrl('bg', wallCfg.v);
+            if (wallCfg.depth) { sub.src = wallUrl('subject', wallCfg.v); sub.classList.add('ad-lock__subject--full'); }
+        } else {
+            bg.removeAttribute('src'); fill.removeAttribute('src');
+            sub.src = '/_p7n3x/lock-subject.webp'; sub.classList.remove('ad-lock__subject--full');
+        }
+        bg.hidden = fill.hidden = !custom;
+        sub.hidden = custom && !wallCfg.depth;
+        paintClock(lockEl, custom ? wallCfg.clock : null);
+        wallTop = custom && wallCfg.top ? wallCfg.top : '#e9be32';
+        if (!lockEl.hidden) lockTheme(true);
+        store(WALL, custom ? wallCfg : null);
+    }
+    applyWall(wallCfg);
+    fetch(FN + 'get-lock?part=config', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (cfg) { if (cfg && (cfg.v || 0) !== (wallCfg.v || 0)) applyWall(cfg); })
+        .catch(function () {});
+
+    function wake() {
+        if (lockEl.classList.contains('is-pass')) return;
+        lockEl.classList.add('is-pass');
+        lockErr.textContent = '';
+        lockInput.focus();               // inside the tap, so iOS raises the keyboard
+    }
+    function sleep() {
+        lockEl.classList.remove('is-pass');
+        lockInput.value = '';
+        lockErr.textContent = '';
+        lockInput.blur();
+    }
+    Array.prototype.forEach.call(lockEl.querySelectorAll('[data-wake]'), function (b) { b.addEventListener('click', wake); });
+    $('lock-cancel').addEventListener('click', sleep);
+
+    // Swipe up anywhere on the lock face, as on the phone.
+    var swipeY = null;
+    lockEl.addEventListener('pointerdown', function (e) { swipeY = lockEl.classList.contains('is-pass') ? null : e.clientY; });
+    lockEl.addEventListener('pointerup', function (e) { if (swipeY != null && swipeY - e.clientY > 40) wake(); swipeY = null; });
+
+    // On a keyboard, typing on the lock face starts the password; Escape goes back.
+    document.addEventListener('keydown', function (e) {
+        if (lockEl.hidden) return;
+        if (e.key === 'Escape' && lockEl.classList.contains('is-pass')) { sleep(); return; }
+        if (!lockEl.classList.contains('is-pass') && !e.metaKey && !e.ctrlKey && !e.altKey && (e.key.length === 1 || e.key === 'Enter')) wake();
+    });
+
+    startClock();
+    lockTheme(true);
+
     lockForm.addEventListener('submit', function (e) {
         e.preventDefault();
         var value = lockInput.value;
@@ -91,13 +205,18 @@
             pw = value;
             lockInput.value = '';
             lockEl.classList.add('is-leaving');
+            lockInput.blur();
             setTimeout(function () {
                 lockEl.hidden = true;
-                lockEl.classList.remove('is-leaving');
+                lockEl.classList.remove('is-leaving', 'is-pass');
+                clearInterval(clockTimer);
+                lockTheme(false);
                 app.hidden = false;
                 requestAnimationFrame(function () { app.classList.add('is-in'); glass(); });
+                markMe();
                 syncNotes();
                 syncPhotos();
+                if (view === 'view-stats') syncStats();
             }, 320);
         }).catch(function () {
             go.disabled = false;
@@ -111,8 +230,10 @@
         closeSheets();
         app.classList.remove('is-in');
         app.hidden = true;
+        lockEl.classList.remove('is-pass');
         lockEl.hidden = false;
-        lockInput.focus();
+        lockTheme(true);
+        startClock();
     }
 
     /* ═══════════ Shell: tabs, menus, title ═══════════ */
@@ -125,12 +246,15 @@
         tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.view === id)); });
         $('view-notes').hidden = id !== 'view-notes';
         $('view-roll').hidden = id !== 'view-roll';
+        $('view-stats').hidden = id !== 'view-stats';
         var notes = id === 'view-notes';
+        actNew.hidden = id === 'view-stats';
         actNew.setAttribute('aria-label', notes ? 'New note' : 'Add photos');
         actNew.querySelector('use').setAttribute('href', notes ? '#i-compose' : '#i-plus');
         closeMenus();
-        if (!notes) { window.scrollTo(0, document.documentElement.scrollHeight); }
+        if (id === 'view-roll') { window.scrollTo(0, document.documentElement.scrollHeight); }
         else window.scrollTo(0, 0);
+        if (id === 'view-stats' && pw && Date.now() - statsAt > 60000) syncStats();
         onScroll();
         glass();
     }
@@ -164,6 +288,8 @@
             if (a === 'refresh-notes') syncNotes().then(function () { say('Notes Up to Date'); });
             if (a === 'refresh-roll') syncPhotos().then(function () { say('B-Roll Up to Date'); });
             if (a === 'build-thumbs') buildThumbs();
+            if (a === 'refresh-stats') syncStats().then(function (ok) { if (ok) say('Stats Up to Date'); });
+            if (a === 'wallpaper') openWall();
         });
     });
 
@@ -595,6 +721,7 @@
             s.classList.remove('is-open');
             s.setAttribute('aria-hidden', 'true');
             if (s.id === 'sheet-import') resetImport();
+            if (s.id === 'sheet-wall') wl = null;   // let the photo and its cutout go
         });
         if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
     }
@@ -604,6 +731,512 @@
             closeSheets();
         });
     });
+
+    /* ═══════════ Stats ═══════════
+       Who came to the site and from where, counted by /js/track.js. */
+    var statsAt = 0, statDays = recall('ad-stat-days') || 7;
+    var segBtns = Array.prototype.slice.call(document.querySelectorAll('.ad-seg [data-days]'));
+    function markSeg() { segBtns.forEach(function (b) { b.setAttribute('aria-checked', String(+b.dataset.days === statDays)); }); }
+    segBtns.forEach(function (b) {
+        b.addEventListener('click', function () { statDays = +b.dataset.days; store('ad-stat-days', statDays); markSeg(); syncStats(); });
+    });
+    markSeg();
+
+    // This device's own visits aren't counted unless you ask for them to be.
+    function markMe() {
+        try { if (recall('ad-count-me')) localStorage.removeItem('kv-me'); else localStorage.setItem('kv-me', '1'); } catch (_) {}
+    }
+    $('st-me').checked = !!recall('ad-count-me');
+    $('st-me').addEventListener('change', function () { store('ad-count-me', this.checked || null); markMe(); });
+
+    function fmt(n) { return Number(n || 0).toLocaleString('en-US'); }
+    function flag(code) {
+        return /^[A-Z]{2}$/.test(code) ? String.fromCodePoint.apply(null, code.split('').map(function (c) { return 127397 + c.charCodeAt(0); })) + '  ' : '';
+    }
+    var PAGE_NAMES = { '/': 'Home', '/blog.html': 'Blog', '/roll.html': 'B-Roll', '/404.html': 'Page not found' };
+    function pageName(p) {
+        if (PAGE_NAMES[p]) return PAGE_NAMES[p];
+        var n = p.replace(/^\/(work\/)?/, '').replace(/\.html$/, '').replace(/\/$/, '');
+        return n ? n.split(/[-_]/).map(function (w) { return w ? w.charAt(0).toUpperCase() + w.slice(1) : w; }).join(' ') : p;
+    }
+    function ago(t) {
+        var m = Math.round((Date.now() - t) / 60000);
+        if (m < 1) return 'Just now';
+        if (m < 60) return m + ' min ago';
+        return Math.floor(m / 60) + ' hr ago';
+    }
+    function dayLabel(date, long) {
+        return new Date(date + 'T12:00:00Z').toLocaleDateString('en-US', long ? { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' } : { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    }
+
+    // A ranked list: name, count and share of the total, with a thin bar for the share.
+    function rankList(id, rows, total, unit) {
+        var box = $(id);
+        box.textContent = '';
+        if (!rows.length) { box.appendChild(el('div', 'ad-stat ad-stat--empty', 'Nothing yet')); return; }
+        rows.forEach(function (r) {
+            var share = total ? r.n / total : 0;
+            var row = el('div', 'ad-stat');
+            var line = el('div', 'ad-stat__row');
+            var name = el('span', 'ad-stat__name', r.name);
+            if (r.title) name.title = r.title;
+            line.appendChild(name);
+            line.appendChild(el('span', 'ad-stat__n', fmt(r.n) + (total ? ' · ' + Math.round(share * 100) + '%' : '')));
+            row.appendChild(line);
+            var meter = el('div', 'ad-stat__meter');
+            var fillBar = el('span');
+            fillBar.style.width = Math.max(1.5, share * 100) + '%';
+            meter.appendChild(fillBar);
+            row.appendChild(meter);
+            row.setAttribute('aria-label', r.name + ': ' + fmt(r.n) + ' ' + unit + (total ? ', ' + Math.round(share * 100) + ' percent' : ''));
+            box.appendChild(row);
+        });
+    }
+
+    // Visitors per day. Each day is a button: hover, focus or tap shows its numbers.
+    function chart(series) {
+        var box = $('st-chart'), plot = $('st-plot'), tip = $('st-tip'), axis = $('st-axis');
+        box.hidden = series.length < 2;
+        if (box.hidden) return;
+        plot.textContent = ''; axis.textContent = ''; tip.hidden = true;
+        plot.style.gap = series.length > 40 ? '1px' : '2px';
+        var max = Math.max.apply(null, series.map(function (d) { return d.visitors; }).concat(1));
+        box.querySelector('.ad-chart__hd').textContent = 'Visitors per day · busiest ' + fmt(max);
+        function show(col) {
+            plot.querySelectorAll('.is-on').forEach(function (c) { c.classList.remove('is-on'); });
+            col.classList.add('is-on');
+            plot.classList.add('is-picked');
+            tip.textContent = col.dataset.tip;
+            tip.hidden = false;
+        }
+        function hide() {
+            plot.classList.remove('is-picked');
+            plot.querySelectorAll('.is-on').forEach(function (c) { c.classList.remove('is-on'); });
+            tip.hidden = true;
+        }
+        series.forEach(function (d) {
+            var col = el('button', 'ad-chart__col');
+            col.type = 'button';
+            var text = dayLabel(d.date, true) + ' · ' + fmt(d.visitors) + ' visitor' + (d.visitors === 1 ? '' : 's') + ' · ' + fmt(d.views) + ' view' + (d.views === 1 ? '' : 's');
+            col.dataset.tip = text;
+            col.setAttribute('aria-label', text);
+            if (!d.visitors) col.classList.add('is-zero');
+            var bar = el('span', 'ad-chart__bar');
+            bar.style.height = (d.visitors / max * 100) + '%';
+            col.appendChild(bar);
+            col.addEventListener('mouseenter', function () { show(col); });
+            col.addEventListener('focus', function () { show(col); });
+            col.addEventListener('click', function () { show(col); });
+            plot.appendChild(col);
+        });
+        plot.onmouseleave = hide;
+        axis.appendChild(el('span', '', dayLabel(series[0].date)));
+        axis.appendChild(el('span', '', 'Today'));
+    }
+
+    function renderStats(d) {
+        $('stats-count').textContent = statDays === 1 ? 'Today' : 'Last ' + statDays + ' days';
+        $('st-visitors').textContent = fmt(d.visitors);
+        $('st-views').textContent = fmt(d.views);
+        $('st-now').textContent = fmt(d.now);
+        chart(d.series || []);
+        rankList('st-sources', (d.sources || []).map(function (r) { return { name: r[0], n: r[1] }; }), d.visitors, 'visitors');
+        rankList('st-countries', (d.countries || []).map(function (r) { return { name: flag(r[0]) + r[1], n: r[2] }; }), d.visitors, 'visitors');
+        rankList('st-cities', (d.cities || []).map(function (r) { return { name: r[0], n: r[1] }; }), d.visitors, 'visitors');
+        rankList('st-pages', (d.pages || []).map(function (r) { return { name: pageName(r[0]), n: r[1], title: r[0] }; }), d.views, 'views');
+        rankList('st-devices', (d.devices || []).map(function (r) { return { name: r[0], n: r[1] }; }), d.visitors, 'visitors');
+
+        var recent = $('st-recent');
+        recent.textContent = '';
+        if (!d.recent || !d.recent.length) recent.appendChild(el('div', 'ad-stat ad-stat--empty', 'No visits yet today'));
+        (d.recent || []).forEach(function (v) {
+            var row = el('div', 'ad-stat');
+            var line = el('div', 'ad-stat__row');
+            line.appendChild(el('span', 'ad-stat__name', pageName(v.p)));
+            line.appendChild(el('span', 'ad-stat__n', ago(v.t)));
+            row.appendChild(line);
+            var place = v.ci ? v.ci + (v.cn ? ', ' + v.cn : '') : (v.cn || '');
+            row.appendChild(el('p', 'ad-stat__sub', [flag(v.c).trim() + (place ? ' ' + place : ''), v.s ? 'from ' + v.s : '', v.d].filter(function (x) { return x && x.trim(); }).join(' · ')));
+            recent.appendChild(row);
+        });
+        glass();
+    }
+
+    function syncStats() {
+        $('stats-count').textContent = 'Loading…';
+        return api('get-stats', { days: statDays }).then(function (d) {
+            statsAt = Date.now();
+            renderStats(d);
+            return true;
+        }).catch(function (err) {
+            $('stats-count').textContent = err.message;
+            return false;
+        });
+    }
+
+    /* ═══════════ Lock Screen ═══════════
+       Pick a photo, drag and zoom it into the phone's shape, and the person in it
+       is cut out (MediaPipe, in this browser) so the clock can sit behind them. */
+    var W_OUT = 1179, H_OUT = 2556;
+    var MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+    var MP_MODEL = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite';
+    var wl = null;            // the photo being set up: { work, z, cx, cy, cut, depth, clock, token }
+    var wlKeep = null;        // settings for the saved photo when no new one is chosen
+    var wlToken = 0;
+    var wlFrame = $('wl-frame'), wlBg = $('wl-bg'), wlCut = $('wl-cut'), wlSaved = $('wl-saved'), wlDefault = $('wl-default');
+    var wlStatus = $('wl-status'), wlSave = $('wl-save'), wlReset = $('wl-reset');
+
+    function canvas(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+    function wlSay(msg, kind) { wlStatus.textContent = msg || ''; wlStatus.className = 'ad-status' + (kind ? ' is-' + kind : ''); }
+
+    function openWall() {
+        wl = null;
+        wlToken++;
+        var custom = !!wallCfg.v;
+        wlKeep = custom ? { clock: wallCfg.clock || '#ffffff', depth: !!wallCfg.depth } : null;
+        wlFrame.classList.remove('is-photo');
+        wlFrame.style.backgroundImage = custom ? 'url("' + wallUrl('bg', wallCfg.v) + '")' : '';
+        wlFrame.style.backgroundSize = 'cover';
+        wlBg.hidden = true; wlCut.hidden = true;
+        wlDefault.hidden = custom;
+        wlSaved.hidden = !(custom && wallCfg.depth);
+        if (custom && wallCfg.cut) wlSaved.src = wallUrl('subject', wallCfg.v);
+        $('wl-controls').hidden = !custom;
+        $('wl-zoom').closest('.ad-field').hidden = true;
+        $('wl-depth').checked = !!(custom && wallCfg.depth);
+        $('wl-depth').disabled = !(custom && wallCfg.cut);
+        markSwatch(custom ? wallCfg.clock : null);
+        paintClock(wlFrame, custom ? wallCfg.clock : null);
+        wlReset.hidden = !custom;
+        wlReset.classList.remove('is-confirm');
+        wlReset.textContent = 'Use the Original Wallpaper';
+        $('wl-hint').hidden = false;
+        wlSave.disabled = true;
+        wlSay('');
+        openSheet('sheet-wall');
+        tick();
+        requestAnimationFrame(function () { fitClock($('wl-time')); });
+    }
+
+    function markSwatch(value) {
+        document.querySelectorAll('.ad-swatches [data-clock]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.clock === value)); });
+        var pick = document.querySelector('.ad-swatches__pick');
+        var known = value === 'auto' || !!document.querySelector('.ad-swatches [data-clock="' + value + '"]');
+        pick.setAttribute('aria-checked', String(!!value && !known));
+        if (value && value !== 'auto') $('wl-color').value = value;
+    }
+
+    // The part of the photo that shows, for the current zoom and position.
+    function wlView() {
+        var iw = wl.work.width, ih = wl.work.height;
+        var s = Math.max(W_OUT / iw, H_OUT / ih) * wl.z;
+        var vw = W_OUT / s, vh = H_OUT / s;
+        wl.cx = Math.min(iw - vw / 2, Math.max(vw / 2, wl.cx));
+        wl.cy = Math.min(ih - vh / 2, Math.max(vh / 2, wl.cy));
+        return { x: wl.cx - vw / 2, y: wl.cy - vh / 2, w: vw, h: vh };
+    }
+
+    // Clock colour picked from the photo, as iOS does: the top's hue, made light
+    // (or dark, when the top of the photo is already light).
+    function photoColours(v) {
+        var c = canvas(12, 26), g = c.getContext('2d');
+        g.drawImage(wl.work, v.x, v.y, v.w, v.h, 0, 0, 12, 26);
+        var px = g.getImageData(0, 0, 12, 11).data, r = 0, gr = 0, b = 0, n = 0;
+        // Judge only what's behind the person (the clock sits on that), not their hair or face.
+        var behind = null;
+        if (wl.cut) {
+            var m = canvas(12, 26), mg = m.getContext('2d');
+            mg.drawImage(wl.cut, v.x, v.y, v.w, v.h, 0, 0, 12, 26);
+            behind = mg.getImageData(0, 0, 12, 11).data;
+        }
+        for (var i = 0; i < px.length; i += 4) {
+            var wt = behind ? 1 - behind[i + 3] / 255 : 1;
+            r += px[i] * wt; gr += px[i + 1] * wt; b += px[i + 2] * wt; n += wt;
+        }
+        if (n < 1) { r = gr = b = 0; n = 0; for (var j2 = 0; j2 < px.length; j2 += 4) { r += px[j2]; gr += px[j2 + 1]; b += px[j2 + 2]; n++; } }
+        r /= n * 255; gr /= n * 255; b /= n * 255;
+        var top = g.getImageData(0, 0, 12, 1).data, tr = 0, tg = 0, tb = 0;
+        for (var j = 0; j < top.length; j += 4) { tr += top[j]; tg += top[j + 1]; tb += top[j + 2]; }
+        var hexOf = function (R, G, B) { return '#' + ((1 << 24) | (Math.round(R) << 16) | (Math.round(G) << 8) | Math.round(B)).toString(16).slice(1); };
+        var mx = Math.max(r, gr, b), mn = Math.min(r, gr, b), l = (mx + mn) / 2, d = mx - mn, h = 0, s = 0;
+        if (d) {
+            s = d / (1 - Math.abs(2 * l - 1));
+            h = mx === r ? ((gr - b) / d) % 6 : mx === gr ? (b - r) / d + 2 : (r - gr) / d + 4;
+            h *= 60; if (h < 0) h += 360;
+        }
+        var L = l > 0.72 ? 0.2 : 0.88, S = s < 0.12 ? 0 : Math.min(0.85, s * 0.9 + 0.15);
+        var k = function (n2) { var a = S * Math.min(L, 1 - L), kk = (n2 + h / 30) % 12; return 255 * (L - a * Math.max(-1, Math.min(kk - 3, 9 - kk, 1))); };
+        return { clock: hexOf(k(0), k(8), k(4)), top: hexOf(tr / 12, tg / 12, tb / 12) };
+    }
+
+    function wlClock() {
+        if (wl) return wl.clock === 'auto' ? photoColours(wlView()).clock : wl.clock;
+        return wlKeep ? wlKeep.clock : null;
+    }
+
+    var wlFrameReq = 0;
+    function wlRender() {
+        cancelAnimationFrame(wlFrameReq);
+        wlFrameReq = requestAnimationFrame(function () {
+            if (!wl) return;
+            var v = wlView();
+            var r = wlFrame.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+            var cw = Math.round(r.width * dpr), ch = Math.round(r.height * dpr);
+            [wlBg, wlCut].forEach(function (c) { if (c.width !== cw) c.width = cw; if (c.height !== ch) c.height = ch; });
+            wlBg.getContext('2d').drawImage(wl.work, v.x, v.y, v.w, v.h, 0, 0, cw, ch);
+            wlCut.hidden = !(wl.cut && wl.depth);
+            if (!wlCut.hidden) {
+                var g = wlCut.getContext('2d');
+                g.clearRect(0, 0, cw, ch);
+                g.drawImage(wl.cut, v.x, v.y, v.w, v.h, 0, 0, cw, ch);
+            }
+            paintClock(wlFrame, wlClock());
+        });
+    }
+
+    $('wl-pick').addEventListener('click', function () { $('wl-file').click(); });
+    $('wl-file').addEventListener('change', function () {
+        var file = this.files && this.files[0];
+        this.value = '';
+        if (file) loadWallPhoto(file);
+    });
+
+    function loadWallPhoto(file) {
+        var token = ++wlToken;
+        wlSay('Opening the photo…');
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onerror = function () { URL.revokeObjectURL(url); wlSay('That file could not be opened as a photo.', 'error'); };
+        img.onload = function () {
+            URL.revokeObjectURL(url);
+            if (token !== wlToken) return;
+            // Work at up to 2560px on the long side: plenty for a 1179 × 2556 crop with room to zoom.
+            var k = Math.min(1, 2560 / Math.max(img.naturalWidth, img.naturalHeight));
+            var work = canvas(Math.round(img.naturalWidth * k), Math.round(img.naturalHeight * k));
+            work.getContext('2d').drawImage(img, 0, 0, work.width, work.height);
+            wl = { work: work, z: 1, cx: work.width / 2, cy: work.height / 2, cut: null, depth: false, clock: 'auto' };
+            wlKeep = null;
+            wlFrame.style.backgroundImage = '';
+            wlFrame.classList.add('is-photo');
+            wlBg.hidden = false; wlDefault.hidden = true; wlSaved.hidden = true;
+            $('wl-controls').hidden = false;
+            $('wl-zoom').closest('.ad-field').hidden = false;
+            $('wl-zoom').value = 1;
+            $('wl-depth').checked = false;
+            $('wl-depth').disabled = true;
+            $('wl-hint').hidden = true;
+            markSwatch('auto');
+            wlSave.disabled = false;
+            wlRender();
+            wlSay('Finding you in the photo…');
+            cutout(work).then(function (res) {
+                if (token !== wlToken || !wl) return;
+                if (res.cover < 0.015) {
+                    wlSay('No person found in this photo, so the clock sits in front.');
+                    return;
+                }
+                wl.cut = res.cut;
+                wl.depth = true;
+                $('wl-depth').checked = true;
+                $('wl-depth').disabled = false;
+                wlRender();
+                wlSay('Drag to move the photo. Pinch or use Zoom to resize it.');
+            }).catch(function () {
+                if (token !== wlToken) return;
+                wlSay('Couldn’t cut you out (the cutout tool didn’t load). The clock will sit in front.', 'error');
+            });
+        };
+        img.src = url;
+    }
+
+    // Drag to move, pinch or scroll to zoom.
+    var wlPointers = new Map(), wlPinch = 0;
+    function pinchDist() { var p = Array.from(wlPointers.values()); return Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y); }
+    wlFrame.addEventListener('pointerdown', function (e) {
+        if (!wl) return;
+        wlFrame.setPointerCapture(e.pointerId);
+        wlPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (wlPointers.size === 2) wlPinch = pinchDist();
+    });
+    wlFrame.addEventListener('pointermove', function (e) {
+        if (!wl || !wlPointers.has(e.pointerId)) return;
+        var prev = wlPointers.get(e.pointerId);
+        wlPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (wlPointers.size === 2) {
+            var d = pinchDist();
+            if (wlPinch) setZoom(wl.z * d / wlPinch);
+            wlPinch = d;
+            return;
+        }
+        var v = wlView(), r = wlFrame.getBoundingClientRect();
+        wl.cx -= (e.clientX - prev.x) * v.w / r.width;
+        wl.cy -= (e.clientY - prev.y) * v.h / r.height;
+        wlRender();
+    });
+    function endPointer(e) { wlPointers.delete(e.pointerId); if (wlPointers.size < 2) wlPinch = 0; }
+    wlFrame.addEventListener('pointerup', endPointer);
+    wlFrame.addEventListener('pointercancel', endPointer);
+    wlFrame.addEventListener('wheel', function (e) {
+        if (!wl) return;
+        e.preventDefault();
+        setZoom(wl.z * Math.exp(-e.deltaY * 0.0015));
+    }, { passive: false });
+    function setZoom(z) {
+        wl.z = Math.min(3, Math.max(1, z));
+        $('wl-zoom').value = wl.z;
+        wlRender();
+    }
+    $('wl-zoom').addEventListener('input', function () { if (wl) setZoom(+this.value); });
+
+    $('wl-depth').addEventListener('change', function () {
+        if (wl) { wl.depth = this.checked; wlRender(); }
+        else if (wlKeep) {
+            wlKeep.depth = this.checked;
+            wlSaved.hidden = !this.checked;
+            wlSave.disabled = false;
+        }
+    });
+
+    function setClock(value) {
+        markSwatch(value);
+        if (wl) { wl.clock = value; wlRender(); }
+        else if (wlKeep) {
+            wlKeep.clock = value === 'auto' ? wallCfg.clock : value;
+            paintClock(wlFrame, wlKeep.clock);
+            wlSave.disabled = false;
+        }
+    }
+    document.querySelectorAll('.ad-swatches [data-clock]').forEach(function (b) {
+        b.addEventListener('click', function () { setClock(b.dataset.clock); });
+    });
+    $('wl-color').addEventListener('input', function () { setClock(this.value.toLowerCase()); });
+
+    wlSave.addEventListener('click', function () {
+        var body;
+        if (wl) {
+            var v = wlView(), colours = photoColours(v);
+            var out = canvas(W_OUT, H_OUT), g = out.getContext('2d');
+            g.drawImage(wl.work, v.x, v.y, v.w, v.h, 0, 0, W_OUT, H_OUT);
+            body = { bg: out.toDataURL('image/jpeg', 0.86), depth: wl.depth, clock: wl.clock === 'auto' ? colours.clock : wl.clock, top: colours.top };
+            if (wl.cut) {
+                g.clearRect(0, 0, W_OUT, H_OUT);
+                g.drawImage(wl.cut, v.x, v.y, v.w, v.h, 0, 0, W_OUT, H_OUT);
+                body.subject = out.toDataURL('image/webp', 0.86);   // browsers without WebP give PNG; the server takes both
+            }
+        } else if (wlKeep) {
+            body = { keep: true, depth: wlKeep.depth, clock: wlKeep.clock };
+        } else return;
+        wlSave.disabled = true;
+        wlSay('Saving…');
+        api('save-lock', body).then(function (res) {
+            applyWall(res.config);
+            closeSheets();
+            say('Lock Screen Updated');
+        }).catch(function (err) {
+            wlSave.disabled = false;
+            wlSay(err.message, 'error');
+        });
+    });
+
+    wlReset.addEventListener('click', function () {
+        if (!wlReset.classList.contains('is-confirm')) {
+            wlReset.classList.add('is-confirm');
+            wlReset.textContent = 'Tap Again to Use the Original';
+            return;
+        }
+        wlReset.disabled = true;
+        api('save-lock', { reset: true }).then(function () {
+            applyWall({});
+            closeSheets();
+            say('Original Wallpaper Back');
+        }).catch(function (err) { wlSay(err.message, 'error'); }).then(function () { wlReset.disabled = false; });
+    });
+
+    /* The cutout. MediaPipe's person model gives a rough mask at 256px; a guided
+       filter then snaps its edge to the edges in the photo, so hair and
+       shoulders follow the real outline instead of a blurry blob. */
+    var segmenterP = null;
+    function segmenter() {
+        if (!segmenterP) {
+            segmenterP = import(MP + '/vision_bundle.mjs').then(function (vision) {
+                return vision.FilesetResolver.forVisionTasks(MP + '/wasm').then(function (files) {
+                    return vision.ImageSegmenter.createFromOptions(files, {
+                        baseOptions: { modelAssetPath: MP_MODEL, delegate: 'CPU' },
+                        runningMode: 'IMAGE',
+                        outputCategoryMask: false,
+                        outputConfidenceMasks: true
+                    });
+                });
+            });
+            segmenterP.catch(function () { segmenterP = null; });
+        }
+        return segmenterP;
+    }
+
+    // Mean over a (2r+1)² square, edges handled by averaging only what's inside.
+    function boxBlur(src, w, h, r) {
+        var tmp = new Float32Array(w * h), out = new Float32Array(w * h), P = new Float64Array(Math.max(w, h) + 1), x, y, a, b;
+        for (y = 0; y < h; y++) {
+            P[0] = 0;
+            for (x = 0; x < w; x++) P[x + 1] = P[x] + src[y * w + x];
+            for (x = 0; x < w; x++) { a = Math.max(0, x - r); b = Math.min(w, x + r + 1); tmp[y * w + x] = (P[b] - P[a]) / (b - a); }
+        }
+        for (x = 0; x < w; x++) {
+            P[0] = 0;
+            for (y = 0; y < h; y++) P[y + 1] = P[y] + tmp[y * w + x];
+            for (y = 0; y < h; y++) { a = Math.max(0, y - r); b = Math.min(h, y + r + 1); out[y * w + x] = (P[b] - P[a]) / (b - a); }
+        }
+        return out;
+    }
+    function guidedFilter(I, p, w, h, r, eps) {
+        var n = w * h, i, II = new Float32Array(n), Ip = new Float32Array(n);
+        for (i = 0; i < n; i++) { II[i] = I[i] * I[i]; Ip[i] = I[i] * p[i]; }
+        var mI = boxBlur(I, w, h, r), mP = boxBlur(p, w, h, r), mII = boxBlur(II, w, h, r), mIp = boxBlur(Ip, w, h, r);
+        var A = new Float32Array(n), B = new Float32Array(n);
+        for (i = 0; i < n; i++) {
+            A[i] = (mIp[i] - mI[i] * mP[i]) / (mII[i] - mI[i] * mI[i] + eps);
+            B[i] = mP[i] - A[i] * mI[i];
+        }
+        var mA = boxBlur(A, w, h, r), mB = boxBlur(B, w, h, r), q = new Float32Array(n);
+        for (i = 0; i < n; i++) q[i] = mA[i] * I[i] + mB[i];
+        return q;
+    }
+
+    function cutout(work) {
+        return segmenter().then(function (seg) {
+            var k = Math.min(1, 1280 / Math.max(work.width, work.height));
+            var gw = Math.round(work.width * k), gh = Math.round(work.height * k), n = gw * gh, i;
+            var guide = canvas(gw, gh), gg = guide.getContext('2d');
+            gg.drawImage(work, 0, 0, gw, gh);
+
+            var res = seg.segment(guide);
+            var bgMask = res.confidenceMasks[0], raw = bgMask.getAsFloat32Array(), mw = bgMask.width, mh = bgMask.height;
+            var p = new Float32Array(n);
+            for (var y = 0; y < gh; y++) for (var x = 0; x < gw; x++) {
+                var sx = Math.min(mw - 1, Math.floor(x * mw / gw)), sy = Math.min(mh - 1, Math.floor(y * mh / gh));
+                p[y * gw + x] = 1 - raw[sy * mw + sx];
+            }
+            res.confidenceMasks.forEach(function (m) { m.close(); });
+
+            var px = gg.getImageData(0, 0, gw, gh).data, I = new Float32Array(n);
+            for (i = 0; i < n; i++) I[i] = (px[i * 4] * 0.299 + px[i * 4 + 1] * 0.587 + px[i * 4 + 2] * 0.114) / 255;
+            var q = guidedFilter(I, p, gw, gh, Math.max(4, Math.round(Math.max(gw, gh) / 180)), 0.0008);
+
+            var maskData = gg.createImageData(gw, gh), md = maskData.data, cover = 0;
+            for (i = 0; i < n; i++) {
+                var t = Math.min(1, Math.max(0, (q[i] - 0.3) / 0.4)), a = t * t * (3 - 2 * t);
+                md[i * 4 + 3] = Math.round(a * 255);
+                cover += a;
+            }
+            var mask = canvas(gw, gh);
+            mask.getContext('2d').putImageData(maskData, 0, 0);
+            var cut = canvas(work.width, work.height), cg = cut.getContext('2d');
+            cg.drawImage(work, 0, 0);
+            cg.globalCompositeOperation = 'destination-in';
+            cg.drawImage(mask, 0, 0, work.width, work.height);
+            return { cut: cut, cover: cover / n };
+        });
+    }
 
     /* ═══════════ B-Roll ═══════════ */
     var photos = [];
