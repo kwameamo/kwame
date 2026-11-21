@@ -604,6 +604,10 @@
 #br-info-btn[aria-pressed="true"] { color: inherit; }
 .br-tools__spacer { width: 40px; }
 
+/* Sound on or off: only there while a video is showing; its place is kept otherwise */
+.br-sound { visibility: hidden; }
+.br-viewer.is-video .br-sound { visibility: visible; }
+
 /* Info: the photo slides up, the details rise under it */
 .br-viewer.is-info .br-stage { bottom: 50%; }
 .br-viewer.is-info .br-viewer__top, .br-viewer.is-info .br-strip { opacity: 0; pointer-events: none; }

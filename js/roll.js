@@ -471,11 +471,34 @@
         });
 
         // One player for the whole viewer: it moves onto the current page when that
-        // page is a video, laid exactly over the poster, muted and looping.
+        // page is a video, laid exactly over the poster, looping, with sound when
+        // the browser allows it (muted otherwise, until the sound button is tapped).
         var player = document.createElement('video');
         player.className = 'br-page__video';
-        player.muted = true;
         player.loop = true;
+        var soundBtn = document.getElementById('br-sound');
+        var soundOn = true;
+        function paintSound() {
+            var on = !player.muted;
+            soundBtn.querySelector('use').setAttribute('href', on ? '#br-i-sound' : '#br-i-mute');
+            soundBtn.setAttribute('aria-label', on ? 'Mute' : 'Turn Sound On');
+        }
+        function startPlayer() {
+            player.muted = !soundOn;
+            paintSound();
+            player.play().catch(function (err) {
+                // Sound wasn't allowed without a tap: play muted and let the button turn it on
+                if (err && err.name === 'NotAllowedError' && !player.muted) {
+                    player.muted = true;
+                    paintSound();
+                    player.play().catch(function () {});
+                }
+            });
+        }
+        soundBtn.addEventListener('click', function () {
+            soundOn = player.muted;
+            startPlayer();
+        });
         player.playsInline = true;
         player.setAttribute('playsinline', '');
         player.setAttribute('aria-hidden', 'true');
@@ -491,12 +514,21 @@
                 player.classList.remove('is-playing');
                 player.src = photo.video;
             }
-            player.play().catch(function () {});
+            viewer.classList.add('is-video');
+            soundBtn.disabled = false;
+            startPlayer();
         }
         function stopVideo() {
             player.pause();
             if (player.parentNode) player.parentNode.removeChild(player);
+            viewer.classList.remove('is-video');
+            soundBtn.disabled = true;
         }
+        // No sound from a tab that isn't showing
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) player.pause();
+            else if (viewer.classList.contains('is-open') && player.parentNode) player.play().catch(function () {});
+        });
         // Show the clip only once frames are coming, so the poster never flashes black.
         player.addEventListener('playing', function () { player.classList.add('is-playing'); });
 
@@ -1102,6 +1134,7 @@
                 else close();
             } else if (evt.key === 'ArrowLeft') { evt.preventDefault(); goTo(atPos() - 1, true); }
             else if (evt.key === 'ArrowRight') { evt.preventDefault(); goTo(atPos() + 1, true); }
+            else if ((evt.key === 'm' || evt.key === 'M') && !soundBtn.disabled) soundBtn.click();
             else if (evt.key === 'Tab') {
                 var focusable = Array.prototype.filter.call(viewer.querySelectorAll('.br-round, .br-pill__btn'), function (b) { return b.offsetParent && !b.disabled; });
                 var first = focusable[0], last = focusable[focusable.length - 1];
