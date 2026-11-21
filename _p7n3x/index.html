@@ -27,16 +27,17 @@
 <!-- ── Lock ── -->
 <main class="ad-lock" id="lock">
     <!-- Wallpaper, built like an iPhone lock screen: background, then the clock, then the subject in front of it.
-         A custom photo (set in Lock Screen) replaces the yellow; a blurred copy fills the sides on wide screens. -->
-    <img class="ad-lock__fill" id="lock-fill" alt="" hidden>
+         It covers the screen like a phone wallpaper; on a computer it is blurred, with the time on top.
+         A custom photo (set in Lock Screen) replaces the yellow. -->
     <div class="ad-lock__stage" aria-hidden="true">
         <img class="ad-lock__bg" id="lock-bg" alt="" hidden>
         <p class="ad-lock__date" id="lock-date"></p>
         <p class="ad-lock__clock"><span id="lock-time"></span></p>
         <img class="ad-lock__subject" id="lock-subject" src="/_p7n3x/lock-subject.webp" alt="" width="903" height="1843" decoding="async" fetchpriority="high">
-        <a class="ad-lock__btn ad-lock__btn--l lg" href="/" aria-label="Open kwame.vision"><svg aria-hidden="true"><use href="#i-out"/></svg></a>
-        <button type="button" class="ad-lock__btn ad-lock__btn--r lg" data-wake aria-label="Unlock"><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
     </div>
+    <!-- The two round buttons sit in the screen corners, where the phone has its own -->
+    <a class="ad-lock__btn ad-lock__btn--l lg" href="/" aria-label="Open kwame.vision"><svg aria-hidden="true"><use href="#i-out"/></svg></a>
+    <button type="button" class="ad-lock__btn ad-lock__btn--r lg" data-wake aria-label="Unlock"><svg aria-hidden="true"><use href="#i-lock"/></svg></button>
     <button type="button" class="ad-lock__wake" data-wake aria-label="Unlock"></button>
 
     <!-- Password -->
@@ -273,7 +274,7 @@
             <button type="button" class="ad-btn ad-btn--accent" id="sp-save">Save</button>
         </header>
         <div class="ad-form">
-            <div class="ad-photo"><img id="sp-img" alt=""><video id="sp-video" muted loop playsinline controls hidden></video></div>
+            <div class="ad-photo"><img id="sp-img" alt=""><video id="sp-video" loop playsinline controls hidden></video></div>
             <div class="ad-group">
                 <label class="ad-field ad-field--stack"><span>Caption</span><textarea id="sp-caption" rows="2" maxlength="140" placeholder="What's happening here?"></textarea></label>
             </div>

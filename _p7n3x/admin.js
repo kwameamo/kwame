@@ -126,16 +126,16 @@
     function applyWall(cfg) {
         wallCfg = cfg || {};
         var custom = !!wallCfg.v;
-        var bg = $('lock-bg'), fill = $('lock-fill'), sub = $('lock-subject');
+        var bg = $('lock-bg'), sub = $('lock-subject');
         lockEl.classList.toggle('is-custom', custom);
         if (custom) {
-            bg.src = fill.src = wallUrl('bg', wallCfg.v);
+            bg.src = wallUrl('bg', wallCfg.v);
             if (wallCfg.depth) { sub.src = wallUrl('subject', wallCfg.v); sub.classList.add('ad-lock__subject--full'); }
         } else {
-            bg.removeAttribute('src'); fill.removeAttribute('src');
+            bg.removeAttribute('src');
             sub.src = '/_p7n3x/lock-subject.webp'; sub.classList.remove('ad-lock__subject--full');
         }
-        bg.hidden = fill.hidden = !custom;
+        bg.hidden = !custom;
         sub.hidden = custom && !wallCfg.depth;
         paintClock(lockEl, custom ? wallCfg.clock : null);
         wallTop = custom && wallCfg.top ? wallCfg.top : '#e9be32';
@@ -1444,10 +1444,57 @@
     }
 
     /* ── Videos ──
-       Shrunk here before upload: 720p H.264 MP4 at about 2.5 Mbps, at most a
-       minute long, without sound (B-Roll plays muted). Frames come from playing
-       the file once in a hidden player, so it takes about as long as the clip. */
+       Shrunk here before upload: 720p H.264 MP4 at about 2.5 Mbps with AAC
+       sound (Opus where AAC can't be made), at most a minute long. Frames come
+       from playing the file once in a hidden player, so it takes about as long
+       as the clip. The sound is decoded from the file in one go. */
     var VIDEO_LONG_SIDE = 1280, VIDEO_MAX_SECONDS = 60, VIDEO_PART = 3 * 1024 * 1024;
+    var AUDIO_RATE = 48000, AUDIO_MAX_FILE = 400 * 1024 * 1024;
+
+    // The clip's sound as raw samples, or null when it has none or it can't be read.
+    function readSound(file, dur) {
+        var Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+        if (!window.AudioEncoder || !window.AudioData || !Ctx || file.size > AUDIO_MAX_FILE) return Promise.resolve(null);
+        return file.arrayBuffer().then(function (buf) {
+            var ctx = new Ctx(2, AUDIO_RATE, AUDIO_RATE);
+            return new Promise(function (res, rej) {
+                var p = ctx.decodeAudioData(buf, res, rej);
+                if (p && p.then) p.then(res, rej);
+            });
+        }).then(function (ab) {
+            var ch = Math.min(2, ab.numberOfChannels), frames = Math.min(ab.length, Math.round(dur * ab.sampleRate));
+            if (!ch || !frames) return null;
+            var data = [];
+            for (var c = 0; c < ch; c++) data.push(ab.getChannelData(c).subarray(0, frames));
+            return { rate: ab.sampleRate, ch: ch, frames: frames, data: data };
+        }).catch(function () { return null; });
+    }
+
+    function pickAudio(s) {
+        var tries = [{ codec: 'mp4a.40.2', mux: 'aac' }, { codec: 'opus', mux: 'opus' }];
+        function at(i) {
+            if (i >= tries.length) return Promise.resolve(null);
+            var cfg = { codec: tries[i].codec, sampleRate: s.rate, numberOfChannels: s.ch, bitrate: 128000 };
+            return AudioEncoder.isConfigSupported(cfg).then(function (r) { return r.supported ? { cfg: cfg, mux: tries[i].mux } : at(i + 1); }, function () { return at(i + 1); });
+        }
+        return at(0);
+    }
+
+    function encodeSound(s, a, muxer) {
+        return new Promise(function (resolve, reject) {
+            var enc = new AudioEncoder({ output: function (chunk, meta) { muxer.addAudioChunk(chunk, meta); }, error: reject });
+            enc.configure(a.cfg);
+            var STEP = Math.round(s.rate / 10);
+            for (var off = 0; off < s.frames; off += STEP) {
+                var n = Math.min(STEP, s.frames - off), buf = new Float32Array(n * s.ch);
+                for (var c = 0; c < s.ch; c++) buf.set(s.data[c].subarray(off, off + n), c * n);
+                var ad = new AudioData({ format: 'f32-planar', sampleRate: s.rate, numberOfFrames: n, numberOfChannels: s.ch, timestamp: Math.round(off / s.rate * 1e6), data: buf });
+                enc.encode(ad);
+                ad.close();
+            }
+            enc.flush().then(function () { enc.close(); resolve(); }, reject);
+        });
+    }
 
     // When a video was shot: the movie header's creation time (seconds since 1904, UTC).
     function videoDate(file) {
@@ -1517,16 +1564,17 @@
                     if (file.size > 60 * 1024 * 1024) throw new Error('This browser can’t shrink videos and this one is over 60MB. Add it from your phone.');
                     return Object.assign(base, { blob: file });
                 }
-                return encode(v, tw, th, dur, progress).then(function (blob) {
-                    // An MP4 that's already smaller (and not trimmed) is kept as it is.
-                    if (file.type === 'video/mp4' && file.size <= blob.size && !base.trimmed) blob = file;
-                    return Object.assign(base, { blob: blob });
+                return encode(v, file, tw, th, dur, progress).then(function (made) {
+                    var blob = made.blob, silent = made.silent;
+                    // An MP4 that's already smaller (and not trimmed) is kept as it is, sound and all.
+                    if (file.type === 'video/mp4' && file.size <= blob.size && !base.trimmed) { blob = file; silent = false; }
+                    return Object.assign(base, { blob: blob, silent: silent });
                 });
             });
         }).then(function (out) { cleanup(); return out; }, function (err) { cleanup(); throw err; });
     }
 
-    function encode(v, tw, th, dur, progress) {
+    function encode(v, file, tw, th, dur, progress) {
         var bitrate = Math.round(2500000 * (tw * th) / (1280 * 720));
         var codecs = ['avc1.640028', 'avc1.4d0028', 'avc1.42e028', 'avc1.42e01f'];
         function pick(i) {
@@ -1534,9 +1582,18 @@
             var cfg = { codec: codecs[i], width: tw, height: th, bitrate: bitrate, framerate: 30, avc: { format: 'avc' } };
             return VideoEncoder.isConfigSupported(cfg).then(function (r) { return r.supported ? cfg : pick(i + 1); }, function () { return pick(i + 1); });
         }
-        return Promise.all([pick(0), import('/_p7n3x/vendor/mp4-muxer.mjs')]).then(function (got) {
-            var cfg = got[0], M = got[1];
-            var muxer = new M.Muxer({ target: new M.ArrayBufferTarget(), video: { codec: 'avc', width: tw, height: th, frameRate: 30 }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' });
+        // Sound is "lost" when the browser can't encode it at all, or the clip had some and no codec fits.
+        var lost = !window.AudioEncoder;
+        var sound = readSound(file, dur).then(function (s) {
+            return s ? pickAudio(s).then(function (a) { if (!a) lost = true; return a ? { s: s, a: a } : null; }) : null;
+        });
+        return Promise.all([pick(0), import('/_p7n3x/vendor/mp4-muxer.mjs'), sound]).then(function (got) {
+            var cfg = got[0], M = got[1], snd = got[2];
+            var opts = { target: new M.ArrayBufferTarget(), video: { codec: 'avc', width: tw, height: th, frameRate: 30 }, fastStart: 'in-memory', firstTimestampBehavior: 'offset' };
+            if (snd) opts.audio = { codec: snd.a.mux, numberOfChannels: snd.s.ch, sampleRate: snd.s.rate };
+            var muxer = new M.Muxer(opts);
+            // The sound encodes while the frames are read; a failure there leaves the clip silent.
+            var audioDone = snd ? encodeSound(snd.s, snd.a, muxer).then(function () { return true; }, function () { return false; }) : Promise.resolve(false);
             var failure = null;
             var enc = new VideoEncoder({ output: function (chunk, meta) { muxer.addVideoChunk(chunk, meta); }, error: function (e) { failure = e; } });
             enc.configure(cfg);
@@ -1565,10 +1622,11 @@
                     v.pause();
                     if (err) return reject(err instanceof Error ? err : new Error(String(err)));
                     if (!n) return reject(new Error('No frames could be read from this video.'));
-                    enc.flush().then(function () {
+                    Promise.all([enc.flush(), audioDone]).then(function (r) {
                         enc.close();
                         muxer.finalize();
-                        resolve(new Blob([muxer.target.buffer], { type: 'video/mp4' }));
+                        if (snd) snd.s.data = null;
+                        resolve({ blob: new Blob([muxer.target.buffer], { type: 'video/mp4' }), silent: lost || (snd && !r[1]) });
                     }, reject);
                 }
                 if (v.requestVideoFrameCallback) {
@@ -1740,7 +1798,8 @@
                 var job = item.video
                     ? processVideo(item.file, function (f) { status.textContent = 'Shrinking video ' + of + '… ' + Math.round(f * 100) + '%'; })
                         .then(function (out) {
-                            if (out.trimmed) say('Videos are kept to the first minute');
+                            if (out.silent) say('This browser couldn’t keep the sound. Add the video from your phone to keep it.');
+                            else if (out.trimmed) say('Videos are kept to the first minute');
                             return uploadVideo(out.blob, function (f) { status.textContent = 'Uploading video ' + of + '… ' + Math.round(f * 100) + '%'; })
                                 .then(function (up) {
                                     return api('save-gallery', Object.assign({ image: out.poster, thumb: out.thumb, w: out.w, h: out.h, video: { uid: up.uid, parts: up.parts, size: up.size, dur: out.dur } }, fields));
@@ -1781,7 +1840,9 @@
             img.removeAttribute('src');
             vid.poster = fullUrl(p);
             vid.src = videoUrl(p);
-            vid.play().catch(function () {});
+            vid.muted = false;
+            // With sound when the browser allows it; otherwise muted, and the controls turn it on.
+            vid.play().catch(function () { vid.muted = true; vid.play().catch(function () {}); });
         } else {
             vid.pause(); vid.removeAttribute('src');
             img.src = tileUrl(p);

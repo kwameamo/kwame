@@ -168,19 +168,26 @@
    screen. On an iPhone it fills the screen exactly; anywhere else the gradient
    carries on around it. Everything inside is placed in % of this frame. */
 .ad-lock__stage {
+    /* Covers the screen like a phone wallpaper: as wide as the screen, or wider
+       if the screen is taller than the photo's shape. Pinned to the top so the
+       date and clock land where the phone puts them; any extra is cropped below. */
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 50%;
-    height: min(100%, 100vw * 2556 / 1179);
+    width: max(100%, 100dvh * 1179 / 2556);
     aspect-ratio: 1179 / 2556;
     container-type: size;
     transform: translateX(-50%);
     transition: transform 0.5s var(--ad-ease), filter 0.45s ease;
 }
 
+/* The Lock Screen sheet's preview is a phone-shaped frame: fill it exactly. */
+.ad-wall .ad-lock__stage { width: 100%; height: 100%; }
+
 .ad-lock__date {
     position: absolute;
     z-index: 1;                 /* the date stays in front of the person, as on iOS */
+    pointer-events: none;       /* taps go through to the lock face */
     top: 8.6%;
     left: 0;
     right: 0;
@@ -202,6 +209,7 @@
     height: 41%;
     display: flex;
     justify-content: center;
+    pointer-events: none;
     transition: opacity 0.3s ease, transform 0.45s var(--ad-ease);
 }
 
@@ -232,30 +240,29 @@
 }
 
 /* The two round buttons sit where the phone's own are. */
+/* iPhone sizes: 58pt circles, their centres 74pt in from the sides and 79pt up
+   from the bottom of the screen. */
 .ad-lock__btn {
     position: absolute;
     z-index: 2;
-    top: 90.75%;
+    bottom: max(50px, calc(16px + env(safe-area-inset-bottom)));
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 14.8cqw;
-    height: 14.8cqw;
-    min-width: 48px;
-    min-height: 48px;
+    width: 58px;
+    height: 58px;
     padding: 0;
     border: 0;
     border-radius: 50%;
     color: #fff;
     cursor: pointer;
-    transform: translate(-50%, -50%);
     -webkit-tap-highlight-color: transparent;
     transition: opacity 0.3s ease;
 }
 
-.ad-lock__btn--l { left: 18.96%; }
-.ad-lock__btn--r { left: 80.7%; }
-.ad-lock__btn svg { width: 38%; height: 38%; }
+.ad-lock__btn--l { left: 45px; }
+.ad-lock__btn--r { right: 45px; }
+.ad-lock__btn svg { width: 22px; height: 22px; }
 
 /* Anywhere else on the lock face wakes it. */
 .ad-lock__wake {
@@ -390,8 +397,7 @@
 
 /* A photo chosen in Lock Screen. It is cropped to the frame's shape, so it
    fills the stage exactly; the cutout is the same size and lines up on top. */
-.ad-lock__bg,
-.ad-lock__fill {
+.ad-lock__bg {
     position: absolute;
     inset: 0;
     display: block;
@@ -400,9 +406,39 @@
     object-fit: cover;
 }
 
-.ad-lock__fill { filter: blur(48px) brightness(0.85); transform: scale(1.2); }
-.ad-lock.is-pass .ad-lock__fill { filter: blur(48px) brightness(0.7); }
 .ad-lock__subject--full { left: 0; top: 0; width: 100%; height: 100%; }
+
+/* Computers: the wallpaper still covers the screen but is blurred all over,
+   with the date and time sharp on top, centred on the screen. The frame is
+   centred with margins (no transform, no containment) so the date and time
+   can be placed on the screen itself. */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+    .ad-lock .ad-lock__stage {
+        --sw: max(100vw, 100vh * 1179 / 2556);
+        top: 50%;
+        left: 50%;
+        width: var(--sw);
+        margin: calc(var(--sw) * 2556 / 1179 / -2) 0 0 calc(var(--sw) / -2);
+        transform: none;
+        container-type: normal;
+    }
+    .ad-lock .ad-lock__bg,
+    .ad-lock .ad-lock__subject { filter: blur(60px) saturate(1.2); transform: scale(1.06); }
+    .ad-lock .ad-lock__date {
+        position: fixed;
+        z-index: 2;
+        top: 15vh;
+        font-size: 26px;
+    }
+    .ad-lock .ad-lock__clock {
+        position: fixed;
+        z-index: 2;
+        top: 19vh;
+        height: auto;
+    }
+    .ad-lock .ad-lock__clock span { font-size: 26vh; }
+    .ad-lock.is-pass .ad-lock__stage { transform: none; filter: none; }
+}
 
 /* ── App shell ── */
 .ad-app { opacity: 0; transition: opacity 0.35s ease; }
