@@ -74,11 +74,12 @@ export default async (req, context) => {
   const ua = req.headers.get('user-agent') || '';
   if (!ua || BOT.test(ua)) return done();
 
-  // Browsers send Origin with the beacon: only count views sent from this site.
+  // Browsers always send Origin with the beacon: only count views sent from this site.
+  // (A script outside a browser can fake it; the per-visitor and per-network caps in
+  // get-stats are what bound inflated counts.)
   const origin = req.headers.get('origin');
-  if (origin) {
-    try { if (new URL(origin).host !== new URL(req.url).host) return done(); } catch { return done(); }
-  }
+  if (!origin) return done();
+  try { if (new URL(origin).host !== new URL(req.url).host) return done(); } catch { return done(); }
 
   let d;
   try { d = JSON.parse(await req.text()); } catch { return done(); }
@@ -109,10 +110,12 @@ export default async (req, context) => {
   const day = new Date(now).toISOString().slice(0, 10);
   const ip = context?.ip || req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for') || '';
   const store = getStore({ name: 'stats', consistency: 'strong' });
-  let visitor;
+  let visitor, network;
   try {
     const salt = await getSalt(store);
     visitor = createHash('sha256').update(`${salt}|${day}|${ip}|${ua}`).digest('hex').slice(0, 16);
+    // The network alone (no browser), so swapping user agents can't dodge the daily cap.
+    network = createHash('sha256').update(`${salt}|${day}|net|${ip}`).digest('hex').slice(0, 12);
   } catch { return done(); }
 
   const event = {
@@ -124,6 +127,7 @@ export default async (req, context) => {
     ci: geo.city || '',
     d: device,
     v: visitor,
+    n: network,
   };
 
   try {

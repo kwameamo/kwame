@@ -21,6 +21,8 @@ const dayList = (n) => {
 const MAX_DAY_EVENTS = 15000;
 // One visitor can add at most this many views to a day.
 const MAX_VIEWS_PER_VISITOR = 100;
+// And one network (an office, a phone carrier's address) at most this many, however many browsers it claims.
+const MAX_VIEWS_PER_NETWORK = 400;
 
 async function readEvents(store, day) {
   let { blobs } = await store.list({ prefix: `e/${day}/` });
@@ -40,10 +42,11 @@ const bump = (map, k, n = 1) => { if (k) map[k] = (map[k] || 0) + n; };
 function summarise(events) {
   events.sort((a, b) => a.t - b.t);
   const s = { views: events.length, visitors: 0, pages: {}, sources: {}, countries: {}, cities: {}, devices: {}, names: {} };
-  const seen = new Set(), perVisitor = {};
+  const seen = new Set(), perVisitor = {}, perNetwork = {};
   for (const e of events) {
     perVisitor[e.v] = (perVisitor[e.v] || 0) + 1;
-    if (perVisitor[e.v] > MAX_VIEWS_PER_VISITOR) { s.views--; continue; }
+    if (e.n) perNetwork[e.n] = (perNetwork[e.n] || 0) + 1;
+    if (perVisitor[e.v] > MAX_VIEWS_PER_VISITOR || (e.n && perNetwork[e.n] > MAX_VIEWS_PER_NETWORK)) { s.views--; continue; }
     bump(s.pages, e.p);
     if (seen.has(e.v)) continue;
     seen.add(e.v);
